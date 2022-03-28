@@ -59,9 +59,9 @@
         }
         .horizontal-panel-wrapper:hover .item-icon-add,
         .vertical-panel-wrapper:hover .item-icon-add {
-            /*display: flex;*/
-            /*justify-content: center;*/
-            /*align-items: center;*/
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .item-icon-add {
             width: 40px;
@@ -121,7 +121,7 @@
 
     <div class="vertical-panel-wrapper">
         <i class="item-icon-add">+</i>
-        <div id="container" class="item"><span>起草</span><i class="item-icon-delete">删除</i></div>
+        <div class="item"><span>起草</span><i class="item-icon-delete">删除</i></div>
         <div class="item"><span>起草</span><i class="item-icon-delete">删除</i></div>
         <div class="item"><span>起草</span><i class="item-icon-delete">删除</i></div>
     </div>
@@ -135,7 +135,14 @@
 
 <script>
 
-    x(document.querySelector('#container'), "v")
+    $(".vertical-panel-wrapper>.item").each(function (index, el) {
+        x(el, "v")
+    })
+    $(".horizontal-panel-wrapper>.item").each(function (index, el) {
+        x(el, "h")
+    })
+
+    // x(document.querySelector(".horizontal-panel-wrapper>.item"), "h")
 
     function x(root, vorh) {
 
