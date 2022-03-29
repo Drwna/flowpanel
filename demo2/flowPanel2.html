@@ -27,13 +27,17 @@
             top: 0;
             display: flex;
         }
-        .horizontal-panel-wrapper > .item {
+        .horizontal-panel-wrapper > .item-wrapper > .item {
             width: 240px;
             height: 40px;
             line-height: 40px;
             padding: 0 30px;
             border-right: 1px solid black;
             resize: horizontal;
+        }
+
+        .horizontal-panel-wrapper > .item-wrapper {
+            display: flex;
         }
 
         .panel .item {
@@ -55,7 +59,7 @@
             border: 1px solid red;
             position: absolute;
         }
-        .vertical-panel-wrapper > .item {
+        .vertical-panel-wrapper > .item-wrapper > .item {
             height: 140px;
             border-bottom: 1px solid black;
             padding: 30px 0;
@@ -64,8 +68,6 @@
             display: flex;
             align-items: center;
             resize: vertical;
-        }
-        .vertical-panel-wrapper > .item > span {
         }
 
         /* 新增 */
@@ -163,36 +165,38 @@
                     </path>
                 </svg>
             </i>
-            <div class="item">
-                <span>1业务部业务部业务部业务部业务部务部22</span>
-                <i class="item-icon-delete">
-                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                              p-id="3760"></path>
-                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                    </svg>
-                </i>
-            </div>
-            <div class="item"><span>业务部</span>
-                <i class="item-icon-delete">
-                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                              p-id="3760"></path>
-                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                    </svg>
-                </i>
-            </div>
-            <div class="item"><span>业务部</span>
-                <i class="item-icon-delete">
-                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                              p-id="3760"></path>
-                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                    </svg>
-                </i>
+            <div class="item-wrapper" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div id="div_1" draggable="true" ondragstart="drag(event)" class="item">
+                    <span>1业务部业务部业务部业务部业务部务部22</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div>
+                <div id="div_2" draggable="true" ondragstart="drag(event)" class="item"><span>财务部</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div>
+                <div id="div_3" draggable="true" ondragstart="drag(event)" class="item"><span>人事部</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div>
             </div>
 
         </div>
@@ -208,35 +212,37 @@
                     </path>
                 </svg>
             </i>
-            <div class="item"><span>起草</span>
-                <i class="item-icon-delete">
-                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                              p-id="3760"></path>
-                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                    </svg>
-                </i>
-            </div>
-            <div class="item"><span>起草</span>
-                <i class="item-icon-delete">
-                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                              p-id="3760"></path>
-                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                    </svg>
-                </i>
-            </div>
-            <div class="item"><span>起草</span>
-                <i class="item-icon-delete">
-                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                              p-id="3760"></path>
-                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                    </svg>
-                </i>
+            <div class="item-wrapper">
+                <div class="item"><span>起草</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div>
+                <div class="item"><span>起草</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div>
+                <div class="item"><span>起草</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div>
             </div>
         </div>
 
@@ -267,6 +273,23 @@
             })
         })
     })
+
+    // 可拖曳排序
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+    function drag(ev) {
+        ev.dataTransfer.setData("text/plain", ev.target.id);
+    }
+    function drop(ev) {
+        ev.preventDefault();
+        let data = ev.dataTransfer.getData("text/plain");
+        let thisDiv = ev.target;
+        $(document.getElementById(data)).insertBefore(thisDiv);
+    }
+
+
+
 </script>
 
 

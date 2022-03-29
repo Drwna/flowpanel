@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Document</title>
+    <style>
+        .wrapper {
+            display: flex;
+            border: 1px solid orangered;
+            padding: 10px;
+        }
+
+        .col {
+            border: 1px solid #808080;
+            height: 500px;
+            width: 200px;
+            margin: 0 10px;
+            padding: 10px;
+        }
+
+        .item {
+            border: 1px solid #808080;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+<div class="wrapper">
+    <div class="col1 col">
+        <div class="item" id="item1" draggable="true">
+            <div>item1</div>
+        </div>
+
+        <div class="item" id="item2" draggable="true">item2</div>
+    </div>
+</div>
+
+<script>
+    let cols = document.getElementsByClassName("col");
+
+    for (let col of cols) {
+        col.ondragover = (e) => {
+            e.preventDefault();
+
+            console.log(e.target);
+        };
+    }
+</script>
+</body>
+</html>
