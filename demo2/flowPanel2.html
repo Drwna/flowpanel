@@ -166,7 +166,7 @@
                 </svg>
             </i>
             <div class="item-wrapper" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <div id="div_1" draggable="true" ondragstart="drag(event)" class="item">
+                <div id="h-div_1" draggable="true" ondragstart="drag(event)" class="item">
                     <span>1业务部业务部业务部业务部业务部务部22</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -177,7 +177,7 @@
                         </svg>
                     </i>
                 </div>
-                <div id="div_2" draggable="true" ondragstart="drag(event)" class="item"><span>财务部</span>
+                <div id="h-div_2" draggable="true" ondragstart="drag(event)" class="item"><span>财务部</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -187,7 +187,7 @@
                         </svg>
                     </i>
                 </div>
-                <div id="div_3" draggable="true" ondragstart="drag(event)" class="item"><span>人事部</span>
+                <div id="h-div_3" draggable="true" ondragstart="drag(event)" class="item"><span>人事部</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -212,8 +212,8 @@
                     </path>
                 </svg>
             </i>
-            <div class="item-wrapper">
-                <div class="item"><span>起草</span>
+            <div ondrop="drop(event)" ondragover="allowDrop(event)" class="item-wrapper">
+                <div id="v-div_1" draggable="true" ondragstart="drag(event)" class="item"><span>起草</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -223,7 +223,7 @@
                         </svg>
                     </i>
                 </div>
-                <div class="item"><span>起草</span>
+                <div id="v-div_2" draggable="true" ondragstart="drag(event)" class="item"><span>审批</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -233,7 +233,7 @@
                         </svg>
                     </i>
                 </div>
-                <div class="item"><span>起草</span>
+                <div id="v-div_3" draggable="true" ondragstart="drag(event)" class="item"><span>处理</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -278,9 +278,11 @@
     function allowDrop(ev) {
         ev.preventDefault();
     }
+
     function drag(ev) {
         ev.dataTransfer.setData("text/plain", ev.target.id);
     }
+
     function drop(ev) {
         ev.preventDefault();
         let data = ev.dataTransfer.getData("text/plain");
