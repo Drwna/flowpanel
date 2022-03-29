@@ -75,13 +75,31 @@
         }
 
         /* 新增 */
-        .item-icon-add {
-            display: none;
+        .item-icon-add svg {
+            fill: black;
             position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
         }
+        .item-icon-add {
+             display: none;
+             width: 30px;
+             position: absolute;
+             z-index: 9;
+         }
         .item-icon-add:hover {
-            background: grey;
             cursor: pointer;
+        }
+        .item-icon-add svg{
+            fill: grey;
+        }
+        .item-icon-add:hover svg {
+            fill: black;
         }
         .horizontal-panel-wrapper > .item-icon-add {
             height: 40px;
@@ -89,11 +107,11 @@
             padding: 0 10px;
         }
         .vertical-panel-wrapper > .item-icon-add {
+            height: 30px;
             width: 40px;
             text-align: center;
             padding: 6px 0;
         }
-
         .horizontal-panel-wrapper:hover .item-icon-add,
         .vertical-panel-wrapper:hover .item-icon-add {
             display: block;
@@ -128,26 +146,7 @@
             -o-transform: translate(-50%, 0);
             transform: translate(-50%, 0);
         }
-        .item-icon-add svg {
-            fill: black;
-            position: absolute;
-        }
-        .horizontal-panel-wrapper .item-icon-add svg {
-            top: 50%;
-            -webkit-transform: translate(0, -50%);
-            -moz-transform: translate(0, -50%);
-            -ms-transform: translate(0, -50%);
-            -o-transform: translate(0, -50%);
-            transform: translate(0, -50%);
-        }
-        .vertical-panel-wrapper .item-icon-add svg {
-            left: 50%;
-            -webkit-transform: translate(-50%, 0);
-            -moz-transform: translate(-50%, 0);
-            -ms-transform: translate(-50%, 0);
-            -o-transform: translate(-50%, 0);
-            transform: translate(-50%, 0);
-        }
+
 
     </style>
 
@@ -294,6 +293,16 @@
         $(document.getElementById(data)).insertBefore(thisDiv);
     }
 
+    // 新增
+    $(function () {
+        $(".item-icon-add").hover(function () {
+                console.log(1)
+            }
+        )
+        $(".horizontal-panel-wrapper").hover(function () {
+            // alert(2)
+        })
+    })
 
 
 </script>
