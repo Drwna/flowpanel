@@ -15,7 +15,6 @@
         .panel {
             width: 100%;
             height: 500px;
-            /*border: 1px solid black;*/
             position: relative;
         }
 
@@ -37,7 +36,6 @@
 
         .panel .item {
             position: relative;
-            /*outline: 3px solid purple;*/
         }
 
         /* 垂直 */
@@ -47,6 +45,7 @@
             position: absolute;
         }
         .vertical-panel-wrapper > .item {
+            border-bottom: 1px solid black;
             padding: 30px 0;
             width: 40px;
             writing-mode: vertical-lr;
@@ -55,13 +54,11 @@
         }
         .vertical-panel-wrapper > .item > span {
         }
-        /*.vertical-panel-wrapper > */
 
         /* 新增 */
         .item-icon-add {
             display: none;
             position: absolute;
-            /*border: 1px solid purple;*/
         }
         .item-icon-add:hover {
             background: grey;
@@ -83,7 +80,13 @@
             display: block;
         }
 
-        /*    删除图标*/
+        /* 删除图标*/
+        .item-icon-delete {
+            display: none;
+        }
+        .item:hover .item-icon-delete {
+            display: block;
+        }
         .item-icon-delete svg {
             fill: lightcoral;
             position: absolute;
@@ -106,7 +109,26 @@
             -o-transform: translate(-50%, 0);
             transform: translate(-50%, 0);
         }
-
+        .item-icon-add svg {
+            fill: black;
+            position: absolute;
+        }
+        .horizontal-panel-wrapper .item-icon-add svg {
+            top: 50%;
+            -webkit-transform: translate(0, -50%);
+            -moz-transform: translate(0, -50%);
+            -ms-transform: translate(0, -50%);
+            -o-transform: translate(0, -50%);
+            transform: translate(0, -50%);
+        }
+        .vertical-panel-wrapper .item-icon-add svg {
+            left: 50%;
+            -webkit-transform: translate(-50%, 0);
+            -moz-transform: translate(-50%, 0);
+            -ms-transform: translate(-50%, 0);
+            -o-transform: translate(-50%, 0);
+            transform: translate(-50%, 0);
+        }
 
     </style>
 
@@ -118,7 +140,16 @@
     <div class="panel-wrapper">
 
         <div class="horizontal-panel-wrapper">
-            <i class="item-icon-add">+</i>
+            <i class="item-icon-add">
+                <svg t="1648538855144" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="5243" width="20" height="20">
+                    <path d="M512 149.333333c200.298667 0 362.666667 162.368 362.666667 362.666667s-162.368 362.666667-362.666667 362.666667S149.333333 712.298667 149.333333 512 311.701333 149.333333 512
+                    149.333333z m0 64c-164.949333 0-298.666667 133.717333-298.666667 298.666667s133.717333 298.666667 298.666667 298.666667 298.666667-133.717333 298.666667-298.666667-133.717333-298.666667-298.666667-298.666667z m32
+                    106.666667v160H704v64h-160V704h-64v-160.021333L320 544v-64l160-0.021333V320h64z"
+                          p-id="5244">
+                    </path>
+                </svg>
+            </i>
             <div class="item">
                 <span>业务部业务部业务部业务部业务部务部</span>
                 <i class="item-icon-delete">
@@ -154,7 +185,16 @@
         </div>
 
         <div class="vertical-panel-wrapper">
-            <i class="item-icon-add">+</i>
+            <i class="item-icon-add">
+                <svg t="1648538855144" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="5243" width="20" height="20">
+                    <path d="M512 149.333333c200.298667 0 362.666667 162.368 362.666667 362.666667s-162.368 362.666667-362.666667 362.666667S149.333333 712.298667 149.333333 512 311.701333 149.333333 512
+                    149.333333z m0 64c-164.949333 0-298.666667 133.717333-298.666667 298.666667s133.717333 298.666667 298.666667 298.666667 298.666667-133.717333 298.666667-298.666667-133.717333-298.666667-298.666667-298.666667z m32
+                    106.666667v160H704v64h-160V704h-64v-160.021333L320 544v-64l160-0.021333V320h64z"
+                          p-id="5244">
+                    </path>
+                </svg>
+            </i>
             <div class="item"><span>起草</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
