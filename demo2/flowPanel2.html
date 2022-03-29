@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+    <style>
+        .panel * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .panel {
+            width: 100%;
+            height: 500px;
+            /*border: 1px solid black;*/
+            position: relative;
+        }
+
+        /* 水平  */
+        .horizontal-panel-wrapper {
+            width: 100%;
+            border: 1px solid red;
+            padding-left: 40px;
+            position: absolute;
+            top: 0;
+            display: flex;
+        }
+        .horizontal-panel-wrapper > .item {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 30px;
+            border-right: 1px solid black;
+        }
+
+        .panel .item {
+            position: relative;
+            /*outline: 3px solid purple;*/
+        }
+
+        /* 垂直 */
+        .vertical-panel-wrapper {
+            padding-top: 40px;
+            border: 1px solid red;
+            position: absolute;
+        }
+        .vertical-panel-wrapper > .item {
+            padding: 30px 0;
+            width: 40px;
+            writing-mode: vertical-lr;
+            display: flex;
+            align-items: center;
+        }
+        .vertical-panel-wrapper > .item > span {
+        }
+        /*.vertical-panel-wrapper > */
+
+        /* 新增 */
+        .item-icon-add {
+            display: none;
+            position: absolute;
+            /*border: 1px solid purple;*/
+        }
+        .item-icon-add:hover {
+            background: grey;
+            cursor: pointer;
+        }
+        .horizontal-panel-wrapper > .item-icon-add {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 10px;
+        }
+        .vertical-panel-wrapper > .item-icon-add {
+            width: 40px;
+            text-align: center;
+            padding: 6px 0;
+        }
+
+        .horizontal-panel-wrapper:hover .item-icon-add,
+        .vertical-panel-wrapper:hover .item-icon-add {
+            display: block;
+        }
+
+        /*    删除图标*/
+        .item-icon-delete svg {
+            fill: lightcoral;
+            position: absolute;
+        }
+        .horizontal-panel-wrapper .item-icon-delete svg {
+            right: 4px;
+            top: 50%;
+            -webkit-transform: translate(0, -50%);
+            -moz-transform: translate(0, -50%);
+            -ms-transform: translate(0, -50%);
+            -o-transform: translate(0, -50%);
+            transform: translate(0, -50%);
+        }
+        .vertical-panel-wrapper .item-icon-delete svg {
+            bottom: 4px;
+            left: 50%;
+            -webkit-transform: translate(-50%, 0);
+            -moz-transform: translate(-50%, 0);
+            -ms-transform: translate(-50%, 0);
+            -o-transform: translate(-50%, 0);
+            transform: translate(-50%, 0);
+        }
+
+
+    </style>
+
+</head>
+<body>
+
+<div name="flow-panel" class="panel">
+
+    <div class="panel-wrapper">
+
+        <div class="horizontal-panel-wrapper">
+            <i class="item-icon-add">+</i>
+            <div class="item">
+                <span>业务部业务部业务部业务部业务部务部</span>
+                <i class="item-icon-delete">
+                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                              p-id="3760"></path>
+                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                    </svg>
+                </i>
+            </div>
+            <div class="item"><span>业务部</span>
+                <i class="item-icon-delete">
+                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                              p-id="3760"></path>
+                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                    </svg>
+                </i>
+            </div>
+            <div class="item"><span>业务部</span>
+                <i class="item-icon-delete">
+                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                              p-id="3760"></path>
+                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                    </svg>
+                </i>
+            </div>
+
+        </div>
+
+        <div class="vertical-panel-wrapper">
+            <i class="item-icon-add">+</i>
+            <div class="item"><span>起草</span>
+                <i class="item-icon-delete">
+                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                              p-id="3760"></path>
+                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                    </svg>
+                </i>
+            </div>
+            <div class="item"><span>起草</span>
+                <i class="item-icon-delete">
+                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                              p-id="3760"></path>
+                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                    </svg>
+                </i>
+            </div>
+            <div class="item"><span>起草</span>
+                <i class="item-icon-delete">
+                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                              p-id="3760"></path>
+                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                    </svg>
+                </i>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+</script>
+
+
+</body>
+
+</html>
