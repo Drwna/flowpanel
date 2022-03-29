@@ -53,6 +53,12 @@
             white-space: nowrap;
             /*padding: 0 10px;*/
         }
+        .vertical-panel-wrapper input {
+            -webkit-writing-mode: bt-rl;
+            -ms-writing-mode: bt-rl;
+            writing-mode: bt-rl;
+            width: 100%;
+        }
         .item input {
             outline-style: none;
             border: 1px solid #ccc;
@@ -225,7 +231,7 @@
             let value = $(this).html()
             updateVal(currentEle, value)
         })
-        $(".vertical-panel-wrapper").on("dblclick","span",function (e){
+        $(".vertical-panel-wrapper").on("dblclick", "span", function (e) {
             e.stopPropagation()
             let currentEle = $(this)
             let value = $(this).html()
