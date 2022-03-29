@@ -87,15 +87,15 @@
             transform: translate(-50%, -50%);
         }
         .item-icon-add {
-             display: none;
-             width: 30px;
-             position: absolute;
-             z-index: 9;
-         }
+            display: none;
+            width: 30px;
+            position: absolute;
+            z-index: 9;
+        }
         .item-icon-add:hover {
             cursor: pointer;
         }
-        .item-icon-add svg{
+        .item-icon-add svg {
             fill: grey;
         }
         .item-icon-add:hover svg {
@@ -120,6 +120,9 @@
         /* 删除图标*/
         .item-icon-delete {
             display: none;
+        }
+        .item-icon-delete:hover {
+            cursor: pointer;
         }
         .item:hover .item-icon-delete {
             display: block;
@@ -253,6 +256,7 @@
 
 </div>
 
+<div class="test" style="border: 1px solid red; margin-top: 800px; width: 300px;height: 300px;"></div>
 <script>
     // 双击编辑
     $(function () {
@@ -262,15 +266,18 @@
             let currentVal = $(this).text()
             self.attr("contenteditable", "true")
             self.css({
-                background: "lightgrey",
+                background: "#f1eded",
                 outline: "1px solid grey"
             })
+            $(this).parents()[2].className.substring(0, 1) === "h"
+                ? self.css({padding: "0 12px",})
+                : self.css({padding: "12px 0", width: "100%"})
             self.focus()
             $(document).click(function () {
                 self.removeAttr("contenteditable")
                 self.css({
-                    background: "",
-                    outline: ""
+                    padding: "", width: "",
+                    background: "", outline: ""
                 })
                 self.text() === '' ? self.text(currentVal) : ""
             })
@@ -295,12 +302,36 @@
 
     // 新增
     $(function () {
-        $(".item-icon-add").hover(function () {
-                console.log(1)
+        $(".item-icon-add").on("click", function () {
+            let x = $(this).parent()[0].className.substring(0, 1)
+            if (x === "h") {
+                let id = Math.random().toString(36).substring(2)
+                $(`<div id=${id}
+                    draggable="true" onDragStart="drag(event)" class="item">
+                    <span>修改名称</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0
+                            512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333
+                            85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                   </div>`).appendTo($(this).next())
+            } else {
+                console.log("垂直的")
             }
-        )
-        $(".horizontal-panel-wrapper").hover(function () {
-            // alert(2)
+        })
+    })
+
+    // 删除
+    $(function () {
+        $(".item-icon-delete").on("click", function () {
+            console.log(1)
+            $(this).parent().parent().children().length > 1
+                ? $(this).parent().remove() : ""
         })
     })
 
