@@ -33,12 +33,14 @@
             line-height: 40px;
             padding: 0 30px;
             border-right: 1px solid black;
+            resize: horizontal;
         }
 
         .panel .item {
             position: relative;
             display: flex;
             justify-content: center;
+            overflow: auto;
         }
         .panel .item > span {
             overflow: hidden;
@@ -61,6 +63,7 @@
             writing-mode: vertical-lr;
             display: flex;
             align-items: center;
+            resize: vertical;
         }
         .vertical-panel-wrapper > .item > span {
         }
