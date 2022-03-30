@@ -183,6 +183,7 @@
                         </svg>
                     </i>
                 </div>
+
                 <div id="h-div_2" draggable="true" ondragstart="drag(event)" class="item"><span>财务部</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -193,6 +194,7 @@
                         </svg>
                     </i>
                 </div>
+
                 <div id="h-div_3" draggable="true" ondragstart="drag(event)" class="item"><span>人事部</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -256,7 +258,7 @@
 
 </div>
 
-<div class="test" style="border: 1px solid red; margin-top: 800px; width: 300px;height: 300px;"></div>
+<div class="test" style="border: 1px solid red; margin-top: 200px; width: 300px;height: 300px;"></div>
 <script>
     // 双击编辑
     $(function () {
@@ -307,7 +309,7 @@
         $(".item-icon-add").on("click", function () {
             let x = $(this).parent()[0].className.substring(0, 1)
             if (x === "h") {
-                let id = Math.random().toString(36).substring(2)
+                let id = "h-" + Math.random().toString(36).slice(-4)
                 $(`<div id=${id}
                     draggable="true" onDragStart="drag(event)" class="item">
                     <span>修改名称</span>
@@ -321,25 +323,40 @@
                             <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
                         </svg>
                     </i>
-                   </div>`).appendTo($(this).next())
-                $(".item-icon-delete").on("click", function () {
-                    console.log(1)
-                    $(this).parent().parent().children().length > 1
-                        ? $(this).parent().remove() : ""
-                })
+                </div>`).appendTo($(this).next())
+                remove()
             } else {
                 console.log("垂直的")
+                let id = "v-" + Math.random().toString(36).slice(-4)
+                $(`<div id=${id}
+                    draggable="true" ondragstart="drag(event)" class="item"><span>修改名称</span>
+                    <i class="item-icon-delete">
+                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0
+                            512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333
+                            85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                  p-id="3760"></path>
+                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                        </svg>
+                    </i>
+                </div> `).appendTo($(this).next())
+                remove()
             }
         })
     })
 
     // 删除
     $(function () {
+        remove()
+    })
+
+    function remove() {
         $(".item-icon-delete").on("click", function () {
             $(this).parent().parent().children().length > 1
                 ? $(this).parent().remove() : ""
         })
-    })
+    }
 
 
 </script>
