@@ -175,8 +175,8 @@
                 </path>
             </svg>
         </i>
-        <div class="item-wrapper" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <div id="h-div_1" draggable="true" ondragstart="drag(event)" class="item">
+        <div class="item-wrapper" id="test">
+            <div id="h-div_1" draggable="true" class="item">
                 <span>1业务部业务部业务部业务部业务部务部22</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -187,8 +187,7 @@
                     </svg>
                 </i>
             </div>
-
-            <div id="h-div_2" draggable="true" ondragstart="drag(event)" class="item"><span>财务部</span>
+            <div id="h-div_2" draggable="true" class="item"><span>财务部</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -198,8 +197,7 @@
                     </svg>
                 </i>
             </div>
-
-            <div id="h-div_3" draggable="true" ondragstart="drag(event)" class="item"><span>人事部</span>
+            <div id="h-div_3" draggable="true" class="item"><span>人事部</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -224,8 +222,8 @@
                 </path>
             </svg>
         </i>
-        <div ondrop="drop(event)" ondragover="allowDrop(event)" class="item-wrapper">
-            <div id="v-div_1" draggable="true" ondragstart="drag(event)" class="item"><span>起草</span>
+        <div class="item-wrapper">
+            <div id="v-div_1" draggable="true" class="item"><span>起草</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -235,7 +233,7 @@
                     </svg>
                 </i>
             </div>
-            <div id="v-div_2" draggable="true" ondragstart="drag(event)" class="item"><span>审批</span>
+            <div id="v-div_2" class="item"><span>审批</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -245,7 +243,7 @@
                     </svg>
                 </i>
             </div>
-            <div id="v-div_3" draggable="true" ondragstart="drag(event)" class="item"><span>处理</span>
+            <div id="v-div_3" draggable="true" class="item"><span>处理</span>
                 <i class="item-icon-delete">
                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -267,12 +265,11 @@
         removeField()
         editable()
         addField()
+        drag()
     })
-
 
     // 双击编辑
     function editable() {
-
         $(".panel").on("dblclick", "span", function (e) {
             e.stopPropagation()
             let self = $(this)
@@ -299,30 +296,34 @@
         })
     }
 
-    // 可拖曳排序
-    function allowDrop(ev) {
-        ev.preventDefault();
+    // 拖曳
+    function drag() {
+        $(".item-wrapper")
+            .on("drop", function (ev) {
+                ev.preventDefault();
+                let data = ev.originalEvent.dataTransfer.getData("text/plain");
+                let thisDiv = ev.target;
+                $(document.getElementById(data)).insertBefore(thisDiv);
+            })
+            .on("dragover", function (ev) {
+                ev.originalEvent.preventDefault();
+            })
+        dragItem()
     }
 
-    function drag(ev) {
-        ev.dataTransfer.setData("text/plain", ev.target.id);
-    }
-
-    function drop(ev) {
-        ev.preventDefault();
-        let data = ev.dataTransfer.getData("text/plain");
-        let thisDiv = ev.target;
-        $(document.getElementById(data)).insertBefore(thisDiv);
+    function dragItem() {
+        $(".item").on("dragstart", function (ev) {
+            ev.originalEvent.dataTransfer.setData("text/plain", ev.target.id);
+        })
     }
 
     // 新增
     function addField() {
         $(".item-icon-add").on("click", function () {
-            let x = $(this).parent()[0].className.substring(0, 1)
-            if (x === "h") {
+            let xOrH = $(this).parent()[0].className.substring(0, 1)
+            if (xOrH === "h") {
                 let id = "h-" + Math.random().toString(36).slice(-4)
-                $(`<div id=${id}
-                    draggable="true" onDragStart="drag(event)" class="item">
+                $(`<div id=${id} draggable="true" class="item">
                     <span>h-修改名称</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -336,11 +337,10 @@
                     </i>
                 </div>`).appendTo($(this).next())
                 removeField()
+                dragItem()
             } else {
-                console.log("垂直的")
                 let id = "v-" + Math.random().toString(36).slice(-4)
-                $(`<div id=${id}
-                    draggable="true" ondragstart="drag(event)" class="item">
+                $(`<div id=${id} draggable="true" class="item">
                     <span>v-修改名称</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -354,6 +354,7 @@
                     </i>
                 </div> `).appendTo($(this).next())
                 removeField()
+                dragItem()
             }
         })
     }
