@@ -313,7 +313,7 @@
                 let id = "h-" + Math.random().toString(36).slice(-4)
                 $(`<div id=${id}
                     draggable="true" onDragStart="drag(event)" class="item">
-                    <span>修改名称</span>
+                    <span>h-修改名称</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -330,7 +330,8 @@
                 console.log("垂直的")
                 let id = "v-" + Math.random().toString(36).slice(-4)
                 $(`<div id=${id}
-                    draggable="true" ondragstart="drag(event)" class="item"><span>修改名称</span>
+                    draggable="true" ondragstart="drag(event)" class="item">
+                    <span>v-修改名称</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -359,10 +360,18 @@
         })
     }
 
-    // 双击
+    // 双击切换
     $(function () {
         $(".toggle-panel").on("dblclick", function () {
-            alert(1)
+            let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
+            let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
+            for (let i = 0; i < xSelector.length; i++) {
+                let x = xSelector[i].innerText;
+                let y = ySelector[i].innerText;
+                [x, y] = [y, x];
+                xSelector.children("span")[i].innerHTML = x
+                ySelector.children("span")[i].innerHTML = y
+            }
         })
     })
 
