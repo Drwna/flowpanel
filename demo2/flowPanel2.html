@@ -261,8 +261,18 @@
 </div>
 
 <script>
-    // 双击编辑
+
     $(function () {
+        togglePanel()
+        removeField()
+        editable()
+        addField()
+    })
+
+
+    // 双击编辑
+    function editable() {
+
         $(".panel").on("dblclick", "span", function (e) {
             e.stopPropagation()
             let self = $(this)
@@ -287,7 +297,7 @@
                 self.text() === '' ? self.text(currentVal) : ""
             })
         })
-    })
+    }
 
     // 可拖曳排序
     function allowDrop(ev) {
@@ -306,7 +316,7 @@
     }
 
     // 新增
-    $(function () {
+    function addField() {
         $(".item-icon-add").on("click", function () {
             let x = $(this).parent()[0].className.substring(0, 1)
             if (x === "h") {
@@ -325,7 +335,7 @@
                         </svg>
                     </i>
                 </div>`).appendTo($(this).next())
-                remove()
+                removeField()
             } else {
                 console.log("垂直的")
                 let id = "v-" + Math.random().toString(36).slice(-4)
@@ -343,17 +353,13 @@
                         </svg>
                     </i>
                 </div> `).appendTo($(this).next())
-                remove()
+                removeField()
             }
         })
-    })
+    }
 
     // 删除
-    $(function () {
-        remove()
-    })
-
-    function remove() {
+    function removeField() {
         $(".item-icon-delete").on("click", function () {
             $(this).parent().parent().children().length > 1
                 ? $(this).parent().remove() : ""
@@ -361,7 +367,7 @@
     }
 
     // 双击切换
-    $(function () {
+    function togglePanel() {
         $(".toggle-panel").on("dblclick", function () {
             let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
             let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
@@ -373,7 +379,7 @@
                 ySelector.children("span")[i].innerHTML = y
             }
         })
-    })
+    }
 
 </script>
 
