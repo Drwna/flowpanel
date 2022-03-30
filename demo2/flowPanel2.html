@@ -179,12 +179,12 @@
     })
 
     function bindFeature() {
-        addH()
-        addV()
         togglePanel()
         removeField()
         editable()
         drag()
+        add("v")
+        add("h")
     }
 
     function init(root) {
@@ -298,17 +298,17 @@
         })
     }
 
-    // 新增 h
-    function addH(data) {
+    function add(vOrH, data) {
         let title = data?.title
         let size = data?.size
-        $(".horizontal-panel-wrapper>.item-icon-add")
+        let vh = vOrH === "v" ? "vertical" : "horizontal"
+        $("." + vh + "-panel-wrapper>.item-icon-add")
             .on("click", function () {
-                let id = "h-" + Math.random().toString(36).slice(-4)
-                $(`<div id=${id} draggable="true" class="item"
-                        style="width:${size || 240}px;">
-                     <span>${title || "h-修改名称"}</span>
-                     <i class="item-icon-delete">
+                $(`<div id=${vOrH + "-" + Math.random().toString(36).slice(-4)}
+                        draggable="true" class="item"
+                        style="${vOrH === "v" ? "height" : "width"}:${size || ""}px">
+                      <span>${title || "修改名称"}</span>
+                      <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
                             <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0
@@ -320,32 +320,6 @@
                     </i>
                    </div>`)
                     .appendTo($(this).next())
-                removeField()
-                dragItem()
-            })
-    }
-
-    // 新增 v
-    function addV(data) {
-        let title = data?.title
-        let size = data?.size
-        $(".vertical-panel-wrapper>.item-icon-add")
-            .on("click", function () {
-                let id = "v-" + Math.random().toString(36).slice(-4)
-                $(`<div id=${id} draggable="true" class="item"
-                        style="height:${size || 200}px">
-                    <span>${title || "v-修改名称"}</span>
-                    <i class="item-icon-delete">
-                        <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                             xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                            <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0
-                            512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333
-                            85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                                  p-id="3760"></path>
-                            <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                        </svg>
-                    </i>
-                </div> `).appendTo($(this).next())
                 removeField()
                 dragItem()
             })
