@@ -165,9 +165,18 @@
 <div name="flow-panel" class="panel"></div>
 
 <script>
-    let selector = $(".panel")
-    initH(selector)
-    intV(selector)
+
+    $(function () {
+        let selector = $(".panel")
+        initH(selector)
+        intV(selector)
+        addH()
+        addV()
+        togglePanel()
+        removeField()
+        editable()
+        drag()
+    })
 
     function initH(root) {
         let hPanelWrapper = $(`<div class="horizontal-panel-wrapper">
@@ -225,15 +234,6 @@
                                </div>`)
         root.append(vPanelWrapper)
     }
-
-    $(function () {
-        togglePanel()
-        removeField()
-        editable()
-        drag()
-        addH()
-        addV()
-    })
 
     // 双击编辑
     function editable() {
