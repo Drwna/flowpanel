@@ -166,12 +166,19 @@
 
 <script>
 
+    // testData({title: "xxx", size: 240})
+    //
+    // function testData(data) {
+    //     let {title, size} = data
+    // }
+
+
     $(function () {
         let selector = $(".panel")
         initH(selector)
         intV(selector)
-        addH()
-        addV()
+        addH({title: "天下第二也挺好", size: 100})
+        addV({title: "天下第一", size: 800})
         togglePanel()
         removeField()
         editable()
@@ -191,7 +198,7 @@
                                     </svg>
                                 </i>
                                  <div class="item-wrapper">
-                                    <div id="h-div_3" draggable="true" class="item"><span>人事部</span>
+                                    <div id="h-div1" draggable="true" class="item"><span>人事部</span>
                                         <i class="item-icon-delete">
                                             <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                                  xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -220,7 +227,7 @@
                                                                  </svg>
                                                                  </i>
                                   <div class="item-wrapper">
-                                     <div id="v-div_3" draggable="true" class="item"><span>处理</span>
+                                     <div id="v-div1" draggable="true" class="item"><span>处理</span>
                                          <i class="item-icon-delete">
                                              <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                                   xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -285,13 +292,16 @@
     }
 
     // 新增 h
-    function addH() {
+    function addH(data) {
+        let title = data?.title
+        let size = data?.size
         $(".horizontal-panel-wrapper>.item-icon-add")
             .on("click", function () {
                 let id = "h-" + Math.random().toString(36).slice(-4)
-                $(`<div id=${id} draggable="true" class="item">
-                    <span>h-修改名称</span>
-                    <i class="item-icon-delete">
+                $(`<div id=${id} draggable="true" class="item"
+                        style="width:${size || 240}px;">
+                     <span>${title || "修改名称"}</span>
+                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
                             <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0
@@ -301,19 +311,23 @@
                             <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
                         </svg>
                     </i>
-                </div>`).appendTo($(this).next())
+                   </div>`)
+                    .appendTo($(this).next())
                 removeField()
                 dragItem()
             })
     }
 
     // 新增 v
-    function addV() {
+    function addV(data) {
+        let title = data?.title
+        let size = data?.size
         $(".vertical-panel-wrapper>.item-icon-add")
             .on("click", function () {
                 let id = "v-" + Math.random().toString(36).slice(-4)
-                $(`<div id=${id} draggable="true" class="item">
-                    <span>v-修改名称</span>
+                $(`<div id=${id} draggable="true" class="item"
+                        style="height:${size || 240}px">
+                    <span>${title || "修改名称"}</span>
                     <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                              xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
