@@ -166,145 +166,125 @@
 
 <script>
 
-    // testData({title: "xxx", size: 240})
-    //
-    // function testData(data) {
-    //     let {title, size} = data
-    // }
+    class Lane {
+        constructor(root) {
+            this.init(root)
+            this.bindFeature()
+        }
 
+        bindFeature() {
+            this.togglePanel()
+            this.removeField()
+            this.editable()
+            this.drag()
+            this.dragItem()
+            this.addField("v")
+            this.addField("h")
+        }
 
-    $(function () {
-        init($(".panel"))
-        bindFeature()
-    })
+        init(root) {
+            this.initVH("h", root)
+            this.initVH("v", root)
+        }
 
-    function bindFeature() {
-        togglePanel()
-        removeField()
-        editable()
-        drag()
-        add("v")
-        add("h")
-    }
-
-    function init(root) {
-        initH(root)
-        initV(root)
-    }
-
-    function initH(rootH) {
-        let hPanelWrapper = $(`<div class="horizontal-panel-wrapper">
-                                 <i class="item-icon-add">
-                                    <svg t="1648538855144" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                         xmlns="http://www.w3.org/2000/svg" p-id="5243" width="20" height="20">
-                                        <path d="M512 149.333333c200.298667 0 362.666667 162.368 362.666667 362.666667s-162.368 362.666667-362.666667 362.666667S149.333333 712.298667 149.333333 512 311.701333 149.333333 512
-                                            149.333333z m0 64c-164.949333 0-298.666667 133.717333-298.666667 298.666667s133.717333 298.666667 298.666667 298.666667 298.666667-133.717333 298.666667-298.666667-133.717333-298.666667-298.666667-298.666667z m32
-                                            106.666667v160H704v64h-160V704h-64v-160.021333L320 544v-64l160-0.021333V320h64z"
-                                              p-id="5244">
-                                        </path>
+        initVH(vOrH, root) {
+            let vh = vOrH === "v" ? "vertical" : "horizontal"
+            let hContent = `<div id="h-div1" draggable="true" class="item"><span>业务部</span>
+                                <i class="item-icon-delete">
+                                    <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                         xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                                        <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                              p-id="3760"></path>
+                                        <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
                                     </svg>
                                 </i>
-                                 <div class="item-wrapper">
-                                    <div id="h-div1" draggable="true" class="item"><span>人事部</span>
-                                        <i class="item-icon-delete">
-                                            <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                                 xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                                                <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                                                      p-id="3760"></path>
-                                                <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                                            </svg>
-                                        </i>
-                                    </div>
-                                 </div>
-                               </div>`)
-        rootH.append(hPanelWrapper)
-    }
+                            </div>`
+            let vContent = `<div id="v-div1" draggable="true" class="item"><span>起草</span>
+                                 <i class="item-icon-delete">
+                                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                                         <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                                               p-id="3760"></path>
+                                         <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                                     </svg>
+                                 </i>
+                             </div>`
+            let content = vOrH === "v" ? vContent : hContent
+            let panelWrapper =
+                $(`
+                    <div class="${vh}-panel-wrapper">
+                     ${vOrH === "v" ? "<div class='toggle-panel'></div>" : ""}
+                     <i class="item-icon-add">
+                        <svg t="1648538855144" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                               xmlns="http://www.w3.org/2000/svg" p-id="5243" width="20" height="20">
+                              <path d="M512 149.333333c200.298667 0 362.666667 162.368 362.666667 362.666667s-162.368 362.666667-362.666667 362.666667S149.333333 712.298667 149.333333 512 311.701333 149.333333 512
+                                149.333333z m0 64c-164.949333 0-298.666667 133.717333-298.666667 298.666667s133.717333 298.666667 298.666667 298.666667 298.666667-133.717333 298.666667-298.666667-133.717333-298.666667-298.666667-298.666667z m32
+                                106.666667v160H704v64h-160V704h-64v-160.021333L320 544v-64l160-0.021333V320h64z"
+                                p-id="5244">
+                              </path>
+                         </svg>
+                     </i>
+                     <div class="item-wrapper">${content}</div>
+                    </div>
+                `)
+            root.append(panelWrapper)
+        }
 
-    function initV(rootV) {
-        let vPanelWrapper = $(`<div class="vertical-panel-wrapper">
-                                  <div class="toggle-panel"></div>
-                                  <i class="item-icon-add">
-                                      <svg t="1648538855144" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                             xmlns="http://www.w3.org/2000/svg" p-id="5243" width="20" height="20">
-                                            <path d="M512 149.333333c200.298667 0 362.666667 162.368 362.666667 362.666667s-162.368 362.666667-362.666667 362.666667S149.333333 712.298667 149.333333 512 311.701333 149.333333 512
-                                                149.333333z m0 64c-164.949333 0-298.666667 133.717333-298.666667 298.666667s133.717333 298.666667 298.666667 298.666667 298.666667-133.717333 298.666667-298.666667-133.717333-298.666667-298.666667-298.666667z m32
-                                                106.666667v160H704v64h-160V704h-64v-160.021333L320 544v-64l160-0.021333V320h64z"
-                                                  p-id="5244">
-                                            </path>
-                                        </svg>
-                                  </i>
-                                  <div class="item-wrapper">
-                                     <div id="v-div1" draggable="true" class="item"><span>处理</span>
-                                         <i class="item-icon-delete">
-                                             <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                                  xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
-                                                 <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
-                                                       p-id="3760"></path>
-                                                 <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
-                                             </svg>
-                                         </i>
-                                     </div>
-                                 </div>
-                               </div>`)
-        rootV.append(vPanelWrapper)
-    }
-
-    // 双击编辑
-    function editable() {
-        $(".panel").on("dblclick", "span", function (e) {
-            e.stopPropagation()
-            let self = $(this)
-            let currentVal = $(this).text()
-            self.attr("contenteditable", "true")
-            self.css({
-                background: "#f1eded",
-                outline: "1px solid grey"
-            })
-            $(this).parents()[2].className.substring(0, 1) === "h"
-                ? self.css({padding: "0 12px",})
-                : self.css({padding: "12px 0", width: "100%"})
-            self.focus()
-            let sel = window.getSelection()
-            sel.collapse(self[0], 1)
-            $(document).click(function () {
-                self.removeAttr("contenteditable")
+        editable() {
+            $(".panel").on("dblclick", "span", function (e) {
+                e.stopPropagation()
+                let self = $(this)
+                let currentVal = $(this).text()
+                self.attr("contenteditable", "true")
                 self.css({
-                    padding: "", width: "",
-                    background: "", outline: ""
+                    background: "#f1eded",
+                    outline: "1px solid grey"
                 })
-                self.text() === '' ? self.text(currentVal) : ""
+                $(this).parents()[2].className.substring(0, 1) === "h"
+                    ? self.css({padding: "0 12px",})
+                    : self.css({padding: "12px 0", width: "100%"})
+                self.focus()
+                let sel = window.getSelection()
+                sel.collapse(self[0], 1)
+                $(document).click(function () {
+                    self.removeAttr("contenteditable")
+                    self.css({
+                        padding: "", width: "",
+                        background: "", outline: ""
+                    })
+                    self.text() === '' ? self.text(currentVal) : ""
+                })
             })
-        })
-    }
+        }
 
-    // 拖曳
-    function drag() {
-        $(".item-wrapper")
-            .on("drop", function (ev) {
-                ev.preventDefault();
-                let data = ev.originalEvent.dataTransfer.getData("text/plain");
-                let thisDiv = ev.target;
-                $(document.getElementById(data)).insertBefore(thisDiv);
+        drag() {
+            $(".item-wrapper")
+                .on("drop", function (ev) {
+                    ev.preventDefault();
+                    let data = ev.originalEvent.dataTransfer.getData("text/plain");
+                    let thisDiv = ev.target;
+                    $(document.getElementById(data)).insertBefore(thisDiv);
+                })
+                .on("dragover", function (ev) {
+                    ev.originalEvent.preventDefault();
+                })
+            this.dragItem()
+        }
+
+        dragItem() {
+            $(".item").on("dragstart", function (ev) {
+                ev.originalEvent.dataTransfer.setData("text/plain", ev.target.id);
             })
-            .on("dragover", function (ev) {
-                ev.originalEvent.preventDefault();
-            })
-        dragItem()
-    }
+        }
 
-    function dragItem() {
-        $(".item").on("dragstart", function (ev) {
-            ev.originalEvent.dataTransfer.setData("text/plain", ev.target.id);
-        })
-    }
-
-    function add(vOrH, data) {
-        let title = data?.title
-        let size = data?.size
-        let vh = vOrH === "v" ? "vertical" : "horizontal"
-        $("." + vh + "-panel-wrapper>.item-icon-add")
-            .on("click", function () {
-                $(`<div id=${vOrH + "-" + Math.random().toString(36).slice(-4)}
+        addField(vOrH, data) {
+            let that = this
+            let title = data?.title
+            let size = data?.size
+            let vh = vOrH === "v" ? "vertical" : "horizontal"
+            $("." + vh + "-panel-wrapper>.item-icon-add")
+                .on("click", function () {
+                    $(`<div id=${vOrH + "-" + Math.random().toString(36).slice(-4)}
                         draggable="true" class="item"
                         style="${vOrH === "v" ? "height" : "width"}:${size || ""}px">
                       <span>${title || "修改名称"}</span>
@@ -319,34 +299,35 @@
                         </svg>
                     </i>
                    </div>`)
-                    .appendTo($(this).next())
-                removeField()
-                dragItem()
+                        .appendTo($(this).next())
+                    that.removeField()
+                    that.dragItem()
+                })
+        }
+
+        removeField() {
+            $(".item-icon-delete").on("click", function () {
+                $(this).parent().parent().children().length > 1
+                    ? $(this).parent().remove() : ""
             })
+        }
+
+        togglePanel() {
+            $(".toggle-panel").on("dblclick", function () {
+                let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
+                let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
+                for (let i = 0; i < xSelector.length; i++) {
+                    let x = xSelector[i].innerText;
+                    let y = ySelector[i].innerText;
+                    [x, y] = [y, x];
+                    xSelector.children("span")[i].innerHTML = x
+                    ySelector.children("span")[i].innerHTML = y
+                }
+            })
+        }
     }
 
-    // 删除
-    function removeField() {
-        $(".item-icon-delete").on("click", function () {
-            $(this).parent().parent().children().length > 1
-                ? $(this).parent().remove() : ""
-        })
-    }
-
-    // 双击切换
-    function togglePanel() {
-        $(".toggle-panel").on("dblclick", function () {
-            let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
-            let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
-            for (let i = 0; i < xSelector.length; i++) {
-                let x = xSelector[i].innerText;
-                let y = ySelector[i].innerText;
-                [x, y] = [y, x];
-                xSelector.children("span")[i].innerHTML = x
-                ySelector.children("span")[i].innerHTML = y
-            }
-        })
-    }
+    let v = new Lane($(".panel"))
 
 </script>
 
