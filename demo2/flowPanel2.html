@@ -322,6 +322,11 @@
                         </svg>
                     </i>
                    </div>`).appendTo($(this).next())
+                $(".item-icon-delete").on("click", function () {
+                    console.log(1)
+                    $(this).parent().parent().children().length > 1
+                        ? $(this).parent().remove() : ""
+                })
             } else {
                 console.log("垂直的")
             }
@@ -331,7 +336,6 @@
     // 删除
     $(function () {
         $(".item-icon-delete").on("click", function () {
-            console.log(1)
             $(this).parent().parent().children().length > 1
                 ? $(this).parent().remove() : ""
         })
