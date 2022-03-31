@@ -286,8 +286,8 @@
                 let yVal = ySelector.children("span")
                 if (xLength === yLength) {
                     for (let i = 0; i < xLength; i++) {
-                        let x = xLength[i].innerText;
-                        let y = xLength[i].innerText;
+                        let x = xSelector[i].innerText;
+                        let y = ySelector[i].innerText;
                         [x, y] = [y, x];
                         xVal[i].innerHTML = x
                         yVal[i].innerHTML = y
@@ -342,7 +342,12 @@
                        </div>`)
         }
 
-        add(xy, data) {
+        add(xy, data, able = true) {
+            if (able) {
+                let title = data?.title
+                xy === 'x' ? this.#data.horz.push(title)
+                    : this.#data.vert.push(title)
+            }
             if (!xy || !data) throw new Error("需要传入xy和data")
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             if (!data.title) throw new Error("data需要title")
@@ -371,7 +376,9 @@
         }
 
         setData(data) {
-            this.#data = data
+            let {xTitles, yTitles} = this.handleData(data)
+            xTitles && this.#data.horz.push(...xTitles)
+            yTitles && this.#data.vert.push(...yTitles)
             this.addMultiple(this.#data)
         }
 
@@ -380,11 +387,11 @@
             if (!xTitles || !yTitles) return
             for (let i = 0; i < xTitles.length; i++) {
                 let title = xTitles[i]
-                this.add("x", {title})
+                this.add("x", {title}, false)
             }
             for (let i = 0; i < yTitles.length; i++) {
                 let title = yTitles[i]
-                this.add("y", {title})
+                this.add("y", {title}, false)
             }
         }
     }
@@ -392,23 +399,20 @@
     let v = new Lane($(".panel"))
 
     v.setData({
-        // vert: ["起草", "审批", "处理", "事物"],
-        // horz: ["业务部", "人事部", "财务部", "法律部"],
-        // vert: ["起草", "审批"],
-        // horz: ["业务部", "人事部", "财务部"],
+        vert: ["起草", "审批"],
+        horz: ["业务部", "人事部"],
     })
-    // console.log(v.getData("x"))
-    // console.log(v.getData("y"))
-    // console.log(v.getData())
+    console.log("x: ", v.getData("x"))
+    console.log("y: ", v.getData("y"))
+    console.log("all：", v.getData())
 
-    v.add("x", {title: "业务部1", size: 150})
+    // v.add("x", {title: "业务部1", size: 150})
     v.add("x", {title: "财务部2", size: 130})
-    v.add("x", {title: "人事部3", size: 120})
-    v.add("x", {title: "法律部4", size: 120})
+    // v.add("x", {title: "人事部3", size: 120})
     //
-    v.add("y", {title: "起草1", size: 140})
-    v.add("y", {title: "审批2", size: 140})
-    // v.add("y", {title: "处理3", size: 200})
+    // v.add("y", {title: "起草1", size: 140})
+    // v.add("y", {title: "审批2", size: 140})
+    v.add("y", {title: "处理3", size: 200})
 
 </script>
 
