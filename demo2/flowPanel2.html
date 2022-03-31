@@ -271,8 +271,7 @@
 
         removeField() {
             $(".item-icon-delete").on("click", function () {
-                $(this).parent().parent().children().length > 1
-                    ? $(this).parent().remove() : ""
+                $(this).parent().remove()
             })
         }
 
