@@ -299,9 +299,12 @@
                             xSelector.children("span")[i].innerHTML = x
                             ySelector.children("span")[i].innerHTML = y
                         }
-                        let b = xSelector[2].innerText
-                        that.add("y", {title: b})
-                        xSelector[2].remove()
+                        let q = xSelector.length - ySelector.length
+                        for (let i = q; i > 0; i--) {
+                            let title = xSelector[xSelector.length - i].innerText
+                            that.add("y", {title})
+                            xSelector[xSelector.length - i].remove()
+                        }
                     } else {
                         console.log("竖的多")
                         for (let i = 0; i < xSelector.length; i++) {
@@ -311,9 +314,12 @@
                             xSelector.children("span")[i].innerHTML = x
                             ySelector.children("span")[i].innerHTML = y
                         }
-                        let b = ySelector[2].innerText
-                        that.add("x", {title: b})
-                        ySelector[2].remove()
+                        let q = ySelector.length - xSelector.length
+                        for (let i = q; i > 0; i--) {
+                            let title = ySelector[ySelector.length - i].innerText
+                            that.add("x", {title})
+                            ySelector[ySelector.length - i].remove()
+                        }
                     }
                 }
             })
@@ -402,6 +408,7 @@
     v.add("x", {title: "业务部1", size: 150})
     v.add("x", {title: "财务部2", size: 130})
     v.add("x", {title: "人事部3", size: 120})
+    v.add("x", {title: "法律部4", size: 120})
     //
     v.add("y", {title: "起草1", size: 140})
     v.add("y", {title: "审批2", size: 140})
