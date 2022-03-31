@@ -168,26 +168,22 @@
 
     class Lane {
         constructor(root) {
-            this.init(root)
-            this.bindFeature()
+            Lane.#initXY("x", root)
+            Lane.#initXY("y", root)
+            this.#bindFeature()
         }
 
-        bindFeature() {
-            this.togglePanel()
-            this.removeField()
-            this.editable()
-            this.drag()
-            this.dragItem()
-            this.addDefaultField("x")
-            this.addDefaultField("y")
+        #bindFeature() {
+            this.#togglePanel()
+            this.#removeField()
+            this.#editable()
+            this.#drag()
+            Lane.#dragItem()
+            this.#addDefaultField("x")
+            this.#addDefaultField("y")
         }
 
-        init(root) {
-            this.initXY("x", root)
-            this.initXY("y", root)
-        }
-
-        initXY(xy, root) {
+        static #initXY(xy, root) {
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             let vh = xy === "y" ? "vertical" : "horizontal"
             let panelWrapper =
@@ -210,7 +206,7 @@
             root.append(panelWrapper)
         }
 
-        editable() {
+        #editable() {
             $(".panel").on("dblclick", "span", function (e) {
                 e.stopPropagation()
                 let self = $(this)
@@ -237,7 +233,7 @@
             })
         }
 
-        drag() {
+        #drag() {
             $(".item-wrapper")
                 .on("drop", function (ev) {
                     ev.preventDefault();
@@ -248,34 +244,34 @@
                 .on("dragover", function (ev) {
                     ev.originalEvent.preventDefault();
                 })
-            this.dragItem()
+            Lane.#dragItem()
         }
 
-        dragItem() {
+        static #dragItem() {
             $(".item").on("dragstart", function (ev) {
                 ev.originalEvent.dataTransfer.setData("text/plain", ev.target.id);
             })
         }
 
-        addDefaultField(xy, data) {
+        #addDefaultField(xy, data) {
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             let self = this
             let vh = xy === "y" ? "vertical" : "horizontal"
             $("." + vh + "-panel-wrapper>.item-icon-add")
                 .on("click", function () {
-                    self.itemContent(xy, data).appendTo($(this).next())
-                    self.removeField()
-                    self.dragItem()
+                    Lane.#itemContent(xy, data).appendTo($(this).next())
+                    self.#removeField()
+                    Lane.#dragItem()
                 })
         }
 
-        removeField() {
+        #removeField() {
             $(".item-icon-delete").on("click", function () {
                 $(this).parent().remove()
             })
         }
 
-        togglePanel() {
+        #togglePanel() {
             let self = this
             $(".toggle-panel").on("dblclick", function () {
                 let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
@@ -322,7 +318,7 @@
             })
         }
 
-        itemContent(xy, ts) {
+        static #itemContent(xy, ts) {
             let title = ts?.title
             let size = ts?.size
             return $(`<div id=${xy + "-" + Math.random().toString(36).slice(-4)}
@@ -353,14 +349,14 @@
             if (!data.title) throw new Error("data需要title")
             let a = xy === "x" ? "horizontal" : "vertical"
             $("." + a + "-panel-wrapper>.item-wrapper")
-                .append(this.itemContent(xy, data))
-            this.removeField()
-            this.dragItem()
+                .append(Lane.#itemContent(xy, data))
+            this.#removeField()
+            Lane.#dragItem()
         }
 
         #data = {vert: [], horz: [],}
 
-        handleData(data) {
+        static #handleData(data) {
             let xTitles, yTitles
             for (let key in data) {
                 if (key === "vert") yTitles = data[key]
@@ -370,20 +366,20 @@
         }
 
         getData(xy) {
-            let {xTitles, yTitles} = this.handleData(this.#data)
+            let {xTitles, yTitles} = Lane.#handleData(this.#data)
             let newData = xy === "x" ? xTitles : yTitles
             return xy ? newData : this.#data
         }
 
         setData(data) {
-            let {xTitles, yTitles} = this.handleData(data)
+            let {xTitles, yTitles} = Lane.#handleData(data)
             xTitles && this.#data.horz.push(...xTitles)
             yTitles && this.#data.vert.push(...yTitles)
-            this.addMultiple(this.#data)
+            this.#addMultiple(this.#data)
         }
 
-        addMultiple(data) {
-            let {xTitles, yTitles} = this.handleData(data)
+        #addMultiple(data) {
+            let {xTitles, yTitles} = Lane.#handleData(data)
             if (!xTitles || !yTitles) return
             for (let i = 0; i < xTitles.length; i++) {
                 let title = xTitles[i]
