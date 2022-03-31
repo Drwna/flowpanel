@@ -184,7 +184,6 @@
         }
 
         static #initXY(xy, root) {
-            if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             let vh = xy === "y" ? "vertical" : "horizontal"
             let panelWrapper =
                 $(`
@@ -357,7 +356,7 @@
             }
             if (!xy || !data) throw new Error("需要传入xy和data")
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
-            if (!data.title) throw new Error("data需要title")
+            if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("data需要title")
             let a = xy === "x" ? "horizontal" : "vertical"
             $("." + a + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data))
