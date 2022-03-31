@@ -259,13 +259,13 @@
 
         addDefaultField(xy, data) {
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
-            let that = this
+            let self = this
             let vh = xy === "y" ? "vertical" : "horizontal"
             $("." + vh + "-panel-wrapper>.item-icon-add")
                 .on("click", function () {
-                    that.itemContent(xy, data).appendTo($(this).next())
-                    that.removeField()
-                    that.dragItem()
+                    self.itemContent(xy, data).appendTo($(this).next())
+                    self.removeField()
+                    self.dragItem()
                 })
         }
 
@@ -276,7 +276,7 @@
         }
 
         togglePanel() {
-            let that = this
+            let self = this
             $(".toggle-panel").on("dblclick", function () {
                 let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
                 let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
@@ -302,7 +302,7 @@
                             yVal[i].innerHTML = y
                         }
                         for (let i = xLength - yLength; i > 0; i--) {
-                            that.add("y", {title: xSelector[xLength - i].innerText})
+                            self.add("y", {title: xSelector[xLength - i].innerText})
                             xSelector[xLength - i].remove()
                         }
                     } else {
@@ -314,7 +314,7 @@
                             yVal[i].innerHTML = y
                         }
                         for (let i = yLength - xLength; i > 0; i--) {
-                            that.add("x", {title: ySelector[yLength - i].innerText})
+                            self.add("x", {title: ySelector[yLength - i].innerText})
                             ySelector[yLength - i].remove()
                         }
                     }
