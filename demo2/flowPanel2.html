@@ -276,15 +276,45 @@
         }
 
         togglePanel() {
+            let that = this
             $(".toggle-panel").on("dblclick", function () {
                 let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
                 let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
-                for (let i = 0; i < xSelector.length; i++) {
-                    let x = xSelector[i].innerText;
-                    let y = ySelector[i].innerText;
-                    [x, y] = [y, x];
-                    xSelector.children("span")[i].innerHTML = x
-                    ySelector.children("span")[i].innerHTML = y
+                if (xSelector.length === ySelector.length) {
+                    console.log("相等")
+                    for (let i = 0; i < xSelector.length; i++) {
+                        let x = xSelector[i].innerText;
+                        let y = ySelector[i].innerText;
+                        [x, y] = [y, x];
+                        xSelector.children("span")[i].innerHTML = x
+                        ySelector.children("span")[i].innerHTML = y
+                    }
+                } else {
+                    if (xSelector.length > ySelector.length) {
+                        console.log("横的多")
+                        for (let i = 0; i < ySelector.length; i++) {
+                            let x = xSelector[i].innerText;
+                            let y = ySelector[i].innerText;
+                            [x, y] = [y, x];
+                            xSelector.children("span")[i].innerHTML = x
+                            ySelector.children("span")[i].innerHTML = y
+                        }
+                        let b = xSelector[2].innerText
+                        that.add("y", {title: b})
+                        xSelector[2].remove()
+                    } else {
+                        console.log("竖的多")
+                        for (let i = 0; i < xSelector.length; i++) {
+                            let x = xSelector[i].innerText;
+                            let y = ySelector[i].innerText;
+                            [x, y] = [y, x];
+                            xSelector.children("span")[i].innerHTML = x
+                            ySelector.children("span")[i].innerHTML = y
+                        }
+                        let b = ySelector[2].innerText
+                        that.add("x", {title: b})
+                        ySelector[2].remove()
+                    }
                 }
             })
         }
@@ -344,6 +374,7 @@
 
         addMultiple(data) {
             let {xTitles, yTitles} = this.handleData(data)
+            if (!xTitles || !yTitles) return
             for (let i = 0; i < xTitles.length; i++) {
                 let title = xTitles[i]
                 this.add("x", {title})
@@ -358,19 +389,22 @@
     let v = new Lane($(".panel"))
 
     v.setData({
-        vert: ["起草", "审批", "处理", "事物"],
-        horz: ["业务部", "人事部", "财务部", "法律部"],
+        // vert: ["起草", "审批", "处理", "事物"],
+        // horz: ["业务部", "人事部", "财务部", "法律部"],
+        // vert: ["起草", "审批"],
+        // horz: ["业务部", "人事部", "财务部"],
     })
-    console.log(v.getData("x"))
-    console.log(v.getData("y"))
-    console.log(v.getData())
+    // console.log(v.getData("x"))
+    // console.log(v.getData("y"))
+    // console.log(v.getData())
+    console.log(v.getData(), "正在写切换功能")
 
-    // v.add("x", {title: "业务部1"})
-    // v.add("x", {title: "财务部2", size: 130})
-    // v.add("x", {title: "人事部3"})
+    v.add("x", {title: "业务部1", size: 150})
+    v.add("x", {title: "财务部2", size: 130})
+    v.add("x", {title: "人事部3", size: 120})
     //
-    // v.add("y", {title: "起草1", size: 200})
-    // v.add("y", {title: "审批2", size: 200})
+    v.add("y", {title: "起草1", size: 140})
+    v.add("y", {title: "审批2", size: 140})
     // v.add("y", {title: "处理3", size: 200})
 
 </script>
