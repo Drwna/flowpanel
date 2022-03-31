@@ -338,6 +338,17 @@
                        </div>`)
         }
 
+        #data = {vert: [], horz: [],}
+
+        static #handleData(data) {
+            let xTitles, yTitles
+            for (let key in data) {
+                if (key === "vert") yTitles = data[key]
+                else xTitles = data[key]
+            }
+            return {xTitles, yTitles}
+        }
+
         add(xy, data, able = true) {
             if (able) {
                 let title = data?.title
@@ -352,17 +363,6 @@
                 .append(Lane.#itemContent(xy, data))
             this.#removeField()
             Lane.#dragItem()
-        }
-
-        #data = {vert: [], horz: [],}
-
-        static #handleData(data) {
-            let xTitles, yTitles
-            for (let key in data) {
-                if (key === "vert") yTitles = data[key]
-                else xTitles = data[key]
-            }
-            return {xTitles, yTitles}
         }
 
         getData(xy) {
