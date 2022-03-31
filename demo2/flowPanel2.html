@@ -178,18 +178,19 @@
             this.editable()
             this.drag()
             this.dragItem()
-            this.addField("v")
-            this.addField("h")
+            this.addField("x")
+            this.addField("y")
         }
 
         init(root) {
-            this.initVH("h", root)
-            this.initVH("v", root)
+            this.initXY("x", root)
+            this.initXY("y", root)
         }
 
-        initVH(vOrH, root) {
-            let vh = vOrH === "v" ? "vertical" : "horizontal"
-            let hContent = `<div id="h-div1" draggable="true" class="item"><span>业务部</span>
+        initXY(xy, root) {
+            if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
+            let vh = xy === "y" ? "vertical" : "horizontal"
+            let hContent = `<div id="x-div1" draggable="true" class="item"><span>业务部</span>
                                 <i class="item-icon-delete">
                                     <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                          xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -199,7 +200,7 @@
                                     </svg>
                                 </i>
                             </div>`
-            let vContent = `<div id="v-div1" draggable="true" class="item"><span>起草</span>
+            let vContent = `<div id="y-div1" draggable="true" class="item"><span>起草</span>
                                  <i class="item-icon-delete">
                                      <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                           xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
@@ -209,11 +210,11 @@
                                      </svg>
                                  </i>
                              </div>`
-            let content = vOrH === "v" ? vContent : hContent
+            let content = xy === "y" ? vContent : hContent
             let panelWrapper =
                 $(`
                     <div class="${vh}-panel-wrapper">
-                     ${vOrH === "v" ? "<div class='toggle-panel'></div>" : ""}
+                     ${xy === "y" ? "<div class='toggle-panel'></div>" : ""}
                      <i class="item-icon-add">
                         <svg t="1648538855144" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                xmlns="http://www.w3.org/2000/svg" p-id="5243" width="20" height="20">
@@ -277,16 +278,17 @@
             })
         }
 
-        addField(vOrH, data) {
+        addField(xy, data) {
+            if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             let that = this
             let title = data?.title
             let size = data?.size
-            let vh = vOrH === "v" ? "vertical" : "horizontal"
+            let vh = xy === "y" ? "vertical" : "horizontal"
             $("." + vh + "-panel-wrapper>.item-icon-add")
                 .on("click", function () {
-                    $(`<div id=${vOrH + "-" + Math.random().toString(36).slice(-4)}
+                    $(`<div id=${xy + "-" + Math.random().toString(36).slice(-4)}
                         draggable="true" class="item"
-                        style="${vOrH === "v" ? "height" : "width"}:${size || ""}px">
+                        style="${xy === "y" ? "height" : "width"}:${size || ""}px">
                       <span>${title || "修改名称"}</span>
                       <i class="item-icon-delete">
                         <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
