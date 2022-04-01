@@ -364,19 +364,52 @@
                 if (xLength === yLength) {
                     console.log("长度相等")
                     for (let i = 0; i < xLength; i++) {
-
                         let xSize = x[i].offsetWidth
                         let xTitle = x[i].innerText
                         x[i].remove()
                         self.add("y", {title: xTitle, size: xSize})
-
                         let ySize = y[i].offsetHeight
                         let yTitle = y[i].innerText
                         y[i].remove()
                         self.add("x", {title: yTitle, size: ySize})
                     }
+                } else {
+                    if (xLength > yLength) {
+                        let a = xLength - yLength
+                        console.log("横着的多", "多：", a, "个")
+                        for (let i = 0; i < xLength; i++) {
+                            let xSize = x[i].offsetWidth
+                            let xTitle = x[i].innerText
+                            x[i].remove()
+                            self.add("y", {title: xTitle, size: xSize})
+                            try {
+                                let ySize = y[i].offsetHeight
+                                let yTitle = y[i].innerText
+                                y[i].remove()
+                                self.add("x", {title: yTitle, size: ySize})
+                            } catch (e) {
+                                console.log("问题不大")
+                            }
+                        }
+                    } else {
+                        let a = yLength - xLength
+                        console.log("竖着的多", "多：", a, "个")
+                        for (let i = 0; i < yLength; i++) {
+                            let ySize = y[i].offsetHeight
+                            let yTitle = y[i].innerText
+                            y[i].remove()
+                            self.add("x", {title: yTitle, size: ySize})
+                            try {
+                                let xSize = x[i].offsetWidth
+                                let xTitle = x[i].innerText
+                                x[i].remove()
+                                self.add("y", {title: xTitle, size: xSize})
+                            } catch (e) {
+                                console.log("竖着的多了，问题不大")
+                            }
+                        }
+                    }
                 }
-
             })
         }
 
@@ -466,11 +499,11 @@
     // console.log("all：", v.getData())
 
     v.add("x", {title: "业务部1", size: 150})
-    v.add("x", {title: "财务部2", size: 100})
+    // v.add("x", {title: "财务部2", size: 100})
     // v.add("x", {title: "人事部3", size: 120})
     //
-    // v.add("y", {title: "起草1", size: 140})
-    v.add("y", {title: "审批2", size: 140})
+    v.add("y", {title: "起草1", size: 140})
+    // v.add("y", {title: "审批2", size: 140})
     v.add("y", {title: "处理3", size: 200})
 
 </script>
