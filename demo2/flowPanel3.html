@@ -58,6 +58,7 @@
         /* 垂直 */
         .vertical-panel-wrapper {
             height: 640px;
+            width: 42px;
             border: 1px solid red;
             position: absolute;
         }
@@ -109,13 +110,13 @@
             padding: 0 10px;
         }
         .vertical-panel-wrapper > .item-icon-add {
+            /*margin-top: 40px;*/
             height: 30px;
             width: 40px;
             text-align: center;
             padding: 6px 0;
         }
-        .horizontal-panel-wrapper:hover .item-icon-add,
-        .vertical-panel-wrapper:hover .item-icon-add {
+        .horizontal-panel-wrapper:hover .item-icon-add {
             display: block;
         }
 
@@ -175,6 +176,7 @@
         constructor(root) {
             Lane.#initXY("x", root)
             Lane.#initXY("y", root)
+            this.#handleCSS()
             this.#bindFeature()
         }
 
@@ -193,7 +195,7 @@
             let panelWrapper =
                 $(`
                     <div class="${vh}-panel-wrapper">
-                     ${xy === "y" ? "<div class='toggle-panel'></div>" : ""}
+                     ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
                          <i class="item-icon-add">
                             <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
                             xmlns="http://www.w3.org/2000/svg" p-id="1633" width="20" height="20">
@@ -209,6 +211,24 @@
                     </div>
                 `)
             root.append(panelWrapper)
+        }
+
+        #handleCSS() {
+            $(".vertical-panel-wrapper>.item-wrapper")
+                .mouseenter(function () {
+                    $(this).parent().children(".item-icon-add")
+                        .css({display: "block"})
+                }).mouseleave(function () {
+                $(this).parent().children(".item-icon-add")
+                    .css({display: "none"})
+            })
+            $(".vertical-panel-wrapper>.item-icon-add")
+                .mouseenter(function () {
+                    $(this).css({display: "block"})
+                })
+                .mouseleave(function () {
+                    $(this).css({display: "none"})
+                })
         }
 
         #editable() {
@@ -272,6 +292,12 @@
 
         #removeField() {
             $(".item-icon-delete").on("click", function () {
+                let rest = $(this).parents(".item-wrapper").children().length
+                if (rest === 1) {
+                    $(".vertical-panel-wrapper .item-wrapper")
+                        .css({height: "calc(100% - 40px)", width: "42px"})
+                    $(".vertical-panel-wrapper .item-icon-add").css({display: "none"})
+                }
                 $(this).parent().remove()
             })
         }
