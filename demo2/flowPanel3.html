@@ -181,7 +181,6 @@
         }
 
         #bindFeature() {
-            this.#togglePanel()
             this.#toggle2()
             this.#removeField()
             this.#editable()
@@ -304,65 +303,14 @@
             })
         }
 
-        #togglePanel() {
-            let self = this
-            $(".toggle-panel").on("dblclick", function () {
-                let xSelector = $(".horizontal-panel-wrapper>.item-wrapper .item");
-                let ySelector = $(".vertical-panel-wrapper>.item-wrapper .item");
-                let xLength = xSelector.length
-                let yLength = ySelector.length
-                let xVal = xSelector.children("span")
-                let yVal = ySelector.children("span")
-                if (xLength === yLength) {
-                    for (let i = 0; i < xLength; i++) {
-                        console.log(xSelector)
-                        let x = xSelector[i].innerText;
-                        let y = ySelector[i].innerText;
-                        [x, y] = [y, x];
-                        xVal[i].innerHTML = x
-                        yVal[i].innerHTML = y
-                    }
-                } else {
-                    if (xLength > yLength) {
-                        for (let i = 0; i < yLength; i++) {
-                            let x = xSelector[i].innerText;
-                            let y = ySelector[i].innerText;
-                            [x, y] = [y, x];
-                            xVal[i].innerHTML = x
-                            yVal[i].innerHTML = y
-                        }
-                        for (let i = xLength - yLength; i > 0; i--) {
-                            self.add("y", {title: xSelector[xLength - i].innerText})
-                            xSelector[xLength - i].remove()
-                        }
-                    } else {
-                        for (let i = 0; i < xLength; i++) {
-                            let x = xSelector[i].innerText;
-                            let y = ySelector[i].innerText;
-                            [x, y] = [y, x];
-                            xVal[i].innerHTML = x
-                            yVal[i].innerHTML = y
-                        }
-                        for (let i = yLength - xLength; i > 0; i--) {
-                            self.add("x", {title: ySelector[yLength - i].innerText})
-                            ySelector[yLength - i].remove()
-                        }
-                    }
-                }
-            })
-        }
-
-
         #toggle2() {
             let self = this
-            let oldData = Lane.#handleData(this.#data)
-            $(".toggle-panel").on("click", function () {
+            $(".toggle-panel").on("dblclick", function () {
                 let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item")
                 let y = $(".vertical-panel-wrapper>.item-wrapper").children(".item")
                 let xLength = x.length
                 let yLength = y.length
                 if (xLength === yLength) {
-                    console.log("长度相等")
                     for (let i = 0; i < xLength; i++) {
                         let xSize = x[i].offsetWidth
                         let xTitle = x[i].innerText
@@ -375,8 +323,6 @@
                     }
                 } else {
                     if (xLength > yLength) {
-                        let a = xLength - yLength
-                        console.log("横着的多", "多：", a, "个")
                         for (let i = 0; i < xLength; i++) {
                             let xSize = x[i].offsetWidth
                             let xTitle = x[i].innerText
@@ -388,12 +334,9 @@
                                 y[i].remove()
                                 self.add("x", {title: yTitle, size: ySize})
                             } catch (e) {
-                                console.log("问题不大")
                             }
                         }
                     } else {
-                        let a = yLength - xLength
-                        console.log("竖着的多", "多：", a, "个")
                         for (let i = 0; i < yLength; i++) {
                             let ySize = y[i].offsetHeight
                             let yTitle = y[i].innerText
@@ -405,14 +348,12 @@
                                 x[i].remove()
                                 self.add("y", {title: xTitle, size: xSize})
                             } catch (e) {
-                                console.log("竖着的多了，问题不大")
                             }
                         }
                     }
                 }
             })
         }
-
 
         static #itemContent(xy, ts) {
             let title = ts?.title
@@ -489,7 +430,6 @@
 
     let v = new Lane($(".panel"))
 
-    console.log("正在写交换功能（交换长宽）")
     // v.setData({
     //     vert: ["起草", "审批"],
     //     horz: ["业务部", "人事部"],
