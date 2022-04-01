@@ -259,6 +259,7 @@
             })
         }
 
+        // TODO 待优化
         #drag() {
             $(".item-wrapper")
                 .on("drop", function (ev) {
@@ -357,22 +358,24 @@
             let oldData = Lane.#handleData(this.#data)
             $(".toggle-panel").on("click", function () {
                 let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item")
-                let xlength = x.length
-                console.log(x[0])
-                let xWidth = x[0].offsetWidth
-                let xTitle = x[0].innerText
-                console.log(xWidth, xTitle)
-                x[0].remove()
-                self.add("y", {title: xTitle, size: xWidth})
-
                 let y = $(".vertical-panel-wrapper>.item-wrapper").children(".item")
+                let xLength = x.length
                 let yLength = y.length
-                console.log(y[0])
-                let yHeight = y[0].offsetHeight
-                let yTitle = y[0].innerText
-                console.log(yHeight, yTitle)
-                y[0].remove()
-                self.add("x", {title: yTitle, size: yHeight})
+                if (xLength === yLength) {
+                    console.log("长度相等")
+                    for (let i = 0; i < xLength; i++) {
+
+                        let xSize = x[i].offsetWidth
+                        let xTitle = x[i].innerText
+                        x[i].remove()
+                        self.add("y", {title: xTitle, size: xSize})
+
+                        let ySize = y[i].offsetHeight
+                        let yTitle = y[i].innerText
+                        y[i].remove()
+                        self.add("x", {title: yTitle, size: ySize})
+                    }
+                }
 
             })
         }
@@ -462,12 +465,12 @@
     // console.log("y: ", v.getData("y"))
     // console.log("all：", v.getData())
 
-    // v.add("x", {title: "业务部1", size: 150})
+    v.add("x", {title: "业务部1", size: 150})
     v.add("x", {title: "财务部2", size: 100})
     // v.add("x", {title: "人事部3", size: 120})
     //
     // v.add("y", {title: "起草1", size: 140})
-    // v.add("y", {title: "审批2", size: 140})
+    v.add("y", {title: "审批2", size: 140})
     v.add("y", {title: "处理3", size: 200})
 
 </script>
