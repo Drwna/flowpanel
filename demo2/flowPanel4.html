@@ -185,6 +185,7 @@
             this.#addDefaultField("x", {title: "x-修改名称"})
             this.#addDefaultField("y", {title: "y-修改名称"})
             this.#editable()
+            this.#togglePanel()
         }
 
         static #initXY(xy, root) {
@@ -301,8 +302,7 @@
 
         #delete(el) {
             let {xTitles, yTitles} = Lane.#handleData(this.#data)
-            el.parent().parent()[0].className.substr(0, 1)
-            === "h" ?
+            el.parent().parent()[0].className.substr(0, 1) === "h" ?
                 this.removeArray(xTitles, el[0].innerText) :
                 this.removeArray(yTitles, el[0].innerText)
             el.remove()
@@ -352,6 +352,58 @@
                     if (xy === "h") xTitles[currentIndex] = that.text()
                     else yTitles[currentIndex] = that.text()
                 })
+            })
+        }
+
+        #togglePanel() {
+            let self = this
+            $(".toggle-panel").on("dblclick", function () {
+                let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item")
+                let y = $(".vertical-panel-wrapper>.item-wrapper").children(".item")
+                let xLength = x.length
+                let yLength = y.length
+                if (xLength === yLength) {
+                    for (let i = 0; i < xLength; i++) {
+                        let xSize = x[i].offsetWidth
+                        let xTitle = x[i].innerText
+                        self.#delete($(x[i]))
+                        self.add("y", {title: xTitle, size: xSize})
+                        let ySize = y[i].offsetHeight
+                        let yTitle = y[i].innerText
+                        self.#delete($(y[i]))
+                        self.add("x", {title: yTitle, size: ySize})
+                    }
+                } else {
+                    if (xLength > yLength) {
+                        for (let i = 0; i < xLength; i++) {
+                            let xSize = x[i].offsetWidth
+                            let xTitle = x[i].innerText
+                            self.#delete($(x[i]))
+                            self.add("y", {title: xTitle, size: xSize})
+                            try {
+                                let ySize = y[i].offsetHeight
+                                let yTitle = y[i].innerText
+                                self.#delete($(y[i]))
+                                self.add("x", {title: yTitle, size: ySize})
+                            } catch (e) {
+                            }
+                        }
+                    } else {
+                        for (let i = 0; i < yLength; i++) {
+                            let ySize = y[i].offsetHeight
+                            let yTitle = y[i].innerText
+                            self.#delete($(y[i]))
+                            self.add("x", {title: yTitle, size: ySize})
+                            try {
+                                let xSize = x[i].offsetWidth
+                                let xTitle = x[i].innerText
+                                self.#delete($(x[i]))
+                                self.add("y", {title: xTitle, size: xSize})
+                            } catch (e) {
+                            }
+                        }
+                    }
+                }
             })
         }
     }
