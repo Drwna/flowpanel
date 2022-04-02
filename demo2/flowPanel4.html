@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>flowPanel4</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+    <style>
+        .panel * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .panel {
+            border: 1px solid blue;
+            width: 100%;
+            height: 650px;
+            position: relative;
+        }
+
+        /* 水平  */
+        .horizontal-panel-wrapper {
+            height: 42px;
+            width: 100%;
+            border: 1px solid red;
+            padding-left: 40px;
+            position: absolute;
+            top: 0;
+            display: flex;
+        }
+        .horizontal-panel-wrapper .item {
+            width: 240px;
+            height: 40px;
+            line-height: 40px;
+            padding: 0 30px;
+            border-right: 1px solid black;
+        }
+        .horizontal-panel-wrapper .item:hover {
+            resize: horizontal;
+        }
+        .horizontal-panel-wrapper > .item-wrapper {
+            display: flex;
+        }
+        .panel .item {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            overflow: auto;
+        }
+        .panel .item > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: default;
+        }
+
+        /* 垂直 */
+        .vertical-panel-wrapper {
+            height: 640px;
+            width: 42px;
+            border: 1px solid red;
+            position: absolute;
+        }
+        .vertical-panel-wrapper .item {
+            height: 200px;
+            border-bottom: 1px solid black;
+            padding: 30px 0;
+            width: 40px;
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-lr;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .vertical-panel-wrapper .item:hover {
+            resize: vertical;
+        }
+
+        /* 新增 */
+        .item-icon-add svg {
+            fill: black;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+        .item-icon-add {
+            display: none;
+            width: 30px;
+            position: absolute;
+            z-index: 9;
+        }
+        .item-icon-add:hover {
+            cursor: pointer;
+        }
+        .item-icon-add svg {
+            fill: grey;
+        }
+        .item-icon-add:hover svg {
+            fill: black;
+        }
+        .horizontal-panel-wrapper > .item-icon-add {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 10px;
+        }
+        .vertical-panel-wrapper > .item-icon-add {
+            /*margin-top: 40px;*/
+            height: 30px;
+            width: 40px;
+            text-align: center;
+            padding: 6px 0;
+        }
+        .horizontal-panel-wrapper:hover .item-icon-add {
+            display: block;
+        }
+
+        /* 删除图标*/
+        .item-icon-delete {
+            display: none;
+        }
+        .item-icon-delete:hover {
+            cursor: pointer;
+        }
+        .item-icon-delete:hover svg {
+            fill: red;
+        }
+        .item:hover .item-icon-delete {
+            display: block;
+        }
+        .item-icon-delete svg {
+            fill: lightcoral;
+            position: absolute;
+        }
+        .horizontal-panel-wrapper .item-icon-delete svg {
+            right: .5em;
+            top: 50%;
+            -webkit-transform: translate(0, -50%);
+            -moz-transform: translate(0, -50%);
+            -ms-transform: translate(0, -50%);
+            -o-transform: translate(0, -50%);
+            transform: translate(0, -50%);
+        }
+        .vertical-panel-wrapper .item-icon-delete svg {
+            bottom: .5em;
+            left: 50%;
+            -webkit-transform: translate(-50%, 0);
+            -moz-transform: translate(-50%, 0);
+            -ms-transform: translate(-50%, 0);
+            -o-transform: translate(-50%, 0);
+            transform: translate(-50%, 0);
+        }
+        .toggle-panel {
+            width: 40px;
+            height: 40px;
+        }
+        .toggle-panel:hover {
+            background: grey;
+        }
+
+        body {
+            background-color: gainsboro;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="panel"></div>
+
+<script>
+    class Lane {
+        #data = {vert: [], horz: []}
+
+        constructor(root) {
+            this.root = root
+            Lane.#initXY("x", this.root)
+            Lane.#initXY("y", this.root)
+            this.#handleCSS()
+        }
+
+        static #initXY(xy, root) {
+            let panelWrapper =
+                $(`
+                    <div class="${xy === "y" ? "vertical" : "horizontal"}-panel-wrapper">
+                     ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
+                         <i class="item-icon-add">
+                            <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" p-id="1633" width="20" height="20">
+                            <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
+                            229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
+                            512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
+                            463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572 0v-160.036572H303.981714a47.981714
+                            47.981714 0 0 1 0-95.963428h160V304.018286a48.018286 48.018286 0 0 1 96.036572 0v160h160a47.981714
+                             47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
+                             </svg>
+                         </i>
+                     <div class="item-wrapper"></div>
+                    </div>
+                `)
+            root.append(panelWrapper)
+        }
+
+        #handleCSS() {
+            $(".vertical-panel-wrapper>.item-wrapper")
+                .mouseenter(function () {
+                    $(this).parent().children(".item-icon-add")
+                        .css({display: "block"})
+                }).mouseleave(function () {
+                $(this).parent().children(".item-icon-add")
+                    .css({display: "none"})
+            })
+            $(".vertical-panel-wrapper>.item-icon-add")
+                .mouseenter(function () {
+                    $(this).css({display: "block"})
+                })
+                .mouseleave(function () {
+                    $(this).css({display: "none"})
+                })
+        }
+
+        static #handleData(data) {
+            let xTitles, yTitles
+            for (let key in data) {
+                key === "vert" ? yTitles = data[key] : xTitles = data[key]
+            }
+            return {xTitles, yTitles}
+        }
+
+        static #itemContent(xy, ts) {
+            let title = ts?.title
+            let size = ts?.size
+            return $(`<div id=${xy + "-" + Math.random().toString(36).slice(-4)}
+                              draggable="true" class="item"
+                              style="${xy === "y" ? "height" : "width"}:${size || ''}px">
+                            <span>${title || "修改名称"}</span>
+                            <i class="item-icon-delete">
+                                <svg t="1648779026180" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="1483" width="20" height="20">
+                                    <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
+                                    229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286
+                                    96 512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m207.981714
+                                    463.981714H304.018286a47.981714 47.981714 0 1 1 0-95.963428h415.963428a47.981714 47.981714 0 1 1 0 95.963428z"
+                                    fill="" p-id="1484"></path>
+                                </svg>
+                            </i>
+                       </div>`)
+        }
+
+        getData(xy) {
+            return xy ?
+                xy === "x" ? Lane.#handleData(this.#data).xTitles : Lane.#handleData(this.#data).yTitles
+                : this.#data
+        }
+
+        add(xy, data, able = true) {
+            able && xy === 'x'
+                ? this.#data.horz.push(data?.title)
+                : this.#data.vert.push(data?.title)
+            if (!xy || !data) throw new Error("需要传入xy和data")
+            if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
+            if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("data需要title")
+            $("." + `${xy === "x" ? "horizontal" : "vertical"}`
+                + "-panel-wrapper>.item-wrapper")
+                .append(Lane.#itemContent(xy, data))
+            this.#removeField()
+            // Lane.#dragItem()
+        }
+
+        removeArray(arr, val) {
+            let index = -1
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === val) index = i
+            }
+            index > -1 && arr.splice(index, 1)
+        };
+
+        delete(el) {
+            let {xTitles, yTitles} = Lane.#handleData(this.#data)
+            let xyName = el.parent().parent()[0].className.substr(0, 1)
+            let currentTitle = el[0].innerText
+            xyName === "h" ?
+                this.removeArray(xTitles, currentTitle) :
+                this.removeArray(yTitles, currentTitle)
+            el.remove()
+        }
+
+        #removeField() {
+            let self = this
+            $(".panel .item-icon-delete").on("click", function () {
+                // $(this).parents(".item-wrapper").children().length === 1 &&
+                // $(".vertical-panel-wrapper").children(".item-wrapper")
+                //     .css({height: "calc(100% - 40px)", width: "42px"})
+                //     .parent().children(".item-icon-add")
+                //     .css({display: "none"})
+                // console.log("总数据：", self.getData())
+                self.delete($(this).parent())
+                // console.log("执行了remove:", self.getData())
+            })
+        }
+
+    }
+
+    let v = new Lane($(".panel"))
+    v.add("x", {title: "xxx"})
+    // v.add("x", {title: "xxx111"})
+    // v.add("y", {title: "竖 着的"})
+    // v.add("y", {title: "yyy"})
+    // console.log(v.getData(""))
+    // console.log(v.getData("x"))
+    // console.log(v.getData("y"))
+    $(function () {
+
+        // function removeArray(arr, val) {
+        //     let index = -1
+        //     for (let i = 0; i < arr.length; i++) {
+        //         if (arr[i] === val) index = i
+        //     }
+        //     index > -1 && arr.splice(index, 1)
+        // }
+        //
+        // let b = ["a,", "b", "c", "xxx"]
+        // console.log(b)
+        // removeArray(b, "xxx")
+        // console.log(b)
+    })
+</script>
+</body>
+</html>
