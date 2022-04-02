@@ -163,6 +163,9 @@
             background: grey;
         }
 
+        body {
+            background-color: gainsboro;
+        }
     </style>
 
 </head>
@@ -186,8 +189,8 @@
             this.#editable()
             this.#drag()
             Lane.#dragItem()
-            this.#addDefaultField("x")
-            this.#addDefaultField("y")
+            this.#addDefaultField("x", {title: "x-修改名称"})
+            this.#addDefaultField("y", {title: "y-修改名称"})
         }
 
         static #initXY(xy, root) {
@@ -280,12 +283,11 @@
         }
 
         #addDefaultField(xy, data) {
-            if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             let self = this
-            let vh = xy === "y" ? "vertical" : "horizontal"
-            $("." + vh + "-panel-wrapper>.item-icon-add")
+            $("." + `${xy === "y" ? "vertical" : "horizontal"}`
+                + "-panel-wrapper>.item-icon-add")
                 .on("click", function () {
-                    Lane.#itemContent(xy, data).appendTo($(this).next())
+                    self.add(xy, data)
                     self.#removeField()
                     Lane.#dragItem()
                 })
@@ -314,6 +316,7 @@
                     for (let i = 0; i < xLength; i++) {
                         let xSize = x[i].offsetWidth
                         let xTitle = x[i].innerText
+                        // TODO 需要重写 remove
                         x[i].remove()
                         self.add("y", {title: xTitle, size: xSize})
                         let ySize = y[i].offsetHeight
@@ -447,7 +450,6 @@
     v.add("y", {title: "处理3", size: 200})
 
 </script>
-
 
 </body>
 
