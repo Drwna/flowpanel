@@ -184,6 +184,7 @@
             this.#handleCSS()
             this.#addDefaultField("x", {title: "x-修改名称"})
             this.#addDefaultField("y", {title: "y-修改名称"})
+            this.#editable()
         }
 
         static #initXY(xy, root) {
@@ -286,12 +287,16 @@
                 })
         }
 
-        removeArray(arr, val) {
-            let index = -1
-            for (let i = 0; i < arr.length; i++) {
-                if (arr[i] === val) index = i
+        arrayIndex(array, value) {
+            for (let i = 0; i < array.length; i++) {
+                if (array[i] === value) return i
             }
-            index > -1 && arr.splice(index, 1)
+            return -1
+        }
+
+        removeArray(arr, val) {
+            this.arrayIndex(arr, val) > -1
+            && arr.splice(this.arrayIndex(arr, val), 1)
         }
 
         #delete(el) {
@@ -305,7 +310,7 @@
 
         #removeField() {
             let self = this
-            $(".panel .item-icon-delete").on("click", function () {
+            $(".panel .item-icon-delete").off("click").on("click", function () {
                 $(this).parents(".item-wrapper").children().length === 1 &&
                 $(".vertical-panel-wrapper").children(".item-wrapper")
                     .css({height: "calc(100% - 40px)", width: "42px"})
@@ -315,12 +320,46 @@
             })
         }
 
+        #editable() {
+            let self = this
+            let {xTitles, yTitles} = Lane.#handleData(this.#data)
+            this.root.on("dblclick", "span", function (e) {
+                e.stopPropagation()
+                let that = $(this)
+                let currentVal = $(this).text()
+                let xy = that.parents(".item-wrapper").parent()[0].className.substr(0, 1)
+                let currentIndex
+                if (xy === 'h') currentIndex = self.arrayIndex(xTitles, currentVal)
+                else currentIndex = self.arrayIndex(yTitles, currentVal)
+                that.attr("contenteditable", "true")
+                that.css({
+                    background: "#f1eded",
+                    outline: "1px solid grey"
+                })
+                $(this).parents()[2].className.substring(0, 1) === "h"
+                    ? that.css({padding: "0 12px",})
+                    : that.css({padding: "12px 0", width: "100%"})
+                that.focus()
+                let sel = window.getSelection()
+                sel.collapse(that[0], 1)
+                $(document).click(function () {
+                    that.removeAttr("contenteditable")
+                    that.css({
+                        padding: "", width: "",
+                        background: "", outline: ""
+                    })
+                    that.text() === '' && that.text(currentVal)
+                    if (xy === "h") xTitles[currentIndex] = that.text()
+                    else yTitles[currentIndex] = that.text()
+                })
+            })
+        }
     }
 
     let v = new Lane($(".panel"))
     v.add("x", {title: "xxx"})
     // v.add("x", {title: "xxx111"})
-    // v.add("y", {title: "竖 着的"})
+    v.add("y", {title: "竖 着的"})
     // v.add("y", {title: "yyy"})
     // console.log(v.getData(""))
     // console.log(v.getData("x"))
