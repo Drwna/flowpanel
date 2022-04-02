@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <!-- saved from url=(0047)http://jsdemo.codeman.top/html/dragAndDrop.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>dragAndDrop</title>
     <link rel="icon" type="image/x-icon" href="http://jsdemo.codeman.top/images/favicon.ico">
     <style>
@@ -14,7 +17,8 @@
         }
 
         .container {
-            max-width: 450px;
+            background-color: lightgrey;
+            width: 600px;
             margin: 0 auto;
             padding: 15px;
         }
@@ -23,7 +27,7 @@
             padding-bottom: 15px;
         }
 
-        ul {
+        div {
             touch-action: none;
             user-select: none;
         }
@@ -35,37 +39,20 @@
         .column-item {
             height: 50px;
             margin-bottom: -1px;
-            padding-left: 15px;
-            line-height: 48px;
-            background: #FFF;
-            border: 1px solid #d6d6d6;
-            list-style: none;
+            padding: 0 15px;
+            /*line-height: 48px;*/
+            /*background: #FFF;*/
+            border: 1px solid red;
+            display: inline-block;
         }
 
-        .column-item:first-child {
-            border-radius: 5px 5px 0 0;
-        }
+        /*.column-item:first-child {*/
+        /*    border-radius: 5px 5px 0 0;*/
+        /*}*/
 
-        .column-item:last-child {
-            border-radius: 0 0 5px 5px;
-        }
-
-        .grid {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -15px -15px 0;
-        }
-
-        .grid-item {
-            width: 90px;
-            height: 90px;
-            line-height: 88px;
-            text-align: center;
-            margin: 0 15px 15px 0;
-            background: #FFF;
-            border: 1px solid #d6d6d6;
-            list-style: none;
-        }
+        /*.column-item:last-child {*/
+        /*    border-radius: 0 0 5px 5px;*/
+        /*}*/
 
         .active {
             background: #c8ebfb;
@@ -76,219 +63,219 @@
             left: 0;
             top: 0;
             z-index: 1;
-            width: calc(100% - 30px);
+            width: auto;
             max-width: 420px;
             height: 50px;
             padding-left: 15px;
+            padding-right: 15px;
             line-height: 48px;
             background: #FFF;
             border: 1px solid #d6d6d6;
             opacity: 0.8;
-            list-style: none;
         }
 
-        .clone-grid-item {
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 1;
-            width: 90px;
-            height: 90px;
-            line-height: 88px;
-            text-align: center;
-            background: #FFF;
-            border: 1px solid #d6d6d6;
-            opacity: 0.8;
-            list-style: none;
-        }
     </style>
 
 </head>
 
-<body class="vsc-initialized">
-    <div class="container">
-        <h4>常规布局</h4>
-        <ul class="column">
-            <li class="column-item">item1</li>
-            <li class="column-item">item2</li>
-            <li class="column-item">item3</li>
-            <li class="column-item">item4</li>
-            <li class="column-item">item5</li>
-            <li class="column-item">item6</li>
-            <li class="column-item">item7</li>
-            <li class="column-item">item8</li>
-            <li class="column-item">item9</li>
-            <li class="column-item">item10</li>
-        </ul>
-        <h4>Grid布局</h4>
-        <ul class="grid">
-            <li class="grid-item">item1</li>
-            <li class="grid-item">item2</li>
-            <li class="grid-item">item3</li>
-            <li class="grid-item">item4</li>
-            <li class="grid-item">item5</li>
-            <li class="grid-item">item6</li>
-            <li class="grid-item">item7</li>
-            <li class="grid-item">item8</li>
-            <li class="grid-item">item9</li>
-            <li class="grid-item">item10</li>
-        </ul>
+<body>
+<div class="container">
+    <h4>常规布局</h4>
+    <div class="item-wrapper column">
+        <div id="h-div_1" class="item column-item">
+            <span>1业务部业务部业务部业务部业务部务部22</span>
+            <i class="item-icon-delete">
+                <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                    <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                          p-id="3760"></path>
+                    <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                </svg>
+            </i>
+        </div>
+        <div id="h-div_2" class="item column-item"><span>财务部</span>
+            <i class="item-icon-delete">
+                <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                    <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                          p-id="3760"></path>
+                    <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                </svg>
+            </i>
+        </div>
+        <div id="h-div_3" class="item column-item"><span>人事部</span>
+            <i class="item-icon-delete">
+                <svg t="1648537726522" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                     xmlns="http://www.w3.org/2000/svg" p-id="3759" width="20" height="20">
+                    <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.666667C277.333333 938.666667 85.333333 746.666667 85.333333 512S277.333333 85.333333 512 85.333333s426.666667 192 426.666667 426.666667-192 426.666667-426.666667 426.666667z"
+                          p-id="3760"></path>
+                    <path d="M341.333333 469.333333h341.333334v85.333334H341.333333z" p-id="3761"></path>
+                </svg>
+            </i>
+        </div>
     </div>
+</div>
 
-    <script>
-        class Draggable {
-            constructor(options) {
-                this.parent = options.element; // 父级元素
-                this.cloneElementClassName = options.cloneElementClassName;
-                this.isPointerdown = false;
-                this.diff = { x: 0, y: 0 };
-                this.drag = { element: null, index: 0, firstIndex: 0 }; // 拖拽元素
-                this.referenceElement = null; // 参考元素
-                this.clone = { element: null, x: 0, y: 0 };
-                this.lastPointermove = { x: 0, y: 0 };
-                this.rectList = [];
-                this.init();
-            }
-            init() {
-                this.getRect();
-                this.bindEventListener();
-            }
-            // 获取元素位置信息
-            getRect() {
-                this.rectList.length = 0;
-                for (const item of this.parent.children) {
-                    this.rectList.push(item.getBoundingClientRect());
-                }
-            }
-            handlePointerdown(e) {
-                // 如果是鼠标点击，只响应左键
-                if (e.pointerType === 'mouse' && e.button !== 0) {
-                    return;
-                }
-                if (e.target === this.parent) {
-                    return;
-                }
-                this.isPointerdown = true;
-                this.parent.setPointerCapture(e.pointerId);
-                this.lastPointermove.x = e.clientX;
-                this.lastPointermove.y = e.clientY;
-                for (const item of this.parent.children) {
-                    item.style.transition = 'transform 150ms';
-                }
-                this.drag.element = e.target;
-                this.drag.element.classList.add('active');
-                const i = [].indexOf.call(this.parent.children, this.drag.element);
-                this.clone.x = this.rectList[i].left;
-                this.clone.y = this.rectList[i].top;
-                this.drag.index = i;
-                this.drag.firstIndex = i;
-                this.clone.element = this.drag.element.cloneNode(true);
-                this.clone.element.style.transition = 'none';
-                this.clone.element.className = this.cloneElementClassName;
-                this.clone.element.style.transform = 'translate3d(' + this.clone.x + 'px, ' + this.clone.y + 'px, 0)';
-                document.body.appendChild(this.clone.element);
-            }
-            handlePointermove(e) {
-                if (this.isPointerdown) {
-                    this.diff.x = e.clientX - this.lastPointermove.x;
-                    this.diff.y = e.clientY - this.lastPointermove.y;
-                    this.lastPointermove.x = e.clientX;
-                    this.lastPointermove.y = e.clientY;
-                    this.clone.x += this.diff.x;
-                    this.clone.y += this.diff.y;
-                    this.clone.element.style.transform = 'translate3d(' + this.clone.x + 'px, ' + this.clone.y + 'px, 0)';
-                    for (let i = 0; i < this.rectList.length; i++) {
-                        // 碰撞检测
-                        if (this.drag.index !== i && e.clientX > this.rectList[i].left && e.clientX < this.rectList[i].right &&
-                            e.clientY > this.rectList[i].top && e.clientY < this.rectList[i].bottom) {
-                            if (this.drag.index < i) {
-                                for (let j = this.drag.index; j < i; j++) {
-                                    if (this.drag.firstIndex > j) {
-                                        this.parent.children[j].style.transform = 'translate3d(0px, 0px, 0)';
-                                    } else {
-                                        const x = this.rectList[j].left - this.rectList[j + 1].left;
-                                        const y = this.rectList[j].top - this.rectList[j + 1].top;
-                                        this.parent.children[j + 1].style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
-                                    }
-                                }
-                                this.referenceElement = this.parent.children[i + 1];
-                            } else if (this.drag.index > i) {
-                                for (let j = i; j < this.drag.index; j++) {
-                                    if (this.drag.firstIndex <= j) {
-                                        this.parent.children[j + 1].style.transform = 'translate3d(0px, 0px, 0)';
-                                    } else {
-                                        const x = this.rectList[j + 1].left - this.rectList[j].left;
-                                        const y = this.rectList[j + 1].top - this.rectList[j].top;
-                                        this.parent.children[j].style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
-                                    }
-                                }
-                                this.referenceElement = this.parent.children[i];
-                            }
-                            const x = this.rectList[i].left - this.rectList[this.drag.firstIndex].left;
-                            const y = this.rectList[i].top - this.rectList[this.drag.firstIndex].top;
-                            this.drag.element.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
-                            this.drag.index = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            handlePointerup(e) {
-                if (this.isPointerdown) {
-                    this.isPointerdown = false;
-                    this.drag.element.classList.remove('active');
-                    this.clone.element.remove();
-                    for (const item of this.parent.children) {
-                        item.style.transition = 'none';
-                        item.style.transform = 'translate3d(0px, 0px, 0px)';
-                    }
-                    this.parent.insertBefore(this.drag.element, this.referenceElement);
-                }
-            }
-            handlePointercancel(e) {
-                if (this.isPointerdown) {
-                    this.isPointerdown = false;
-                    this.drag.element.classList.remove('active');
-                    this.clone.element.remove();
-                    for (const item of this.parent.children) {
-                        item.style.transition = 'none';
-                        item.style.transform = 'translate3d(0px, 0px, 0)';
-                    }
-                }
-            }
-            bindEventListener() {
-                this.handlePointerdown = this.handlePointerdown.bind(this);
-                this.handlePointermove = this.handlePointermove.bind(this);
-                this.handlePointerup = this.handlePointerup.bind(this);
-                this.handlePointercancel = this.handlePointercancel.bind(this);
-                this.getRect = this.getRect.bind(this);
-                this.parent.addEventListener('pointerdown', this.handlePointerdown);
-                this.parent.addEventListener('pointermove', this.handlePointermove);
-                this.parent.addEventListener('pointerup', this.handlePointerup);
-                this.parent.addEventListener('pointercancel', this.handlePointercancel);
-                window.addEventListener('scroll', this.getRect);
-                window.addEventListener('resize', this.getRect);
-                window.addEventListener('orientationchange', this.getRect);
-            }
-            unbindEventListener() {
-                this.parent.removeEventListener('pointerdown', this.handlePointerdown);
-                this.parent.removeEventListener('pointermove', this.handlePointermove);
-                this.parent.removeEventListener('pointerup', this.handlePointerup);
-                this.parent.removeEventListener('pointercancel', this.handlePointercancel);
-                window.removeEventListener('scroll', this.getRect);
-                window.removeEventListener('resize', this.getRect);
-                window.removeEventListener('orientationchange', this.getRect);
+<script>
+    class Draggable {
+        constructor(options) {
+            this.parent = options.element; // 父级元素
+            this.cloneElementClassName = options.cloneElementClassName;
+            this.isPointerdown = false;
+            this.diff = {x: 0, y: 0};
+            this.drag = {element: null, index: 0, firstIndex: 0}; // 拖拽元素
+            this.referenceElement = null; // 参考元素
+            this.clone = {element: null, x: 0, y: 0};
+            this.lastPointermove = {x: 0, y: 0};
+            this.rectList = [];
+            this.init();
+        }
+
+        init() {
+            this.getRect();
+            this.bindEventListener();
+        }
+
+        // 获取元素位置信息
+        getRect() {
+            this.rectList.length = 0;
+            for (const item of this.parent.children) {
+                this.rectList.push(item.getBoundingClientRect());
             }
         }
-        new Draggable({
-            element: document.querySelector('.column'),
-            cloneElementClassName: 'clone-column-item'
-        });
-        new Draggable({
-            element: document.querySelector('.grid'),
-            cloneElementClassName: 'clone-grid-item'
-        });
-    </script>
+
+        handlePointerdown(e) {
+            // 如果是鼠标点击，只响应左键
+            if (e.pointerType === 'mouse' && e.button !== 0) {
+                return;
+            }
+            if (e.target === this.parent) {
+                return;
+            }
+            this.isPointerdown = true;
+            this.parent.setPointerCapture(e.pointerId);
+            this.lastPointermove.x = e.clientX;
+            this.lastPointermove.y = e.clientY;
+            for (const item of this.parent.children) {
+                item.style.transition = 'transform 150ms';
+            }
+            this.drag.element = e.target;
+            this.drag.element.classList.add('active');
+            const i = [].indexOf.call(this.parent.children, this.drag.element);
+            this.clone.x = this.rectList[i].left;
+            this.clone.y = this.rectList[i].top;
+            this.drag.index = i;
+            this.drag.firstIndex = i;
+            this.clone.element = this.drag.element.cloneNode(true);
+            this.clone.element.style.transition = 'none';
+            this.clone.element.className = this.cloneElementClassName;
+            this.clone.element.style.transform = 'translate3d(' + this.clone.x + 'px, ' + this.clone.y + 'px, 0)';
+            document.body.appendChild(this.clone.element);
+        }
+
+        handlePointermove(e) {
+            if (this.isPointerdown) {
+                this.diff.x = e.clientX - this.lastPointermove.x;
+                this.diff.y = e.clientY - this.lastPointermove.y;
+                this.lastPointermove.x = e.clientX;
+                this.lastPointermove.y = e.clientY;
+                this.clone.x += this.diff.x;
+                this.clone.y += this.diff.y;
+                this.clone.element.style.transform = 'translate3d(' + this.clone.x + 'px, ' + this.clone.y + 'px, 0)';
+                for (let i = 0; i < this.rectList.length; i++) {
+                    // 碰撞检测
+                    if (this.drag.index !== i && e.clientX > this.rectList[i].left && e.clientX < this.rectList[i].right &&
+                        e.clientY > this.rectList[i].top && e.clientY < this.rectList[i].bottom) {
+                        if (this.drag.index < i) {
+                            for (let j = this.drag.index; j < i; j++) {
+                                if (this.drag.firstIndex > j) {
+                                    this.parent.children[j].style.transform = 'translate3d(0px, 0px, 0)';
+                                } else {
+                                    const x = this.rectList[j].left - this.rectList[j + 1].left;
+                                    const y = this.rectList[j].top - this.rectList[j + 1].top;
+                                    this.parent.children[j + 1].style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+                                }
+                            }
+                            this.referenceElement = this.parent.children[i + 1];
+                        } else if (this.drag.index > i) {
+                            for (let j = i; j < this.drag.index; j++) {
+                                if (this.drag.firstIndex <= j) {
+                                    this.parent.children[j + 1].style.transform = 'translate3d(0px, 0px, 0)';
+                                } else {
+                                    const x = this.rectList[j + 1].left - this.rectList[j].left;
+                                    const y = this.rectList[j + 1].top - this.rectList[j].top;
+                                    this.parent.children[j].style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+                                }
+                            }
+                            this.referenceElement = this.parent.children[i];
+                        }
+                        const x = this.rectList[i].left - this.rectList[this.drag.firstIndex].left;
+                        const y = this.rectList[i].top - this.rectList[this.drag.firstIndex].top;
+                        this.drag.element.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+                        this.drag.index = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        handlePointerup(e) {
+            if (this.isPointerdown) {
+                this.isPointerdown = false;
+                this.drag.element.classList.remove('active');
+                this.clone.element.remove();
+                for (const item of this.parent.children) {
+                    item.style.transition = 'none';
+                    item.style.transform = 'translate3d(0px, 0px, 0px)';
+                }
+                this.parent.insertBefore(this.drag.element, this.referenceElement);
+            }
+        }
+
+        handlePointercancel(e) {
+            if (this.isPointerdown) {
+                this.isPointerdown = false;
+                this.drag.element.classList.remove('active');
+                this.clone.element.remove();
+                for (const item of this.parent.children) {
+                    item.style.transition = 'none';
+                    item.style.transform = 'translate3d(0px, 0px, 0)';
+                }
+            }
+        }
+
+        bindEventListener() {
+            this.handlePointerdown = this.handlePointerdown.bind(this);
+            this.handlePointermove = this.handlePointermove.bind(this);
+            this.handlePointerup = this.handlePointerup.bind(this);
+            this.handlePointercancel = this.handlePointercancel.bind(this);
+            this.getRect = this.getRect.bind(this);
+            this.parent.addEventListener('pointerdown', this.handlePointerdown);
+            this.parent.addEventListener('pointermove', this.handlePointermove);
+            this.parent.addEventListener('pointerup', this.handlePointerup);
+            this.parent.addEventListener('pointercancel', this.handlePointercancel);
+            window.addEventListener('scroll', this.getRect);
+            window.addEventListener('resize', this.getRect);
+            window.addEventListener('orientationchange', this.getRect);
+        }
+
+        unbindEventListener() {
+            this.parent.removeEventListener('pointerdown', this.handlePointerdown);
+            this.parent.removeEventListener('pointermove', this.handlePointermove);
+            this.parent.removeEventListener('pointerup', this.handlePointerup);
+            this.parent.removeEventListener('pointercancel', this.handlePointercancel);
+            window.removeEventListener('scroll', this.getRect);
+            window.removeEventListener('resize', this.getRect);
+            window.removeEventListener('orientationchange', this.getRect);
+        }
+    }
+
+    new Draggable({
+        element: document.querySelector('.column'),
+        cloneElementClassName: 'clone-column-item'
+    });
+</script>
 
 
-</body></html>
+</body>
+</html>
