@@ -179,11 +179,15 @@
 
         constructor(root) {
             this.root = root
+            this.#init()
+        }
+
+        #init() {
             Lane.#initXY("x", this.root)
             Lane.#initXY("y", this.root)
             this.#handleCSS()
-            this.#addDefaultField("x", {title: "x-修改名称"})
-            this.#addDefaultField("y", {title: "y-修改名称"})
+            this.#addDefaultField("x")
+            this.#addDefaultField("y")
             this.#editable()
             this.#togglePanel()
         }
@@ -265,12 +269,12 @@
         }
 
         add(xy, data, able = true) {
-            able && xy === 'x'
-                ? this.#data.horz.push(data?.title)
-                : this.#data.vert.push(data?.title)
             if (!xy || !data) throw new Error("需要传入xy和data")
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y")
             if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("data需要title")
+            able && xy === 'x'
+                ? this.#data.horz.push(data?.title)
+                : this.#data.vert.push(data?.title)
             $("." + `${xy === "x" ? "horizontal" : "vertical"}`
                 + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data))
@@ -332,10 +336,7 @@
                 if (xy === 'h') currentIndex = self.arrayIndex(xTitles, currentVal)
                 else currentIndex = self.arrayIndex(yTitles, currentVal)
                 that.attr("contenteditable", "true")
-                that.css({
-                    background: "#f1eded",
-                    outline: "1px solid grey"
-                })
+                that.css({background: "#f1eded", outline: "1px solid grey"})
                 $(this).parents()[2].className.substring(0, 1) === "h"
                     ? that.css({padding: "0 12px",})
                     : that.css({padding: "12px 0", width: "100%"})
@@ -409,9 +410,9 @@
     }
 
     let v = new Lane($(".panel"))
-    v.add("x", {title: "xxx"})
+    v.add("x", {title: "xxx", size: 100})
     // v.add("x", {title: "xxx111"})
-    v.add("y", {title: "竖 着的"})
+    v.add("y", {title: "竖 着的", size: 300})
     // v.add("y", {title: "yyy"})
     // console.log(v.getData(""))
     // console.log(v.getData("x"))
