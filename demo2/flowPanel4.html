@@ -278,29 +278,26 @@
                 if (arr[i] === val) index = i
             }
             index > -1 && arr.splice(index, 1)
-        };
+        }
 
-        delete(el) {
+        #delete(el) {
             let {xTitles, yTitles} = Lane.#handleData(this.#data)
-            let xyName = el.parent().parent()[0].className.substr(0, 1)
-            let currentTitle = el[0].innerText
-            xyName === "h" ?
-                this.removeArray(xTitles, currentTitle) :
-                this.removeArray(yTitles, currentTitle)
+            el.parent().parent()[0].className.substr(0, 1)
+            === "h" ?
+                this.removeArray(xTitles, el[0].innerText) :
+                this.removeArray(yTitles, el[0].innerText)
             el.remove()
         }
 
         #removeField() {
             let self = this
             $(".panel .item-icon-delete").on("click", function () {
-                // $(this).parents(".item-wrapper").children().length === 1 &&
-                // $(".vertical-panel-wrapper").children(".item-wrapper")
-                //     .css({height: "calc(100% - 40px)", width: "42px"})
-                //     .parent().children(".item-icon-add")
-                //     .css({display: "none"})
-                // console.log("总数据：", self.getData())
-                self.delete($(this).parent())
-                // console.log("执行了remove:", self.getData())
+                $(this).parents(".item-wrapper").children().length === 1 &&
+                $(".vertical-panel-wrapper").children(".item-wrapper")
+                    .css({height: "calc(100% - 40px)", width: "42px"})
+                    .parent().children(".item-icon-add")
+                    .css({display: "none"})
+                self.#delete($(this).parent())
             })
         }
 
@@ -315,19 +312,6 @@
     // console.log(v.getData("x"))
     // console.log(v.getData("y"))
     $(function () {
-
-        // function removeArray(arr, val) {
-        //     let index = -1
-        //     for (let i = 0; i < arr.length; i++) {
-        //         if (arr[i] === val) index = i
-        //     }
-        //     index > -1 && arr.splice(index, 1)
-        // }
-        //
-        // let b = ["a,", "b", "c", "xxx"]
-        // console.log(b)
-        // removeArray(b, "xxx")
-        // console.log(b)
     })
 </script>
 </body>
