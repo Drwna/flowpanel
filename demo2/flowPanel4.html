@@ -186,8 +186,8 @@
             Lane.#initXY("x", this.root)
             Lane.#initXY("y", this.root)
             this.#handleCSS()
-            this.#addDefaultField("x")
-            this.#addDefaultField("y")
+            this.#addDefaultField("x", {title: "xxx"})
+            this.#addDefaultField("y", {title: "yyy"})
             this.#editable()
             this.#togglePanel()
         }
@@ -322,39 +322,28 @@
             })
         }
 
-        // todo bug:编辑后data数据错误
         #editable() {
-            let self = this
+            let that = this
             let {xTitles, yTitles} = Lane.#handleData(this.#data)
-            this.root.on("dblclick", "span", function (e) {
-                e.stopPropagation()
-                /*
-                let that = $(this)
-                let currentVal = $(this).text()
-                let xy = that.parents(".item-wrapper").parent()[0].className.substr(0, 1)
-                let currentIndex
-                if (xy === 'h') currentIndex = self.arrayIndex(xTitles, currentVal)
-                else currentIndex = self.arrayIndex(yTitles, currentVal)
-                that.attr("contenteditable", "true")
-                that.css({background: "#f1eded", outline: "1px solid grey"})
-                $(this).parents()[2].className.substring(0, 1) === "h"
-                    ? that.css({padding: "0 12px",})
-                    : that.css({padding: "12px 0", width: "100%"})
-                that.focus()
+            this.root.on("dblclick", "span", function () {
+                let self = $(this)
+                let currentVal = self.text()
+                let xy = self.parents(".item-wrapper").parent()[0].className.substr(0, 1)
+                let currentIndex = that.arrayIndex(xy === "h" ? xTitles : yTitles, currentVal)
+                $(this).attr("contenteditable", "true")
+                self.css({background: "#f1eded", outline: "1px solid grey"})
+                $(this).parents()[2].className.substr(0, 1) === "h" ?
+                    self.css({padding: "0 12px"}) : self.css({padding: "12px 0", width: "100%"})
+                $(this).focus()
                 let sel = window.getSelection()
-                sel.collapse(that[0], 1)
-                $(document).click(function () {
-                    that.removeAttr("contenteditable")
-                    that.css({
-                        padding: "", width: "",
-                        background: "", outline: ""
-                    })
-                    that.text() === '' && that.text(currentVal)
-                    if (xy === "h") xTitles[currentIndex] = that.text()
-                    else yTitles[currentIndex] = that.text()
+                sel.collapse(self[0], 1)
+                $(this).on("blur", function () {
+                    self.removeAttr("contenteditable")
+                    self.css({background: "", outline: "", padding: "", width: ""})
+                    self.text().trim() === '' && self.text(currentVal)
+                    if (xy === "h") xTitles[currentIndex] = self.text()
+                    else yTitles[currentIndex] = self.text()
                 })
-                 */
-
             })
         }
 
@@ -413,9 +402,9 @@
     }
 
     let v = new Lane($(".panel"))
-    v.add("x", {title: "xxx", size: 100})
+    v.add("x", {title: "业务部", size: 100})
     // v.add("x", {title: "xxx111"})
-    v.add("y", {title: "竖 着的", size: 300})
+    v.add("y", {title: "起草", size: 300})
     // v.add("y", {title: "yyy"})
     // console.log(v.getData(""))
     // console.log(v.getData("x"))
