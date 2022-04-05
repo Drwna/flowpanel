@@ -243,12 +243,10 @@
         }
 
         static #itemContent(xy, ts) {
-            let title = ts?.title
-            let size = ts?.size
             return $(`<div id=${xy + "-" + Math.random().toString(36).slice(-4)}
                               draggable="true" class="item"
-                              style="${xy === "y" ? "height" : "width"}:${size || ''}px">
-                            <span>${title || "修改名称"}</span>
+                              style="${xy === "y" ? "height" : "width"}:${ts.size || ''}px">
+                            <span>${ts.title}</span>
                             <i class="item-icon-delete">
                                 <svg t="1648779026180" class="icon" viewBox="0 0 1024 1024" version="1.1"
                                     xmlns="http://www.w3.org/2000/svg" p-id="1483" width="20" height="20">
@@ -324,11 +322,13 @@
             })
         }
 
+        // todo bug:编辑后data数据错误
         #editable() {
             let self = this
             let {xTitles, yTitles} = Lane.#handleData(this.#data)
             this.root.on("dblclick", "span", function (e) {
                 e.stopPropagation()
+                /*
                 let that = $(this)
                 let currentVal = $(this).text()
                 let xy = that.parents(".item-wrapper").parent()[0].className.substr(0, 1)
@@ -353,6 +353,8 @@
                     if (xy === "h") xTitles[currentIndex] = that.text()
                     else yTitles[currentIndex] = that.text()
                 })
+                 */
+
             })
         }
 
@@ -405,6 +407,7 @@
                         }
                     }
                 }
+                console.log("切换后：", self.getData())
             })
         }
     }
