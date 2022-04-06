@@ -285,7 +285,7 @@
                 + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data))
             this.#removeField()
-            Lane.#dragItem()
+            this.#dragItem()
         }
 
         #addDefaultField(xy, data) {
@@ -310,9 +310,9 @@
             && arr.splice(this.arrayIndex(arr, val), 1)
         }
 
-        #delete(el) {
+        #delete(xy, el) {
             let {xTitles, yTitles} = Lane.#handleData(this.#data)
-            el.parent().parent()[0].className.substr(0, 1) === "h" ?
+            xy === "x" ?
                 this.removeArray(xTitles, el[0].innerText) :
                 this.removeArray(yTitles, el[0].innerText)
             el.remove()
@@ -326,7 +326,8 @@
                     .css({height: "calc(100% - 40px)", width: "42px"})
                     .parent().children(".item-icon-add")
                     .css({display: "none"})
-                self.#delete($(this).parent())
+                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1)
+                self.#delete(xy, $(this).parent())
             })
         }
 
@@ -366,11 +367,11 @@
                     for (let i = 0; i < xLength; i++) {
                         let xSize = x[i].offsetWidth
                         let xTitle = x[i].innerText
-                        self.#delete($(x[i]))
+                        self.#delete("x", $(x[i]))
                         self.add("y", {title: xTitle, size: xSize})
                         let ySize = y[i].offsetHeight
                         let yTitle = y[i].innerText
-                        self.#delete($(y[i]))
+                        self.#delete("y", $(y[i]))
                         self.add("x", {title: yTitle, size: ySize})
                     }
                 } else {
@@ -378,12 +379,12 @@
                         for (let i = 0; i < xLength; i++) {
                             let xSize = x[i].offsetWidth
                             let xTitle = x[i].innerText
-                            self.#delete($(x[i]))
+                            self.#delete("x", $(x[i]))
                             self.add("y", {title: xTitle, size: xSize})
                             try {
                                 let ySize = y[i].offsetHeight
                                 let yTitle = y[i].innerText
-                                self.#delete($(y[i]))
+                                self.#delete("y", $(y[i]))
                                 self.add("x", {title: yTitle, size: ySize})
                             } catch (e) {
                             }
@@ -392,12 +393,12 @@
                         for (let i = 0; i < yLength; i++) {
                             let ySize = y[i].offsetHeight
                             let yTitle = y[i].innerText
-                            self.#delete($(y[i]))
+                            self.#delete("y", $(y[i]))
                             self.add("x", {title: yTitle, size: ySize})
                             try {
                                 let xSize = x[i].offsetWidth
                                 let xTitle = x[i].innerText
-                                self.#delete($(x[i]))
+                                self.#delete("x", $(x[i]))
                                 self.add("y", {title: xTitle, size: xSize})
                             } catch (e) {
                             }
@@ -419,44 +420,47 @@
                 .on("dragover", function (ev) {
                     ev.originalEvent.preventDefault();
                 })
-            Lane.#dragItem()
+            this.#dragItem()
         }
 
-        static #dragItem() {
+        #dragItem() {
             let self = this
-            $(".item").on("dragstart", function (ev) {
+            $(".item").off("dragstart").on("dragstart", function (ev) {
                 ev.originalEvent.dataTransfer.setData("text/plain", ev.target.id);
-            }).on("dragend", function () {
-                console.log("一次拖曳结束")
+            }).off("dragend").on("dragend", function () {
+                let xy = $(this).parent().parent()[0].className.substr(0, 1) === "h" ? "x" : "y"
+                self.#updateData(xy)
             })
         }
 
-
-        #updateData() {
-            console.log("调用了updateData")
-            let {xTitles, yTitles} = Lane.#handleData(this.#data)
-            this.root.on("click", ".item", function () {
-                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1)
-                let sumLength = $(this).parent().children().length
-                console.log(sumLength)
-                if (xy === 'h') {
-                    console.log("x轴")
-                    for (let i = 0; i < sumLength; i++) {
-                        let xTitle = $(this).parent().children()[i].innerText
-                        let xSize = $(this).parent().children()[i].offsetWidth
-                        console.log(xTitle, xSize)
-                    }
-                } else {
-                    console.log("y轴")
+        #updateData(xy) {
+            if (xy === "x") {
+                let length = $(".horizontal-panel-wrapper>.item-wrapper").children().length
+                for (let i = 0; i < length; i++) {
+                    let x = $(".horizontal-panel-wrapper>.item-wrapper>.item")
+                    let title = x[i].innerText
+                    let size = x[i].offsetWidth
+                    this.#delete("x", $(x[i]))
+                    this.add("x", {title, size})
                 }
-            })
+            } else {
+                let length = $(".vertical-panel-wrapper>.item-wrapper").children().length
+                for (let i = 0; i < length; i++) {
+                    let y = $(".vertical-panel-wrapper>.item-wrapper>.item")
+                    let title = y[i].innerText
+                    let size = y[i].offsetHeight
+                    this.#delete("y", $(y[i]))
+                    this.add("y", {title, size})
+                }
+            }
+
         }
 
     }
 
     let v = new Lane($(".panel"))
     v.add("x", {title: "业务部", size: 100})
-    v.add("x", {title: "xxx111"})
+    v.add("x", {title: "人事部"})
     v.add("y", {title: "起草", size: 300});
     v.add("y", {title: "yyy"});
     // console.log(v.getData())
