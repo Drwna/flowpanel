@@ -6,7 +6,7 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 
     <style>
-        .panel * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -43,7 +43,7 @@
             display: flex;
         }
         .panel .item {
-            /*position: relative;*/
+            position: relative;
             display: flex;
             justify-content: center;
             overflow: auto;
@@ -54,6 +54,7 @@
             white-space: nowrap;
             cursor: default;
         }
+        .item-wrapper { -webkit-user-select: none; }
 
         /* 垂直 */
         .vertical-panel-wrapper {
@@ -166,75 +167,42 @@
         body {
             background-color: gainsboro;
         }
-    </style>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        #box {
-            width: 602px;
-            height: 82px;
-            border: 1px solid #000;
-            background-color: slategray;
-            margin: 20px 0 10px 20px;
-            display: flex;
-        }
-        #box .itemDiv {
-            height: 80px;
-            width: 80px;
-            line-height: 80px;
-            text-align: center;
-            border: 1px solid skyblue;
-            background-color: #fff;
-        }
-        #box .drag {
+        .xDragItem {
             position: absolute;
-            width: 80px;
-            height: 80px;
-            line-height: 80px;
+            /*width: 140px;*/
+            height: 36px;
+            line-height: 36px;
             text-align: center;
-            border: 1px solid #00ff;
+            outline: 1px solid grey;
+            background: grey;
         }
-        .zw {
-            /* float: left; */
-            display: flex;
-            width: 80px;
-            height: 80px;
-            border: 1px dashed #f00;
-        }
-    </style>
-
-    <style>
-        .dragItem {
-            position: absolute;
-            width: 140px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            border: 1px solid #00ff;
-            background: rosybrown;
-        }
-        .zwItem {
+        .xPlaceholderItem {
             display: flex;
             width: 140px;
             height: 40px;
-            border: 1px dashed #f00;
+            outline: 1px dashed grey;
         }
+        .yDragItem {
+            position: absolute;
+            width: 36px;
+            padding: 30px 0;
+            text-align: center;
+            outline: 1px solid grey;
+            background: grey;
+        }
+        .yPlaceholderItem {
+            display: flex;
+            width: 40px;
+            height: 140px;
+            outline: 1px dashed grey;
+        }
+
     </style>
 
 </head>
 <body>
 <div class="panel"></div>
-<div id="box"></div>
-<div id="add"
-     style=" width: 90px; height: 60px; line-height: 60px;
-        text-align: center; background-color: tomato;
-        position: fixed; right: 80px; bottom: 50px; ">
-    添加
-</div>
-
 
 <script>
     class Lane {
@@ -243,6 +211,7 @@
         constructor(root) {
             this.root = root;
             this.#init();
+            this.timer = null;
         }
 
         #init() {
@@ -253,19 +222,14 @@
             this.#addDefaultField("y", {title: "yyy"});
             this.#editable();
             this.#togglePanel();
-            // this.#drag()
+            this.drags("x", "item-x", "item", "xDragItem", "xPlaceholderItem");
+            this.drags("y", "item-y", "item", "yDragItem", "yPlaceholderItem");
         }
 
         static #initXY(xy, root) {
             let panelWrapper = $(`
-                    <div class="${
-                xy === "y" ? "vertical" : "horizontal"
-            }-panel-wrapper">
-                     ${
-                xy === "y"
-                    ? "<div class='toggle-panel'><div class='tc'></div></div>"
-                    : ""
-            }
+                    <div class="${xy === "y" ? "vertical" : "horizontal"}-panel-wrapper">
+                     ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
                          <i class="item-icon-add">
                             <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
                             xmlns="http://www.w3.org/2000/svg" p-id="1633" width="20" height="20">
@@ -277,7 +241,7 @@
                              47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
                              </svg>
                          </i>
-                     <div id="item-p" class="item-wrapper"></div>
+                     <div id="item-${xy}" class="item-wrapper"></div>
                     </div>
                 `);
             root.append(panelWrapper);
@@ -286,15 +250,11 @@
         #handleCSS() {
             $(".vertical-panel-wrapper>.item-wrapper")
                 .mouseenter(function () {
-                    $(this)
-                        .parent()
-                        .children(".item-icon-add")
+                    $(this).parent().children(".item-icon-add")
                         .css({display: "block"});
                 })
                 .mouseleave(function () {
-                    $(this)
-                        .parent()
-                        .children(".item-icon-add")
+                    $(this).parent().children(".item-icon-add")
                         .css({display: "none"});
                 })
                 .children().length === 0 &&
@@ -317,11 +277,7 @@
         }
 
         static #itemContent(xy, ts) {
-            return $(`<div id=${xy + "-" + Math.random().toString(36).slice(-4)}
-                               class="item"
-                              style="${xy === "y" ? "height" : "width"}:${
-                ts.size || ""
-            }px">
+            return $(`<div class="item" style="${xy === "y" ? "height" : "width"}:${ts.size || "240"}px">
                             <span>${ts.title}</span>
                             <i class="item-icon-delete">
                                 <svg t="1648779026180" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -363,9 +319,7 @@
 
         #addDefaultField(xy, data) {
             let self = this;
-            $(
-                "." +
-                `${xy === "y" ? "vertical" : "horizontal"}` +
+            $("." + `${xy === "y" ? "vertical" : "horizontal"}` +
                 "-panel-wrapper>.item-icon-add"
             ).on("click", function () {
                 self.add(xy, data);
@@ -395,22 +349,15 @@
 
         #removeField() {
             let self = this;
-            $(".panel .item-icon-delete")
-                .off("click")
-                .on("click", function () {
-                    $(this).parents(".item-wrapper").children().length === 1 &&
-                    $(".vertical-panel-wrapper")
-                        .children(".item-wrapper")
-                        .css({height: "calc(100% - 40px)", width: "42px"})
-                        .parent()
-                        .children(".item-icon-add")
-                        .css({display: "none"});
-                    let xy = $(this)
-                        .parents(".item-wrapper")
-                        .parent()[0]
-                        .className.substr(0, 1);
-                    self.#delete(xy, $(this).parent());
-                });
+            $(".panel .item-icon-delete").off("click").on("click", function () {
+                $(this).parents(".item-wrapper").children().length === 1 &&
+                $(".vertical-panel-wrapper").children(".item-wrapper")
+                    .css({height: "calc(100% - 40px)", width: "42px"})
+                    .parent().children(".item-icon-add")
+                    .css({display: "none"});
+                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1);
+                self.#delete(xy, $(this).parent());
+            });
         }
 
         #editable() {
@@ -419,14 +366,8 @@
             this.root.on("dblclick", "span", function () {
                 let self = $(this);
                 let currentVal = self.text();
-                let xy = self
-                    .parents(".item-wrapper")
-                    .parent()[0]
-                    .className.substr(0, 1);
-                let currentIndex = that.arrayIndex(
-                    xy === "h" ? xTitles : yTitles,
-                    currentVal
-                );
+                let xy = self.parents(".item-wrapper").parent()[0].className.substr(0, 1);
+                let currentIndex = that.arrayIndex(xy === "h" ? xTitles : yTitles, currentVal);
                 $(this).attr("contenteditable", "true");
                 self.css({background: "#f1eded", outline: "1px solid grey"});
                 $(this).parents()[2].className.substr(0, 1) === "h"
@@ -448,12 +389,8 @@
         #togglePanel() {
             let self = this;
             $(".toggle-panel").on("dblclick", function () {
-                let x = $(".horizontal-panel-wrapper>.item-wrapper").children(
-                    ".item"
-                );
-                let y = $(".vertical-panel-wrapper>.item-wrapper").children(
-                    ".item"
-                );
+                let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item");
+                let y = $(".vertical-panel-wrapper>.item-wrapper").children(".item");
                 let xLength = x.length;
                 let yLength = y.length;
                 if (xLength === yLength) {
@@ -542,8 +479,7 @@
 
         #updateData(xy) {
             if (xy === "x") {
-                let length = $(".horizontal-panel-wrapper>.item-wrapper").children()
-                    .length;
+                let length = $(".horizontal-panel-wrapper>.item-wrapper").children().length;
                 for (let i = 0; i < length; i++) {
                     let x = $(".horizontal-panel-wrapper>.item-wrapper>.item");
                     let title = x[i].innerText;
@@ -552,8 +488,7 @@
                     this.add("x", {title, size});
                 }
             } else {
-                let length = $(".vertical-panel-wrapper>.item-wrapper").children()
-                    .length;
+                let length = $(".vertical-panel-wrapper>.item-wrapper").children().length;
                 for (let i = 0; i < length; i++) {
                     let y = $(".vertical-panel-wrapper>.item-wrapper>.item");
                     let title = y[i].innerText;
@@ -563,67 +498,22 @@
                 }
             }
         }
-    }
 
-    let v = new Lane($(".panel"));
-
-    v.add("x", {title: "1-业务部", size: 140});
-    v.add("x", {title: "2-人事部", size: 140});
-    v.add("x", {title: "3-行政部", size: 140});
-    // v.add("x", {title: "4-测试部", size: 140})
-    // v.add("x", {title: "5-后勤部", size: 140})
-
-    // v.add("y", {title: "1-起草", size: 120});
-    // v.add("y", {title: "2-审批", size: 120});
-    // v.add("y", {title: "3-处理", size: 120});
-    // v.add("y", {title: "4-test", size: 120});
-    // console.log(v.getData())
-    // console.log(v.getData("x"))
-    // console.log(v.getData("y"))
-</script>
-
-
-<script>
-    // 添加div
-    $(function () {
-        $("#add").on("click", function () {
-            let len = $("#box").children().length;
-            let bgColor = Tool.randomColor2();
-            let divHtml = `
-            <div class="itemDiv" style="background-color:${bgColor}">
-                ${len + 1}
-            </div>`;
-            $(divHtml).appendTo("#box");
-        });
-        Tool.drags("box", "itemDiv", "drag", "zw");
-    })
-</script>
-
-<script>
-    class Tool {
-        /******************************************************
-         * div拖拽排序：
-         * ******************************************
-         * 支持上 下 左 右四个方向拖拽
-         * box：要拖拽元素父元素的id值
-         * name：要拖拽元素未拖拽时的样式的class名
-         * name2：要拖拽元素拖拽时样式的class名
-         * name3：拖拽时占位使用的样式的class名
-         *
-         *****************************************************/
-        static drags(box, name, name2, name3) {
+        drags(xy, box, name, name2, name3) {
+            let self = this;
             let range = {x: 0, y: 0}; // 鼠标元素偏移量
             let lastPos = {x: 0, y: 0, x1: 0, y1: 0}; // 拖拽对象的四个坐标
             let tarPos = {x: 0, y: 0, x1: 0, y1: 0}; // 目标元素对象的坐标初始化
             let thisDiv = null, move = false, choose = false; // 拖拽对象 拖拽状态 选中状态
+
             //拖拽对象的索引、高度、的初始化。
             let thisDivWidth = 0, thisDivHeight = 0,
                 thisDivHalfW = 0, thisDivHalfH = 0,
                 tarFirstX = 0, tarFirstY = 0;
+
             let tarDiv = null, tarFirst, tempDiv; // 要插入的目标元素的对象, 临时的虚线对象
             let initPos = {x: 0, y: 0};  // 记录拖拽元素初始鼠标元素偏移量
 
-            //鼠标按下时执行的事件（为防止动态添加元素无法使用，在这里使用事件委托的格式）
             $(`#${box}`).on('mousedown', `.${name}`, function (event) {
 
                 choose = true;
@@ -633,7 +523,6 @@
                 initPos.x = thisDiv.offset().left;
                 initPos.y = thisDiv.offset().top;
                 // 鼠标元素相对偏移量
-                console.log(event.pageX, event.pageY);
                 range.x = event.pageX - thisDiv.offset().left;
                 range.y = event.pageY - thisDiv.offset().top;
 
@@ -663,11 +552,14 @@
                     return false;
                 }
 
+                thisDiv.css({left: "", top: ""})
                 thisDiv.insertBefore(tempDiv); // 拖拽元素插入到 虚线div的位置上
                 thisDiv.attr("class", name); //恢复对象的初始样式
                 tempDiv.remove(); // 删除新建的虚线div
                 move = false;
                 choose = false;
+
+                xy === "x" ? self.#updateData("x") : self.#updateData("y");
 
             }).on('mousemove', function (event) {
 
@@ -679,15 +571,14 @@
                 lastPos.x1 = lastPos.x + thisDivWidth;
                 lastPos.y1 = lastPos.y + thisDivHeight;
                 // 拖拽元素随鼠标移动
-                // thisDiv.css({left: lastPos.x + 'px', top: lastPos.y + 'px'});
-                thisDiv.css({left: lastPos.x + 'px'});
+                thisDiv.css({left: lastPos.x + 'px', top: lastPos.y + 'px'});
+                // thisDiv.css({left: lastPos.x + 'px'});
                 // 拖拽元素随鼠标移动 查找插入目标元素
                 let $main = $('.' + name); // 局部变量：按照重新排列过的顺序 再次获取 各个元素的坐标，
 
                 $main.each(function () {
 
                     tarDiv = $(this);
-                    console.log(tarDiv.offset())
                     tarPos.x = tarDiv.offset().left;
                     tarPos.y = tarDiv.offset().top;
                     tarPos.x1 = tarPos.x + tarDiv.width() / 2;
@@ -719,37 +610,24 @@
                 });
             });
         }
-
-
-        /*******************************************************************
-         *生成随机颜色
-         *********************************************
-         * randomColor1():返回10进制颜色值，例如：#167772
-         * randomColor2():返回16进制颜色值，例如：#ffffff
-         * randomColor3():返回rgb格式颜色值，例如：rgb(255,255,255)
-         *
-         *********************************************************************/
-        static randomColor1() {
-            return '#' + Math.floor(Math.random() * 256).toString(10);
-        }
-
-        static randomColor2() {
-            return '#' + Math.floor(Math.random() * 0xffffff).toString(16);
-        }
-
-        static randomColor3() {
-            let r = Math.floor(Math.random() * 256);
-            let g = Math.floor(Math.random() * 256);
-            let b = Math.floor(Math.random() * 256);
-            return "rgb(" + r + ',' + g + ',' + b + ")";//所有方法的拼接都可以用ES6新特性`其他字符串{$变量名}`替换
-        }
     }
-</script>
 
-<script>
-    Tool.drags("item-p", "item", "dragItem", "zwItem");
-</script>
+    let v = new Lane($(".panel"));
 
+    v.add("x", {title: "1-业务部", size: 140});
+    v.add("x", {title: "2-人事部", size: 140});
+    v.add("x", {title: "3-行政部", size: 140});
+    // v.add("x", {title: "4-测试部", size: 140})
+    // v.add("x", {title: "5-后勤部", size: 140})
+
+    v.add("y", {title: "1-起草", size: 120});
+    v.add("y", {title: "2-审批", size: 120});
+    v.add("y", {title: "3-处理", size: 120});
+    // v.add("y", {title: "4-test", size: 120});
+    // console.log(v.getData())
+    // console.log(v.getData("x"))
+    // console.log(v.getData("y"))
+</script>
 
 </body>
 </html>
