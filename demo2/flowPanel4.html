@@ -214,6 +214,14 @@
             this.timer = null;
         }
 
+        /** TODO
+         * 绑定冲突的事件：
+         *  单击事件: removeField item-icon-delete 删除
+         *  双击事件：editable span 编辑文字
+         *  拖拽事件：拖拽到另一个位置
+         *  拖拽结束事件：拖拽结束后，更新数据
+         *
+         */
         #init() {
             Lane.#initXY("x", this.root);
             Lane.#initXY("y", this.root);
@@ -236,8 +244,9 @@
                             <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
                             229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
                             512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
-                            463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572 0v-160.036572H303.981714a47.981714
-                            47.981714 0 0 1 0-95.963428h160V304.018286a48.018286 48.018286 0 0 1 96.036572 0v160h160a47.981714
+                            463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572
+                            0v-160.036572H303.981714a47.981714 47.981714 0 0 1 0-95.963428h160V304.018286a48.018286
+                            48.018286 0 0 1 96.036572 0v160h160a47.981714
                              47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
                              </svg>
                          </i>
@@ -284,8 +293,9 @@
                                     xmlns="http://www.w3.org/2000/svg" p-id="1483" width="20" height="20">
                                     <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
                                     229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286
-                                    96 512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m207.981714
-                                    463.981714H304.018286a47.981714 47.981714 0 1 1 0-95.963428h415.963428a47.981714 47.981714 0 1 1 0 95.963428z"
+                                    96 512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z
+                                    m207.981714 463.981714H304.018286a47.981714 47.981714 0 1 1
+                                    0-95.963428h415.963428a47.981714 47.981714 0 1 1 0 95.963428z"
                                     fill="" p-id="1484"></path>
                                 </svg>
                             </i>
@@ -308,13 +318,10 @@
             able && xy === "x"
                 ? this.#data.horz.push(data?.title)
                 : this.#data.vert.push(data?.title);
-            $(
-                "." +
-                `${xy === "x" ? "horizontal" : "vertical"}` +
-                "-panel-wrapper>.item-wrapper"
-            ).append(Lane.#itemContent(xy, data));
+            $("." + `${xy === "x" ? "horizontal" : "vertical"}` + "-panel-wrapper>.item-wrapper")
+                .append(Lane.#itemContent(xy, data));
             this.#removeField();
-            this.#dragItem();
+            // this.#dragItem();
         }
 
         #addDefaultField(xy, data) {
@@ -439,42 +446,32 @@
             });
         }
 
+        // abandoned
         #drag() {
             $(".item-wrapper")
                 .on("drop", function (ev) {
                     ev.preventDefault();
-                    let data = ev.originalEvent.dataTransfer.getData(
-                        "application/x-moz-node"
-                    );
+                    let data = ev.originalEvent.dataTransfer.getData("application/x-moz-node");
                     let thisDiv = ev.target;
                     $(document.getElementById(data)).insertBefore(thisDiv);
                 })
                 .on("dragover", function (ev) {
                     ev.originalEvent.preventDefault();
                 });
-            this.#dragItem();
+            // this.#dragItem();
         }
 
+        // abandoned
         #dragItem() {
             let self = this;
-            $(".item")
-                .off("dragstart")
-                .on("dragstart", function (ev) {
-                    ev.originalEvent.dataTransfer.setData(
-                        "application/x-moz-node",
-                        ev.target.id
-                    );
-                    $(this).css({background: "rgba(0,0,0,0.2)"});
-                })
-                .off("dragend")
-                .on("dragend", function () {
-                    $(this).css({background: ""});
-                    let xy =
-                        $(this).parent().parent()[0].className.substr(0, 1) === "h"
-                            ? "x"
-                            : "y";
-                    self.#updateData(xy);
-                });
+            $(".item").off("dragstart").on("dragstart", function (ev) {
+                ev.originalEvent.dataTransfer.setData("application/x-moz-node", ev.target.id);
+                $(this).css({background: "rgba(0,0,0,0.2)"});
+            }).off("dragend").on("dragend", function () {
+                $(this).css({background: ""});
+                let xy = $(this).parent().parent()[0].className.substr(0, 1) === "h" ? "x" : "y";
+                self.#updateData(xy);
+            });
         }
 
         #updateData(xy) {
