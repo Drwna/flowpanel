@@ -54,7 +54,12 @@
             white-space: nowrap;
             cursor: default;
         }
-        .item-wrapper { -webkit-user-select: none; }
+        .item-wrapper {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
 
         /* 垂直 */
         .vertical-panel-wrapper {
@@ -124,6 +129,7 @@
         /* 删除图标*/
         .item-icon-delete {
             display: none;
+            z-index: 10;
         }
         .item-icon-delete:hover {
             cursor: pointer;
@@ -211,15 +217,17 @@
         constructor(root) {
             this.root = root;
             this.#init();
-            this.timer = null;
         }
+
+        downClickTime = 0 // 记录当前鼠标按下的时间戳
+        upClickTime = 0 // 记录前一次鼠标抬起的时间戳
+        time = 0 // 两次点击的时间间隔
 
         /** TODO
          * 绑定冲突的事件：
          *  单击事件: removeField item-icon-delete 删除
          *  双击事件：editable span 编辑文字
-         *  拖拽事件：拖拽到另一个位置
-         *  拖拽结束事件：拖拽结束后，更新数据
+         *  拖拽事件：mousedown mousemove mouseup
          *
          */
         #init() {
@@ -231,7 +239,7 @@
             this.#editable();
             this.#togglePanel();
             this.drags("x", "item-x", "item", "xDragItem", "xPlaceholderItem");
-            this.drags("y", "item-y", "item", "yDragItem", "yPlaceholderItem");
+            // this.drags("y", "item-y", "item", "yDragItem", "yPlaceholderItem");
         }
 
         static #initXY(xy, root) {
@@ -310,14 +318,11 @@
                 : this.#data;
         }
 
-        add(xy, data, able = true) {
+        add(xy, data) {
             if (!xy || !data) throw new Error("需要传入xy和data");
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y");
-            if (!data.title || data.title.match(/^[ ]*$/))
-                throw new Error("data需要title");
-            able && xy === "x"
-                ? this.#data.horz.push(data?.title)
-                : this.#data.vert.push(data?.title);
+            if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("data需要传入title");
+            xy === "x" ? this.#data.horz.push(data?.title) : this.#data.vert.push(data?.title);
             $("." + `${xy === "x" ? "horizontal" : "vertical"}` + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data));
             this.#removeField();
@@ -356,46 +361,48 @@
 
         #removeField() {
             let self = this;
-            $(".panel .item-icon-delete").off("click").on("click", function () {
+            this.root.off("click").on("click", ".item-icon-delete", function (e) {
+                e.stopPropagation();
                 $(this).parents(".item-wrapper").children().length === 1 &&
                 $(".vertical-panel-wrapper").children(".item-wrapper")
                     .css({height: "calc(100% - 40px)", width: "42px"})
                     .parent().children(".item-icon-add")
                     .css({display: "none"});
-                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1);
+                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1) === "h"
+                    ? "x"
+                    : "y";
                 self.#delete(xy, $(this).parent());
             });
         }
 
         #editable() {
-            let that = this;
+            let self = this;
             let {xTitles, yTitles} = Lane.#handleData(this.#data);
             this.root.on("dblclick", "span", function () {
-                let self = $(this);
-                let currentVal = self.text();
-                let xy = self.parents(".item-wrapper").parent()[0].className.substr(0, 1);
-                let currentIndex = that.arrayIndex(xy === "h" ? xTitles : yTitles, currentVal);
+                let currentVal = $(this).text();
+                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1);
+                let currentIndex = self.arrayIndex(xy === "h" ? xTitles : yTitles, currentVal);
                 $(this).attr("contenteditable", "true");
-                self.css({background: "#f1eded", outline: "1px solid grey"});
+                $(this).css({background: "#f1eded", outline: "1px solid grey"});
                 $(this).parents()[2].className.substr(0, 1) === "h"
-                    ? self.css({padding: "0 12px"})
-                    : self.css({padding: "12px 0", width: "100%"});
+                    ? $(this).css({padding: "0 12px"})
+                    : $(this).css({padding: "12px 0", width: "100%"});
                 $(this).focus();
                 let sel = window.getSelection();
-                sel.collapse(self[0], 1);
+                sel.collapse($(this)[0], 1);
                 $(this).on("blur", function () {
-                    self.removeAttr("contenteditable");
-                    self.css({background: "", outline: "", padding: "", width: ""});
-                    self.text().trim() === "" && self.text(currentVal);
-                    if (xy === "h") xTitles[currentIndex] = self.text();
-                    else yTitles[currentIndex] = self.text();
+                    $(this).removeAttr("contenteditable");
+                    $(this).css({background: "", outline: "", padding: "", width: ""});
+                    $(this).text().trim() === "" && $(this).text(currentVal);
+                    if (xy === "h") xTitles[currentIndex] = $(this).text();
+                    else yTitles[currentIndex] = $(this).text();
                 });
             });
         }
 
         #togglePanel() {
             let self = this;
-            $(".toggle-panel").on("dblclick", function () {
+            $(".panel .toggle-panel").on("dblclick", function () {
                 let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item");
                 let y = $(".vertical-panel-wrapper>.item-wrapper").children(".item");
                 let xLength = x.length;
@@ -513,6 +520,24 @@
 
             $(`#${box}`).on('mousedown', `.${name}`, function (event) {
 
+
+                // 获取鼠标按下时的时间戳
+                self.downClickTime = new Date().getTime();
+                console.log("self.downClickTime: ", self.downClickTime)
+                // 记算两次点击鼠标的时间间隔
+                self.time = self.downClickTime - self.upClickTime;
+                console.log("self.time: ", self.time)
+
+                if (self.time < 299) {
+                    // 处理双击事务
+                    console.log('您双击了~')
+                } else {
+                    // 处理单击事务
+                    console.log('您单击了~')
+                    // thisDiv.css({left: "", top: ""});
+                }
+
+
                 choose = true;
                 // 拖拽对象
                 thisDiv = $(this);
@@ -536,76 +561,81 @@
 
             });
 
-            $(document).on('mouseup', function (event) {
+            $(document)
+                .on('mouseup', function (event) {
 
-                if (!choose) {
-                    return false;
-                }
+                    // 获取鼠标抬起时的时间戳
+                    self.upClickTime = new Date().getTime();
 
-                if (!move) {
-                    thisDiv.attr("class", name);
-                    tempDiv.remove(); // 删除新建的虚线div
-                    choose = false;
-                    return false;
-                }
-
-                thisDiv.css({left: "", top: ""})
-                thisDiv.insertBefore(tempDiv); // 拖拽元素插入到 虚线div的位置上
-                thisDiv.attr("class", name); //恢复对象的初始样式
-                tempDiv.remove(); // 删除新建的虚线div
-                move = false;
-                choose = false;
-
-                xy === "x" ? self.#updateData("x") : self.#updateData("y");
-
-            }).on('mousemove', function (event) {
-
-                if (!choose) return false;
-
-                move = true;
-                lastPos.x = event.pageX - range.x;
-                lastPos.y = event.pageY - range.y;
-                lastPos.x1 = lastPos.x + thisDivWidth;
-                lastPos.y1 = lastPos.y + thisDivHeight;
-                // 拖拽元素随鼠标移动
-                thisDiv.css({left: lastPos.x + 'px', top: lastPos.y + 'px'});
-                // thisDiv.css({left: lastPos.x + 'px'});
-                // 拖拽元素随鼠标移动 查找插入目标元素
-                let $main = $('.' + name); // 局部变量：按照重新排列过的顺序 再次获取 各个元素的坐标，
-
-                $main.each(function () {
-
-                    tarDiv = $(this);
-                    tarPos.x = tarDiv.offset().left;
-                    tarPos.y = tarDiv.offset().top;
-                    tarPos.x1 = tarPos.x + tarDiv.width() / 2;
-                    tarPos.y1 = tarPos.y + tarDiv.height() / 2;
-                    tarFirst = $main.eq(0); // 获得第一个元素
-                    tarFirstX = tarFirst.offset().left + thisDivHalfW / 2; // 第一个元素对象的中心纵坐标
-                    tarFirstY = tarFirst.offset().top + thisDivHalfH / 2; // 第一个元素对象的中心横坐标
-
-                    // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
-                    if (lastPos.x > tarPos.x) {
-                        //拖拽对象 移动到第一个位置
-                        if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
-                            tempDiv.insertBefore(tarFirst);
-                        }
-                        // 判断要插入目标元素的 坐标后， 直接插入
-                        if (lastPos.x <= tarPos.x + thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y <= tarPos.y + thisDivHalfH && lastPos.y1 >= tarPos.y1) {
-                            tempDiv.insertAfter(tarDiv);
-                        }
-                    } else {
-                        //拖拽对象 移动到第一个位置
-                        if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
-                            tempDiv.insertBefore(tarFirst);
-                        }
-                        // 判断要插入目标元素的 坐标后， 直接插入
-                        if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1) {
-                            tempDiv.insertAfter(tarDiv);
-                        }
+                    if (!choose) {
+                        return false;
                     }
+
+                    if (!move) {
+                        thisDiv.attr("class", name);
+                        tempDiv.remove(); // 删除新建的虚线div
+                        choose = false;
+                        return false;
+                    }
+
+                    thisDiv.css({left: "", top: ""})
+                    thisDiv.insertBefore(tempDiv); // 拖拽元素插入到 虚线div的位置上
+                    thisDiv.attr("class", name); //恢复对象的初始样式
+                    tempDiv.remove(); // 删除新建的虚线div
+                    move = false;
+                    choose = false;
+
+                    xy === "x" ? self.#updateData("x") : self.#updateData("y");
+
+                })
+                .on('mousemove', function (event) {
+
+                    if (!choose) return false;
+
+                    move = true;
+                    lastPos.x = event.pageX - range.x;
+                    lastPos.y = event.pageY - range.y;
+                    lastPos.x1 = lastPos.x + thisDivWidth;
+                    lastPos.y1 = lastPos.y + thisDivHeight;
+                    // 拖拽元素随鼠标移动
+                    thisDiv.css({left: lastPos.x + 'px', top: lastPos.y + 'px'});
+                    // thisDiv.css({left: lastPos.x + 'px'});
+                    // 拖拽元素随鼠标移动 查找插入目标元素
+                    let $main = $('.' + name); // 局部变量：按照重新排列过的顺序 再次获取 各个元素的坐标，
+
+                    $main.each(function () {
+
+                        tarDiv = $(this);
+                        tarPos.x = tarDiv.offset().left;
+                        tarPos.y = tarDiv.offset().top;
+                        tarPos.x1 = tarPos.x + tarDiv.width() / 2;
+                        tarPos.y1 = tarPos.y + tarDiv.height() / 2;
+                        tarFirst = $main.eq(0); // 获得第一个元素
+                        tarFirstX = tarFirst.offset().left + thisDivHalfW / 2; // 第一个元素对象的中心纵坐标
+                        tarFirstY = tarFirst.offset().top + thisDivHalfH / 2; // 第一个元素对象的中心横坐标
+
+                        // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
+                        if (lastPos.x > tarPos.x) {
+                            //拖拽对象 移动到第一个位置
+                            if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
+                                tempDiv.insertBefore(tarFirst);
+                            }
+                            // 判断要插入目标元素的 坐标后， 直接插入
+                            if (lastPos.x <= tarPos.x + thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y <= tarPos.y + thisDivHalfH && lastPos.y1 >= tarPos.y1) {
+                                tempDiv.insertAfter(tarDiv);
+                            }
+                        } else {
+                            //拖拽对象 移动到第一个位置
+                            if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
+                                tempDiv.insertBefore(tarFirst);
+                            }
+                            // 判断要插入目标元素的 坐标后， 直接插入
+                            if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1) {
+                                tempDiv.insertAfter(tarDiv);
+                            }
+                        }
+                    });
                 });
-            });
         }
     }
 
