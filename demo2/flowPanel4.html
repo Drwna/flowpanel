@@ -498,35 +498,26 @@
             if (xy === "x") {
                 let length = $(".horizontal-panel-wrapper>.item-wrapper").children().length;
                 console.log("length:", length);
-                // for (let i = 0; i < length; i++) {
-                let x = $(".horizontal-panel-wrapper>.item-wrapper>.item");
-                let title0 = x[0].innerText;
-                let size0 = x[0].offsetWidth;
-                console.log(title0, size0)
-                this.add("x", {title: title0, size: size0})
-                this.#delete("x", $(x[0]))
-
-
-                let title1 = x[1].innerText;
-                let size1 = x[1].offsetWidth;
-                console.log(title1, size1)
-
-
-                let title2 = x[2].innerText;
-                let size2 = x[2].offsetWidth;
-                console.log(title2, size2)
-                // this.add("x", {title, size});
-                // this.#delete("x", $(x[i]));
-                // }
-                // } else {
-                //     let length = $(".vertical-panel-wrapper>.item-wrapper").children().length;
-                // for (let i = 0; i < length; i++) {
-                //     let y = $(".vertical-panel-wrapper>.item-wrapper>.item");
-                //     let title = y[i].innerText;
-                //     let size = y[i].offsetHeight;
-                //     this.#delete("y", $(y[i]));
-                //     this.add("y", {title, size});
-                // }
+                for (let i = 0; i < length; i++) {
+                    console.log("i:", i);
+                    let x = $(".horizontal-panel-wrapper>.item-wrapper>.item");
+                    let title = x[0].innerText;
+                    let size = x[0].offsetWidth;
+                    console.log(i, title, size);
+                    this.add(xy, {title: title, size: size});
+                    this.#delete(xy, $(x[0]));
+                }
+                console.log(this.getData("x"))
+            } else {
+                let length = $(".vertical-panel-wrapper>.item-wrapper").children().length;
+                for (let i = 0; i < length; i++) {
+                    let y = $(".vertical-panel-wrapper>.item-wrapper>.item");
+                    let title = y[0].innerText;
+                    let size = y[0].offsetHeight;
+                    this.#delete("y", $(y[0]));
+                    this.add("y", {title, size});
+                }
+                console.log(this.getData("y"))
             }
         }
 
@@ -604,7 +595,7 @@
                     if (!move) {
                         thisDiv.css({left: '', top: ''});
                         thisDiv.attr("class", name);
-                        tempDiv.remove(); // 删除新建的虚线div
+                        tempDiv.remove();
                         choose = false;
                         return false;
                     }
@@ -612,12 +603,10 @@
                     thisDiv.insertBefore(tempDiv); // 拖拽元素插入到 虚线div的位置上
                     thisDiv.attr("class", name); //恢复对象的初始样式
                     thisDiv.css({left: "", top: ""})
-                    tempDiv.remove(); // 删除新建的虚线div
+                    tempDiv.remove();
                     move = false;
                     choose = false;
-                    setTimeout(() => {
-                        self.#updateData("x")
-                    }, 100)
+                    xy === 'x' ? self.#updateData("x") : self.#updateData("y");
                 })
                 .on('mousemove', function (event) {
 
@@ -633,12 +622,11 @@
                         thisDiv.css({left: lastPos.x + 'px'}) :
                         thisDiv.css({top: lastPos.y + 'px'});
                     // 拖拽元素随鼠标移动 查找插入目标元素
-                    let $main = $('.' + name); // 局部变量：按照重新排列过的顺序 再次获取 各个元素的坐标，
+                    let $main = $('.' + name);
+                    //按照重新排列过的顺序 再次获取 各个元素的坐标，
 
                     $main.each(function () {
-
                         tarDiv = $(this);
-                        // console.log(tarDiv.offset())
                         tarPos.x = tarDiv.offset().left;
                         tarPos.y = tarDiv.offset().top;
                         tarPos.x1 = tarPos.x + tarDiv.width() / 2;
@@ -666,7 +654,6 @@
                             if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1) {
                                 tempDiv.insertAfter(tarDiv);
                             }
-
                         }
                     });
                 });
