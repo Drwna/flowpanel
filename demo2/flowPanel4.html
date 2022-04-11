@@ -68,6 +68,9 @@
             border: 1px solid red;
             position: absolute;
         }
+        .vertical-panel-wrapper .item-wrapper{
+            height: 100%;
+        }
         .vertical-panel-wrapper .item {
             height: 200px;
             border-bottom: 1px solid black;
@@ -268,24 +271,27 @@
         }
 
         #handleCSS() {
-            $(".vertical-panel-wrapper>.item-wrapper")
-                .mouseenter(function () {
-                    $(this).parent().children(".item-icon-add")
-                        .css({display: "block"});
-                })
-                .mouseleave(function () {
-                    $(this).parent().children(".item-icon-add")
-                        .css({display: "none"});
-                })
-                .children().length === 0 &&
-            $(".vertical-panel-wrapper>.item-wrapper").css({height: "100%"});
-            $(".vertical-panel-wrapper>.item-icon-add")
-                .mouseenter(function () {
-                    $(this).css({display: "block"});
-                })
-                .mouseleave(function () {
-                    $(this).css({display: "none"});
-                });
+            setTimeout(function () {
+                $(".vertical-panel-wrapper>.item-wrapper")
+                    .mouseenter(function () {
+                        $(this).parent().children(".item-icon-add")
+                            .css({display: "block"});
+                    })
+                    .mouseleave(function () {
+                        $(this).parent().children(".item-icon-add")
+                            .css({display: "none"});
+                    })
+                    .children().length === 0 &&
+                $(".vertical-panel-wrapper>.item-wrapper")
+                    .css({height: "calc(100% - 40px)"})
+                $(".vertical-panel-wrapper>.item-icon-add")
+                    .mouseenter(function () {
+                        $(this).css({display: "block"});
+                    })
+                    .mouseleave(function () {
+                        $(this).css({display: "none"});
+                    });
+            }, 0)
         }
 
         static #handleData(data) {
