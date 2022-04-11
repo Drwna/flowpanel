@@ -200,7 +200,7 @@
         .yPlaceholderItem {
             display: flex;
             width: 40px;
-            height: 140px;
+            /*height: 140px;*/
             outline: 1px dashed grey;
         }
 
@@ -218,6 +218,9 @@
             this.root = root;
             this.#init();
         }
+
+        flag = false;
+        stop = null;
 
         downClickTime = 0 // 记录当前鼠标按下的时间戳
         upClickTime = 0 // 记录前一次鼠标抬起的时间戳
@@ -238,8 +241,8 @@
             this.#addDefaultField("y", {title: "yyy"});
             this.#editable();
             this.#togglePanel();
-            this.drags("x", "item-x", "item", "xDragItem", "xPlaceholderItem");
-            // this.drags("y", "item-y", "item", "yDragItem", "yPlaceholderItem");
+            this.drags("x", "dragX", "item", "xDragItem", "xPlaceholderItem");
+            // this.drags("y", "dragY", "item", "yDragItem", "yPlaceholderItem");
         }
 
         static #initXY(xy, root) {
@@ -258,7 +261,7 @@
                              47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
                              </svg>
                          </i>
-                     <div id="item-${xy}" class="item-wrapper"></div>
+                     <div id="drag${xy.toUpperCase()}" class="item-wrapper"></div>
                     </div>
                 `);
             root.append(panelWrapper);
@@ -518,52 +521,53 @@
             let tarDiv = null, tarFirst, tempDiv; // 要插入的目标元素的对象, 临时的虚线对象
             let initPos = {x: 0, y: 0};  // 记录拖拽元素初始鼠标元素偏移量
 
-            $(`#${box}`).on('mousedown', `.${name}`, function (event) {
+            $(`#${box}`)
+                .on('mousedown', `.${name}`, function (event) {
+
+                    // 拖拽对象
+                    thisDiv = $(this);
+
+                    // 获取鼠标按下时的时间戳
+                    self.downClickTime = new Date().getTime();
+                    // 记算两次点击鼠标的时间间隔
+                    self.time = self.downClickTime - self.upClickTime;
+
+                    if (self.time > 300) {
+                        console.log("单击了")
+                        self.stop = setTimeout(function () {
+                            self.flag = true;
+                            console.log("长按了")
 
 
-                // 获取鼠标按下时的时间戳
-                self.downClickTime = new Date().getTime();
-                console.log("self.downClickTime: ", self.downClickTime)
-                // 记算两次点击鼠标的时间间隔
-                self.time = self.downClickTime - self.upClickTime;
-                console.log("self.time: ", self.time)
+                            choose = true;
+                            // 记录拖拽元素初始位置
+                            initPos.x = thisDiv.offset().left;
+                            initPos.y = thisDiv.offset().top;
+                            // 鼠标元素相对偏移量
+                            range.x = event.pageX - thisDiv.offset().left;
+                            range.y = event.pageY - thisDiv.offset().top;
 
-                if (self.time < 299) {
-                    // 处理双击事务
-                    console.log('您双击了~')
-                } else {
-                    // 处理单击事务
-                    console.log('您单击了~')
-                    // thisDiv.css({left: "", top: ""});
-                }
+                            thisDivWidth = thisDiv.width();
+                            thisDivHeight = thisDiv.height();
+                            thisDivHalfW = thisDivWidth / 2;
+                            thisDivHalfH = thisDivHeight / 2;
+                            thisDiv.attr("class", name2);
+                            thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
 
+                            // 创建新元素 插入拖拽元素之前的位置(虚线框)
+                            let size = xy === "x" ? thisDiv.outerWidth() : thisDiv.outerHeight()
+                            console.log(size)
+                            $(`<div class="${name3}"
+                                    style="${xy === 'x' ? 'width' : 'height'}:${size}"></div>`)
+                                .insertBefore(thisDiv);
+                            tempDiv = $("." + name3);
 
-                choose = true;
-                // 拖拽对象
-                thisDiv = $(this);
-                // 记录拖拽元素初始位置
-                initPos.x = thisDiv.offset().left;
-                initPos.y = thisDiv.offset().top;
-                // 鼠标元素相对偏移量
-                range.x = event.pageX - thisDiv.offset().left;
-                range.y = event.pageY - thisDiv.offset().top;
-
-                thisDivWidth = thisDiv.width();
-                thisDivHeight = thisDiv.height();
-                thisDivHalfW = thisDivWidth / 2;
-                thisDivHalfH = thisDivHeight / 2;
-                thisDiv.attr("class", name2);
-                thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
-
-                // 创建新元素 插入拖拽元素之前的位置(虚线框)
-                $("<div class='" + name3 + "'></div>").insertBefore(thisDiv);
-                tempDiv = $("." + name3);
-
-            });
-
-            $(document)
+                        }, 300)
+                    }
+                })
                 .on('mouseup', function (event) {
 
+                    if (!self.flag) clearTimeout(self.stop);
                     // 获取鼠标抬起时的时间戳
                     self.upClickTime = new Date().getTime();
 
@@ -647,9 +651,9 @@
     // v.add("x", {title: "4-测试部", size: 140})
     // v.add("x", {title: "5-后勤部", size: 140})
 
-    v.add("y", {title: "1-起草", size: 120});
-    v.add("y", {title: "2-审批", size: 120});
-    v.add("y", {title: "3-处理", size: 120});
+    // v.add("y", {title: "1-起草", size: 120});
+    // v.add("y", {title: "2-审批", size: 120});
+    // v.add("y", {title: "3-处理", size: 120});
     // v.add("y", {title: "4-test", size: 120});
     // console.log(v.getData())
     // console.log(v.getData("x"))

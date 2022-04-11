@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <title>Title</title>
+
     <style>
         #right_panel {
             position: absolute;
@@ -22,10 +24,40 @@
             height: 100%;
             cursor: ew-resize;
         }
+        .div1 {
+            width: 100px;
+            height: 100px;
+            border: 5px saddlebrown solid;
+        }
     </style>
 </head>
 <body>
 <div id="right_panel"></div>
+<div class="div1" onmouseenter="mouseHover()"></div>
+<script>
+
+
+
+    function mouseHover() {
+        $(".div1").on("mouseenter mouseleave", function (e) {
+            let w = $(this).width();
+            let h = $(this).height();
+            let x = (e.pageX - this.offsetLeft - (w / 2)) * (w > h ? (h / w) : 1);
+            let y = (e.pageY - this.offsetTop - (h / 2)) * (h > w ? (w / h) : 1);
+            let direction = Math.round((((Math.atan2(y, x) * (180 / Math.PI)) + 180) / 90) + 3) % 4; //direction的值为“0,1,2,3”分别对应着“上，右，下，左”
+            let eventType = e.type;
+            let dirName = ['top', 'right', 'down', 'left'];
+            if (e.type === 'mouseenter') {
+                $(".div1").html(dirName[direction] + '进入');
+            } else {
+                $('.div1').html(dirName[direction] + '离开');
+            }
+        });
+    }
+
+</script>
+
+
 <script>
     const BORDER_SIZE = 4;
     const panel = document.getElementById("right_panel");
@@ -40,8 +72,8 @@
 
     panel.addEventListener("mousedown", function (e) {
         if (e.offsetX < BORDER_SIZE) {
-        m_pos = e.x;
-        document.addEventListener("mousemove", resize, false);
+            m_pos = e.x;
+            document.addEventListener("mousemove", resize, false);
         }
     }, false);
 
