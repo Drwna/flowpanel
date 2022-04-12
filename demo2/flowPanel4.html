@@ -228,10 +228,6 @@
             this.#init();
         }
 
-        /** TODO
-         * 冲突的事件：
-         * 拖曳和调节尺寸
-         */
         #init() {
             Lane.#initXY("x", this.root);
             Lane.#initXY("y", this.root);
@@ -521,37 +517,42 @@
                         choose = false
                     } else {
                         // 单击事件
+                        let tgt = event.target
+                        let cursorStyle = window.getComputedStyle(tgt).cursor
+                        if (cursorStyle !== "auto") {
 
-                        // 按下延时拖曳
-                        clearTimeout(stop)
-                        stop = setTimeout(() => {
+                            // 按下延时拖曳
+                            clearTimeout(stop)
+                            stop = setTimeout(() => {
 
-                            choose = true;
-                            // 拖拽对象
-                            thisDiv = $(this);
+                                choose = true;
+                                // 拖拽对象
+                                thisDiv = $(this);
 
-                            // 记录拖拽元素初始位置
-                            initPos.x = thisDiv.offset().left;
-                            initPos.y = thisDiv.offset().top;
-                            // 鼠标元素相对偏移量
-                            range.x = event.pageX - thisDiv.offset().left;
-                            range.y = event.pageY - thisDiv.offset().top;
+                                // 记录拖拽元素初始位置
+                                initPos.x = thisDiv.offset().left;
+                                initPos.y = thisDiv.offset().top;
+                                // 鼠标元素相对偏移量
+                                range.x = event.pageX - thisDiv.offset().left;
+                                range.y = event.pageY - thisDiv.offset().top;
 
-                            thisDivWidth = thisDiv.width();
-                            thisDivHeight = thisDiv.height();
-                            thisDivHalfW = thisDivWidth / 2;
-                            thisDivHalfH = thisDivHeight / 2;
-                            thisDiv.attr("class", name2);
-                            thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
+                                thisDivWidth = thisDiv.width();
+                                thisDivHeight = thisDiv.height();
+                                thisDivHalfW = thisDivWidth / 2;
+                                thisDivHalfH = thisDivHeight / 2;
+                                thisDiv.attr("class", name2);
+                                thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
 
-                            // 创建新元素 插入拖拽元素之前的位置(虚线框)
-                            tempDiv = $(`<div class="${name3}"></div>`)
-                            xy === 'x' ?
-                                tempDiv.css({width: thisDiv.outerWidth()}) :
-                                tempDiv.css({height: thisDiv.outerHeight()});
-                            tempDiv.insertBefore(thisDiv);
+                                // 创建新元素 插入拖拽元素之前的位置(虚线框)
+                                tempDiv = $(`<div class="${name3}"></div>`)
+                                xy === 'x' ?
+                                    tempDiv.css({width: thisDiv.outerWidth()}) :
+                                    tempDiv.css({height: thisDiv.outerHeight()});
+                                tempDiv.insertBefore(thisDiv);
 
-                        }, 250)
+                            }, 250)
+
+                        }
                     }
 
                     $(document)
