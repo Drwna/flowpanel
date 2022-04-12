@@ -76,7 +76,7 @@
             position: absolute;
         }
         .vertical-panel-wrapper .item-wrapper {
-            height: 100%;
+            height: calc(100% - var(--panel-size));
         }
         .vertical-panel-wrapper .item {
             border-bottom: 1px solid black;
@@ -233,8 +233,8 @@
         }
 
         #init() {
-            Lane.#initXY("x", this.root);
-            Lane.#initXY("y", this.root);
+            Lane.#renderXY("x", this.root);
+            Lane.#renderXY("y", this.root);
             this.#handleCSS();
             this.#addDefaultField("x", {title: "xxx"});
             this.#addDefaultField("y", {title: "yyy"});
@@ -244,47 +244,43 @@
             this.#drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
         }
 
-        static #initXY(xy, root) {
-            let panelWrapper = $(`
-                    <div class="${xy === "y" ? "vertical" : "horizontal"}-panel-wrapper">
-                     ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
-                         <i class="item-icon-add">
-                            <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                            xmlns="http://www.w3.org/2000/svg" p-id="1633">
-                            <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
-                            229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
-                            512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
-                            463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572
-                            0v-160.036572H303.981714a47.981714 47.981714 0 0 1 0-95.963428h160V304.018286a48.018286
-                            48.018286 0 0 1 96.036572 0v160h160a47.981714
-                             47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
-                             </svg>
-                         </i>
-                     <div id="drag${xy.toUpperCase()}" class="item-wrapper"></div>
-                    </div>
-                `);
-            root.append(panelWrapper);
+        static #renderXY(xy, root) {
+            root.append($(`
+                <div class="${xy === "y" ? "vertical" : "horizontal"}-panel-wrapper">
+                 ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
+                     <i class="item-icon-add">
+                                         <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                         xmlns="http://www.w3.org/2000/svg" p-id="1633">
+                                         <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
+                                         229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
+                                         512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
+                                         463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572
+                                         0v-160.036572H303.981714a47.981714 47.981714 0 0 1 0-95.963428h160V304.018286a48.018286
+                                         48.018286 0 0 1 96.036572 0v160h160a47.981714
+                                         47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
+                                         </svg>
+                                         </i>
+                 <div id="drag${xy.toUpperCase()}" class="item-wrapper"></div>
+                </div>`));
         }
 
         #handleCSS() {
-            setTimeout(function () {
-                $(".vertical-panel-wrapper>.item-wrapper")
-                    .mouseenter(function () {
-                        $(this).parent().children(".item-icon-add")
-                            .css({display: "block"});
-                    })
-                    .mouseleave(function () {
-                        $(this).parent().children(".item-icon-add")
-                            .css({display: "none"});
-                    })
-                $(".vertical-panel-wrapper>.item-icon-add")
-                    .mouseenter(function () {
-                        $(this).css({display: "block"});
-                    })
-                    .mouseleave(function () {
-                        $(this).css({display: "none"});
-                    });
-            }, 0)
+            $(".vertical-panel-wrapper>.item-wrapper")
+                .mouseenter(function () {
+                    $(this).parent().children(".item-icon-add")
+                        .css({display: "block"});
+                })
+                .mouseleave(function () {
+                    $(this).parent().children(".item-icon-add")
+                        .css({display: "none"});
+                })
+            $(".vertical-panel-wrapper>.item-icon-add")
+                .mouseenter(function () {
+                    $(this).css({display: "block"});
+                })
+                .mouseleave(function () {
+                    $(this).css({display: "none"});
+                });
         }
 
         static #handleData(data) {
@@ -329,7 +325,6 @@
             $("." + `${xy === "x" ? "horizontal" : "vertical"}` + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data));
             this.#removeField();
-            // this.#dragItem();
         }
 
         #addDefaultField(xy, data) {
@@ -342,23 +337,23 @@
             });
         }
 
-        arrayIndex(array, value) {
+        static #arrayIndex(array, value) {
             for (let i = 0; i < array.length; i++) {
                 if (array[i] === value) return i;
             }
             return -1;
         }
 
-        removeArray(arr, val) {
-            this.arrayIndex(arr, val) > -1 &&
-            arr.splice(this.arrayIndex(arr, val), 1);
+        static #removeArray(arr, val) {
+            Lane.#arrayIndex(arr, val) > -1 &&
+            arr.splice(Lane.#arrayIndex(arr, val), 1);
         }
 
         #delete(xy, el) {
             let {xTitles, yTitles} = Lane.#handleData(this.#data);
             xy === "x"
-                ? this.removeArray(xTitles, el[0].innerText)
-                : this.removeArray(yTitles, el[0].innerText);
+                ? Lane.#removeArray(xTitles, el[0].innerText)
+                : Lane.#removeArray(yTitles, el[0].innerText);
             el.remove();
         }
 
@@ -371,20 +366,18 @@
                     .css({height: `calc(100% - ${$(".toggle-panel").outerWidth()}px)`})
                     .parent().children(".item-icon-add")
                     .css({display: "none"});
-                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1) === "h"
-                    ? "x"
-                    : "y";
+                let xy = $(this).parents(".item-wrapper").parent()[0].className
+                    .substr(0, 1) === "h" ? "x" : "y";
                 self.#delete(xy, $(this).parent());
             });
         }
 
         #editable() {
-            let self = this;
             let {xTitles, yTitles} = Lane.#handleData(this.#data);
             this.root.on("dblclick", "span", function () {
                 let currentVal = $(this).text();
                 let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1);
-                let currentIndex = self.arrayIndex(xy === "h" ? xTitles : yTitles, currentVal);
+                let currentIndex = Lane.#arrayIndex(xy === "h" ? xTitles : yTitles, currentVal);
                 $(this).attr("contenteditable", "true");
                 $(this).css({background: "#f1eded", outline: "1px solid grey"});
                 $(this).parents()[2].className.substr(0, 1) === "h"
@@ -406,53 +399,53 @@
         #togglePanel() {
             let self = this;
             $(".panel .toggle-panel").on("dblclick", function () {
-                let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item");
-                let y = $(".vertical-panel-wrapper>.item-wrapper").children(".item");
-                let xLength = x.length;
-                let yLength = y.length;
+                let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item"),
+                    y = $(".vertical-panel-wrapper>.item-wrapper").children(".item");
+                let xLength = x.length,
+                    yLength = y.length;
+                let size, title;
                 if (xLength === yLength) {
                     for (let i = 0; i < xLength; i++) {
-                        let xSize = x[i].offsetWidth;
-                        let xTitle = x[i].innerText;
+                        size = x[i].offsetWidth;
+                        title = x[i].innerText;
                         self.#delete("x", $(x[i]));
-                        self.add("y", {title: xTitle, size: xSize});
-                        let ySize = y[i].offsetHeight;
-                        let yTitle = y[i].innerText;
+                        self.add("y", {title, size});
+                        size = y[i].offsetHeight;
+                        title = y[i].innerText;
                         self.#delete("y", $(y[i]));
-                        self.add("x", {title: yTitle, size: ySize});
+                        self.add("x", {title, size});
                     }
                 } else {
                     if (xLength > yLength) {
                         for (let i = 0; i < xLength; i++) {
-                            let xSize = x[i].offsetWidth;
-                            let xTitle = x[i].innerText;
+                            size = x[i].offsetWidth;
+                            title = x[i].innerText;
                             self.#delete("x", $(x[i]));
-                            self.add("y", {title: xTitle, size: xSize});
+                            self.add("y", {title, size});
                             try {
-                                let ySize = y[i].offsetHeight;
-                                let yTitle = y[i].innerText;
+                                size = y[i].offsetHeight;
+                                title = y[i].innerText;
                                 self.#delete("y", $(y[i]));
-                                self.add("x", {title: yTitle, size: ySize});
+                                self.add("x", {title, size});
                             } catch (e) {
                             }
                         }
                     } else {
                         for (let i = 0; i < yLength; i++) {
-                            let ySize = y[i].offsetHeight;
-                            let yTitle = y[i].innerText;
+                            size = y[i].offsetHeight;
+                            title = y[i].innerText;
                             self.#delete("y", $(y[i]));
-                            self.add("x", {title: yTitle, size: ySize});
+                            self.add("x", {title, size});
                             try {
-                                let xSize = x[i].offsetWidth;
-                                let xTitle = x[i].innerText;
+                                size = x[i].offsetWidth;
+                                title = x[i].innerText;
                                 self.#delete("x", $(x[i]));
-                                self.add("y", {title: xTitle, size: xSize});
+                                self.add("y", {title, size});
                             } catch (e) {
                             }
                         }
                     }
                 }
-                console.log("切换后：", self.getData());
             });
         }
 
