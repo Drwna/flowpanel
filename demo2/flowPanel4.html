@@ -190,7 +190,6 @@
         }
         .xPlaceholderItem {
             display: flex;
-            width: 140px;
             height: 40px;
             outline: 1px dashed grey;
         }
@@ -211,7 +210,6 @@
         .yPlaceholderItem {
             display: flex;
             width: 40px;
-            height: 140px;
             outline: 1px dashed grey;
         }
 
@@ -230,13 +228,6 @@
             this.#init();
         }
 
-        flag = false;
-        stop = null;
-
-        downClickTime = 0 // 记录当前鼠标按下的时间戳
-        upClickTime = 0 // 记录前一次鼠标抬起的时间戳
-        time = 0 // 两次点击的时间间隔
-
         /** TODO
          * 冲突的事件：
          * 拖曳和调节尺寸
@@ -249,8 +240,8 @@
             this.#addDefaultField("y", {title: "yyy"});
             this.#editable();
             this.#togglePanel();
-            this.drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
-            this.drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
+            this.#drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
+            this.#drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
         }
 
         static #initXY(xy, root) {
@@ -492,7 +483,7 @@
             }
         }
 
-        drags(xy, box, name, name2, name3) {
+        #drags(xy, box, name, name2, name3) {
             let self = this;
             let range = {x: 0, y: 0}; // 鼠标元素偏移量
             let lastPos = {x: 0, y: 0, x1: 0, y1: 0}; // 拖拽对象的四个坐标
@@ -512,22 +503,28 @@
                 tempDiv;
             let initPos = {x: 0, y: 0};  // 记录拖拽元素初始鼠标元素偏移量
 
-            //鼠标按下时执行的事件（为防止动态添加元素无法使用，在这里使用事件委托的格式）
+            let flag = false; // 拖曳状态
+            let stop = null;  // 拖曳结束
+
+            let downClickTime = 0 // 记录当前鼠标按下的时间戳
+            let upClickTime = 0 // 记录前一次鼠标抬起的时间戳
+            let time = 0 // 两次点击的时间间隔
+
             $(`#${box}`)
                 .on('mousedown', `.${name}`, function (event) {
 
-                    self.downClickTime = new Date().getTime()
-                    self.time = self.downClickTime - self.upClickTime
+                    downClickTime = new Date().getTime()
+                    time = downClickTime - upClickTime
 
-                    if (self.time < 300) {
+                    if (time < 300) {
                         // 双击事件
                         choose = false
-                        move = false
                     } else {
                         // 单击事件
 
                         // 按下延时拖曳
-                        self.stop = setTimeout(() => {
+                        clearTimeout(stop)
+                        stop = setTimeout(() => {
                             self.flag = true
 
                             choose = true;
@@ -549,33 +546,34 @@
                             thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
 
                             // 创建新元素 插入拖拽元素之前的位置(虚线框)
-                            $("<div class='" + name3 + "'></div>").insertBefore(thisDiv);
-                            tempDiv = $("." + name3);
+                            tempDiv = $(`<div class="${name3}"></div>`)
+                            xy === 'x' ?
+                                tempDiv.css({width: thisDiv.outerWidth()}) :
+                                tempDiv.css({height: thisDiv.outerHeight()});
+                            tempDiv.insertBefore(thisDiv);
 
                         }, 250)
                     }
                 })
+            $(document)
                 .on('mouseup', function () {
 
-                    if (!self.flag) clearTimeout(self.stop);
-                    self.upClickTime = new Date().getTime()
+                    if (!flag) clearTimeout(stop);
+                    upClickTime = new Date().getTime()
 
-                    if (!choose) {
-                        return false;
-                    }
+                    if (!choose) return false;
 
                     if (!move) {
                         thisDiv.css({left: '', top: ''});
-                        thisDiv.attr("class", name);
+                        thisDiv.addClass("item" + " " + name);
                         tempDiv.remove();
                         choose = false;
                         return false;
                     }
 
-                    thisDiv.insertBefore(tempDiv); // 拖拽元素插入到 虚线div的位置上
-                    thisDiv.attr("class", name); //恢复对象的初始样式
+                    thisDiv.insertBefore(tempDiv);
                     thisDiv.css({left: "", top: ""})
-                    thisDiv.addClass("item");
+                    thisDiv.addClass("item" + " " + name); //恢复对象的初始样式
                     tempDiv.remove();
                     move = false;
                     choose = false;
@@ -636,14 +634,14 @@
     let v = new Lane($(".panel"));
 
     v.add("x", {title: "1-业务部", size: 140});
-    v.add("x", {title: "2-人事部", size: 140});
+    v.add("x", {title: "2-人事部", size: 200});
     v.add("x", {title: "3-行政部", size: 140});
     // v.add("x", {title: "4-测试部", size: 140})
     // v.add("x", {title: "5-后勤部", size: 140})
 
     v.add("y", {title: "1-起草", size: 120});
     v.add("y", {title: "2-审审批审批审批审批批", size: 120});
-    v.add("y", {title: "3-处理", size: 120});
+    v.add("y", {title: "3-处理", size: 80});
     // v.add("y", {title: "4-test", size: 120});
     // console.log(v.getData())
     // console.log(v.getData("x"))
