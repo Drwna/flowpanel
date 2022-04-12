@@ -457,26 +457,14 @@
         }
 
         #updateData(xy) {
-            if (xy === "x") {
-                let length = $(".horizontal-panel-wrapper>.item-wrapper").children().length;
-                for (let i = 0; i < length; i++) {
-                    let x = $(".horizontal-panel-wrapper>.item-wrapper>.item");
-                    let title = x[0].innerText;
-                    let size = x[0].offsetWidth;
-                    this.add(xy, {title, size});
-                    this.#delete(xy, $(x[0]));
-                }
-                console.log("拖曳后更新：", this.getData("x"));
-            } else {
-                let length = $(".vertical-panel-wrapper>.item-wrapper").children().length;
-                for (let i = 0; i < length; i++) {
-                    let y = $(".vertical-panel-wrapper>.item-wrapper>.item");
-                    let title = y[0].innerText;
-                    let size = y[0].offsetHeight;
-                    this.#delete(xy, $(y[0]));
-                    this.add(xy, {title, size});
-                }
-                console.log("拖曳后更新：", this.getData("y"));
+            let a = xy === 'x' ? '.horizontal-panel-wrapper' : '.vertical-panel-wrapper'
+            let length = $(a + '>.item-wrapper').children().length
+            for (let i = 0; i < length; i++) {
+                let item = $(a + '>.item-wrapper>.item');
+                let title = item[0].innerText;
+                let size = xy === 'x' ? item[0].offsetWidth : item[0].offsetHeight;
+                this.#delete(xy, $(item[0]));
+                this.add(xy, {title, size});
             }
         }
 
