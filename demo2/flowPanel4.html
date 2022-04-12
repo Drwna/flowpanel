@@ -180,11 +180,13 @@
         .xDragItem {
             position: absolute;
             /*width: 140px;*/
+            overflow: hidden;
             height: 36px;
             line-height: 36px;
             text-align: center;
             outline: 1px solid grey;
             background: grey;
+            z-index: 11;
         }
         .xPlaceholderItem {
             display: flex;
@@ -194,11 +196,13 @@
         }
         .yDragItem {
             position: absolute;
+            z-index: 11;
             width: 36px;
             padding: 30px 0;
             text-align: center;
             outline: 1px solid grey;
             background: grey;
+            -webkit-writing-mode: vertical-lr;
             writing-mode: vertical-lr;
             overflow: hidden;
             display: flex;
@@ -234,11 +238,8 @@
         time = 0 // 两次点击的时间间隔
 
         /** TODO
-         * 绑定冲突的事件：
-         *  单击事件: removeField item-icon-delete 删除
-         *  双击事件：editable span 编辑文字
-         *  拖拽事件：mousedown mousemove mouseup
-         *
+         * 冲突的事件：
+         * 拖曳和调节尺寸
          */
         #init() {
             Lane.#initXY("x", this.root);
@@ -248,8 +249,8 @@
             this.#addDefaultField("y", {title: "yyy"});
             this.#editable();
             this.#togglePanel();
-            this.drags("x", "dragX", "item", "xDragItem", "xPlaceholderItem");
-            this.drags("y", "dragY", "item", "yDragItem", "yPlaceholderItem");
+            this.drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
+            this.drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
         }
 
         static #initXY(xy, root) {
@@ -307,7 +308,8 @@
         }
 
         static #itemContent(xy, ts) {
-            return $(`<div class="item" style="${xy === "y" ? "height" : "width"}:${ts.size || "240"}px">
+            return $(`<div class="item ${xy === 'x' ? 'xItem' : 'yItem'}"
+                           style="${xy === "y" ? "height" : "width"}:${ts.size || "240"}px">
                             <span>${ts.title}</span>
                             <i class="item-icon-delete">
                                 <svg t="1648779026180" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -466,58 +468,27 @@
             });
         }
 
-        // abandoned
-        #drag() {
-            $(".item-wrapper")
-                .on("drop", function (ev) {
-                    ev.preventDefault();
-                    let data = ev.originalEvent.dataTransfer.getData("application/x-moz-node");
-                    let thisDiv = ev.target;
-                    $(document.getElementById(data)).insertBefore(thisDiv);
-                })
-                .on("dragover", function (ev) {
-                    ev.originalEvent.preventDefault();
-                });
-            // this.#dragItem();
-        }
-
-        // abandoned
-        #dragItem() {
-            let self = this;
-            $(".item").off("dragstart").on("dragstart", function (ev) {
-                ev.originalEvent.dataTransfer.setData("application/x-moz-node", ev.target.id);
-                $(this).css({background: "rgba(0,0,0,0.2)"});
-            }).off("dragend").on("dragend", function () {
-                $(this).css({background: ""});
-                let xy = $(this).parent().parent()[0].className.substr(0, 1) === "h" ? "x" : "y";
-                self.#updateData(xy);
-            });
-        }
-
         #updateData(xy) {
             if (xy === "x") {
                 let length = $(".horizontal-panel-wrapper>.item-wrapper").children().length;
-                console.log("length:", length);
                 for (let i = 0; i < length; i++) {
-                    console.log("i:", i);
                     let x = $(".horizontal-panel-wrapper>.item-wrapper>.item");
                     let title = x[0].innerText;
                     let size = x[0].offsetWidth;
-                    console.log(i, title, size);
-                    this.add(xy, {title: title, size: size});
+                    this.add(xy, {title, size});
                     this.#delete(xy, $(x[0]));
                 }
-                console.log(this.getData("x"))
+                console.log("拖曳后更新：", this.getData("x"));
             } else {
                 let length = $(".vertical-panel-wrapper>.item-wrapper").children().length;
                 for (let i = 0; i < length; i++) {
                     let y = $(".vertical-panel-wrapper>.item-wrapper>.item");
                     let title = y[0].innerText;
                     let size = y[0].offsetHeight;
-                    this.#delete("y", $(y[0]));
-                    this.add("y", {title, size});
+                    this.#delete(xy, $(y[0]));
+                    this.add(xy, {title, size});
                 }
-                console.log(this.getData("y"))
+                console.log("拖曳后更新：", this.getData("y"));
             }
         }
 
@@ -549,9 +520,11 @@
                     self.time = self.downClickTime - self.upClickTime
 
                     if (self.time < 300) {
-                        console.log("双击")
+                        // 双击事件
+                        choose = false
+                        move = false
                     } else {
-                        console.log("单击")
+                        // 单击事件
 
                         // 按下延时拖曳
                         self.stop = setTimeout(() => {
@@ -581,9 +554,8 @@
 
                         }, 250)
                     }
-
                 })
-                .on('mouseup', function (event) {
+                .on('mouseup', function () {
 
                     if (!self.flag) clearTimeout(self.stop);
                     self.upClickTime = new Date().getTime()
@@ -603,6 +575,7 @@
                     thisDiv.insertBefore(tempDiv); // 拖拽元素插入到 虚线div的位置上
                     thisDiv.attr("class", name); //恢复对象的初始样式
                     thisDiv.css({left: "", top: ""})
+                    thisDiv.addClass("item");
                     tempDiv.remove();
                     move = false;
                     choose = false;
