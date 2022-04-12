@@ -525,7 +525,6 @@
                         // 按下延时拖曳
                         clearTimeout(stop)
                         stop = setTimeout(() => {
-                            self.flag = true
 
                             choose = true;
                             // 拖拽对象
@@ -554,80 +553,82 @@
 
                         }, 250)
                     }
+
+                    $(document)
+                        .on('mouseup', function () {
+
+                            if (!flag) clearTimeout(stop);
+                            upClickTime = new Date().getTime()
+
+                            if (!choose) return false;
+
+                            if (!move) {
+                                thisDiv.css({left: '', top: ''});
+                                thisDiv.addClass("item" + " " + name);
+                                tempDiv.remove();
+                                choose = false;
+                                return false;
+                            }
+
+                            thisDiv.insertBefore(tempDiv);
+                            thisDiv.css({left: "", top: ""})
+                            thisDiv.addClass("item" + " " + name); //恢复对象的初始样式
+                            tempDiv.remove();
+                            move = false;
+                            choose = false;
+                            xy === 'x' ? self.#updateData("x") : self.#updateData("y");
+                        })
+                        .on('mousemove', function (event) {
+
+                            if (!choose) return false;
+
+                            move = true;
+                            lastPos.x = event.pageX - range.x;
+                            lastPos.y = event.pageY - range.y;
+                            lastPos.x1 = lastPos.x + thisDivWidth;
+                            lastPos.y1 = lastPos.y + thisDivHeight;
+                            // 拖拽元素随鼠标移动
+                            xy === 'x' ?
+                                thisDiv.css({left: lastPos.x + 'px'}) :
+                                thisDiv.css({top: lastPos.y + 'px'});
+                            // 拖拽元素随鼠标移动 查找插入目标元素
+                            let $main = $('.' + name);
+                            //按照重新排列过的顺序 再次获取 各个元素的坐标，
+
+                            $main.each(function () {
+                                tarDiv = $(this);
+                                tarPos.x = tarDiv.offset().left;
+                                tarPos.y = tarDiv.offset().top;
+                                tarPos.x1 = tarPos.x + tarDiv.width() / 2;
+                                tarPos.y1 = tarPos.y + tarDiv.height() / 2;
+                                tarFirst = $main.eq(0); // 获得第一个元素
+                                tarFirstX = tarFirst.offset().left + thisDivHalfW / 2; // 第一个元素对象的中心纵坐标
+                                tarFirstY = tarFirst.offset().top + thisDivHalfH / 2; // 第一个元素对象的中心横坐标
+
+                                // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
+                                if (lastPos.x > tarPos.x) {
+                                    //拖拽对象 移动到第一个位置
+                                    if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
+                                        tempDiv.insertBefore(tarFirst);
+                                    }
+                                    // 判断要插入目标元素的 坐标后， 直接插入
+                                    if (lastPos.x <= tarPos.x + thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y <= tarPos.y + thisDivHalfH && lastPos.y1 >= tarPos.y1) {
+                                        tempDiv.insertAfter(tarDiv);
+                                    }
+                                } else {
+                                    //拖拽对象 移动到第一个位置
+                                    if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
+                                        tempDiv.insertBefore(tarFirst);
+                                    }
+                                    // 判断要插入目标元素的 坐标后， 直接插入
+                                    if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1) {
+                                        tempDiv.insertAfter(tarDiv);
+                                    }
+                                }
+                            });
+                        });
+
                 })
-            $(document)
-                .on('mouseup', function () {
-
-                    if (!flag) clearTimeout(stop);
-                    upClickTime = new Date().getTime()
-
-                    if (!choose) return false;
-
-                    if (!move) {
-                        thisDiv.css({left: '', top: ''});
-                        thisDiv.addClass("item" + " " + name);
-                        tempDiv.remove();
-                        choose = false;
-                        return false;
-                    }
-
-                    thisDiv.insertBefore(tempDiv);
-                    thisDiv.css({left: "", top: ""})
-                    thisDiv.addClass("item" + " " + name); //恢复对象的初始样式
-                    tempDiv.remove();
-                    move = false;
-                    choose = false;
-                    xy === 'x' ? self.#updateData("x") : self.#updateData("y");
-                })
-                .on('mousemove', function (event) {
-
-                    if (!choose) return false;
-
-                    move = true;
-                    lastPos.x = event.pageX - range.x;
-                    lastPos.y = event.pageY - range.y;
-                    lastPos.x1 = lastPos.x + thisDivWidth;
-                    lastPos.y1 = lastPos.y + thisDivHeight;
-                    // 拖拽元素随鼠标移动
-                    xy === 'x' ?
-                        thisDiv.css({left: lastPos.x + 'px'}) :
-                        thisDiv.css({top: lastPos.y + 'px'});
-                    // 拖拽元素随鼠标移动 查找插入目标元素
-                    let $main = $('.' + name);
-                    //按照重新排列过的顺序 再次获取 各个元素的坐标，
-
-                    $main.each(function () {
-                        tarDiv = $(this);
-                        tarPos.x = tarDiv.offset().left;
-                        tarPos.y = tarDiv.offset().top;
-                        tarPos.x1 = tarPos.x + tarDiv.width() / 2;
-                        tarPos.y1 = tarPos.y + tarDiv.height() / 2;
-                        tarFirst = $main.eq(0); // 获得第一个元素
-                        tarFirstX = tarFirst.offset().left + thisDivHalfW / 2; // 第一个元素对象的中心纵坐标
-                        tarFirstY = tarFirst.offset().top + thisDivHalfH / 2; // 第一个元素对象的中心横坐标
-
-                        // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
-                        if (lastPos.x > tarPos.x) {
-                            //拖拽对象 移动到第一个位置
-                            if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
-                                tempDiv.insertBefore(tarFirst);
-                            }
-                            // 判断要插入目标元素的 坐标后， 直接插入
-                            if (lastPos.x <= tarPos.x + thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y <= tarPos.y + thisDivHalfH && lastPos.y1 >= tarPos.y1) {
-                                tempDiv.insertAfter(tarDiv);
-                            }
-                        } else {
-                            //拖拽对象 移动到第一个位置
-                            if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY) {
-                                tempDiv.insertBefore(tarFirst);
-                            }
-                            // 判断要插入目标元素的 坐标后， 直接插入
-                            if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1) {
-                                tempDiv.insertAfter(tarDiv);
-                            }
-                        }
-                    });
-                });
         }
     }
 
