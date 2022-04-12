@@ -17,8 +17,8 @@
 
         :root {
             --panel-border: 1px solid red;
-            --panel-size: 35px;
-            --panel-icon-size: 10x;
+            --panel-size: 40px;
+            --panel-icon-size: 18px;
         }
 
         * {
@@ -30,6 +30,7 @@
         /* 水平  */
         .horizontal-panel-wrapper {
             width: 100%;
+            height: var(--panel-size);
             border: var(--panel-border);
             padding-left: var(--panel-size);
             position: absolute;
@@ -39,7 +40,7 @@
         .horizontal-panel-wrapper .item {
             height: var(--panel-size);
             line-height: var(--panel-size);
-            padding: 0 20px;
+            padding: 0 30px;
             border-right: 1px solid black;
         }
         .horizontal-panel-wrapper .item:hover {
@@ -93,6 +94,8 @@
 
         /* 新增 */
         .item-icon-add svg {
+            width: var(--panel-icon-size);
+            height: var(--panel-icon-size);
             fill: black;
             position: absolute;
             top: 50%;
@@ -120,6 +123,7 @@
         }
         .horizontal-panel-wrapper > .item-icon-add {
             height: var(--panel-size);
+            width: 30px;
             line-height: var(--panel-size);
             padding: 0 10px;
         }
@@ -137,6 +141,10 @@
         .item-icon-delete {
             display: none;
             z-index: 10;
+        }
+        .item-icon-delete svg {
+            width: var(--panel-icon-size);
+            height: var(--panel-icon-size);
         }
         .item-icon-delete:hover {
             cursor: pointer;
@@ -242,7 +250,7 @@
                      ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
                          <i class="item-icon-add">
                             <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                            xmlns="http://www.w3.org/2000/svg" p-id="1633" width="20" height="20">
+                            xmlns="http://www.w3.org/2000/svg" p-id="1633">
                             <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
                             229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
                             512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
@@ -269,9 +277,6 @@
                         $(this).parent().children(".item-icon-add")
                             .css({display: "none"});
                     })
-                    .children().length === 0 &&
-                $(".vertical-panel-wrapper>.item-wrapper")
-                    .css({height: "calc(100% - 40px)"})
                 $(".vertical-panel-wrapper>.item-icon-add")
                     .mouseenter(function () {
                         $(this).css({display: "block"});
@@ -296,7 +301,7 @@
                             <span>${ts.title}</span>
                             <i class="item-icon-delete">
                                 <svg t="1648779026180" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" p-id="1483" width="20" height="20">
+                                    xmlns="http://www.w3.org/2000/svg" p-id="1483">
                                     <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
                                     229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286
                                     96 512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z
@@ -363,7 +368,7 @@
                 e.stopPropagation();
                 $(this).parents(".item-wrapper").children().length === 1 &&
                 $(".vertical-panel-wrapper").children(".item-wrapper")
-                    .css({height: "calc(100% - 40px)", width: "42px"})
+                    .css({height: `calc(100% - ${$(".toggle-panel").outerWidth()}px)`})
                     .parent().children(".item-icon-add")
                     .css({display: "none"});
                 let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1) === "h"
