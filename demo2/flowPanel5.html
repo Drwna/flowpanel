@@ -27,7 +27,6 @@
             box-sizing: border-box;
         }
 
-        /* 水平  */
         .horizontal-panel-wrapper {
             width: 100%;
             height: var(--panel-size);
@@ -104,7 +103,6 @@
             user-select: none;
         }
 
-        /* 垂直 */
         .vertical-panel-wrapper {
             height: 640px;
             /*width: 42px;*/
@@ -127,7 +125,6 @@
             resize: vertical;
         }
 
-        /* 新增 */
         .item-icon-add svg {
             width: var(--panel-icon-size);
             height: var(--panel-icon-size);
@@ -172,7 +169,6 @@
             display: block;
         }
 
-        /* 删除图标*/
         .item-icon-delete {
             display: none;
             z-index: 10;
@@ -444,53 +440,7 @@
             });
         }
 
-        #editable() {
-            let {xTitles, yTitles} = Lane.#handleData(this.#data);
-            this.root.on("dblclick", "span", function () {
-                let currentVal = $(this).text();
-                let xy = $(this).parents(".item-wrapper").parent()[0].className.substr(0, 1);
-                let currentIndex = Lane.#arrayIndex(xy === "h" ? xTitles : yTitles, currentVal);
-                $(this).attr("contenteditable", "true");
-                $(this).css({background: "#f1eded", outline: "1px solid grey"});
-                $(this).parents()[2].className.substr(0, 1) === "h"
-                    ? $(this).css({padding: "0 12px"})
-                    : $(this).css({padding: "12px 0", width: "100%"});
-                $(this).focus();
-                // 选中所有文本
-                let selector = window.getSelection();
-                selector.removeAllRanges();
-                let range = document.createRange();
-                selector.addRange(range);
-                range.selectNodeContents($(this)[0]);
-                selector.addRange(range);
-                // 光标移动到末尾
-                selector.collapse($(this)[0], 1);
-                $(this)
-                    .on('keydown', function (e) {
-                        if (e.keyCode === 13) {
-                            e.preventDefault();
-                            $(this).removeAttr("contenteditable");
-                            $(this).css({textOverflow: "ellipsis"});
-                            $(this).css({background: "", outline: "", padding: "", width: ""});
-                            $(this).text().trim() === "" && $(this).text(currentVal);
-                            if (xy === "h") xTitles[currentIndex] = $(this).text();
-                            else yTitles[currentIndex] = $(this).text();
-                        }
-                    })
-                    .on("blur", function () {
-                        $(this).removeAttr("contenteditable");
-                        $(this).css({background: "", outline: "", padding: "", width: ""});
-                        $(this).text().trim() === "" && $(this).text(currentVal);
-                        if (xy === "h") xTitles[currentIndex] = $(this).text();
-                        else yTitles[currentIndex] = $(this).text();
-                    });
-            });
-        }
-
-        // TODO
-        // 更新文本内容
         edit() {
-            let self = this;
             let {xTitles, yTitles} = Lane.#handleData(this.#data);
             this.root.on("dblclick", "span", function () {
                 $(this).parent().css({overflow: "visible"});
