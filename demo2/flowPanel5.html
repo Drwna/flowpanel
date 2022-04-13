@@ -40,8 +40,9 @@
         .horizontal-panel-wrapper .item {
             height: var(--panel-size);
             line-height: var(--panel-size);
-            padding: 0 30px;
+            padding: 0 calc(0.5em + var(--panel-icon-size)) 0 0;
             border-right: 1px solid black;
+            overflow: auto;
         }
         .horizontal-panel-wrapper .item:hover {
             resize: horizontal;
@@ -53,13 +54,48 @@
             position: relative;
             display: flex;
             justify-content: center;
-            overflow: auto;
+            align-items: center;
         }
         .panel .item > span {
+            text-align: center;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             cursor: default;
+        }
+        .horizontal-panel-wrapper span {
+            width: 100%;
+            padding: 0 0 0 calc(0.5em + var(--panel-icon-size));
+        }
+
+        .horizontal-panel-wrapper .item input {
+            text-align: center;
+            height: calc(var(--panel-size) - 6px);
+            line-height: calc(var(--panel-size) - 6px);
+            font-size: inherit;
+            width: 94%;
+            outline: 1px solid green;
+            background: blanchedalmond;
+        }
+        .vertical-panel-wrapper span {
+            height: 100%;
+            padding: calc(0.5em + var(--panel-icon-size)) 0 0 0;
+        }
+        .vertical-panel-wrapper .item input {
+            text-align: center;
+            height: calc(var(--panel-size) - 6px);
+            font-size: inherit;
+            outline: 1px solid green;
+            background: blanchedalmond;
+            margin-left: 30px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-28%, -50%);
+            -moz-transform: translate(-28%, -50%);
+            -ms-transform: translate(-28, -50%);
+            -o-transform: translate(-28%, -50%);
+            transform: translate(-28%, -50%);
         }
         .item-wrapper {
             -webkit-user-select: none;
@@ -80,11 +116,10 @@
         }
         .vertical-panel-wrapper .item {
             border-bottom: 1px solid black;
-            padding: 30px 0;
+            padding: 0 0 calc(0.5em + var(--panel-icon-size)) 0;
             width: var(--panel-size);
             -webkit-writing-mode: vertical-rl;
             writing-mode: vertical-lr;
-            overflow: hidden;
             display: flex;
             align-items: center;
         }
@@ -236,11 +271,9 @@
         #init() {
             Lane.#renderXY("x", this.root);
             Lane.#renderXY("y", this.root);
-            this.#handleCSS();
             this.#addDefaultField("x", {title: "xxx"});
             this.#addDefaultField("y", {title: "yyy"});
-            // this.#editable();
-            this.a();
+            this.edit();
             this.#togglePanel();
             this.#drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
             this.#drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
@@ -283,6 +316,42 @@
                 .mouseleave(function () {
                     $(this).css({display: "none"});
                 });
+            // setTimeout(() => {
+            //     $(".vertical-panel-wrapper>.item-wrapper").css({
+            //         "border-radius": "5px",
+            //         "border": "1px solid #ccc",
+            //         "padding": "10px",
+            //         "margin": "5px",
+            //         "background": "#fff",
+            //         "box-shadow": "0 0 5px #ccc"
+            //     });
+            // }, 100);
+
+            // $('.vertical-panel-wrapper .item').hover(function () {
+            //     $(this).css({
+            //         "border-radius": "5px",
+            //         "border": "1px solid #ccc",
+            //         "padding": "10px",
+            //         "margin": "5px",
+            //         "background": "#fff",
+            //         "box-shadow": "0 0 5px #ccc"
+            //     });
+            // }, function () {
+            //     $(this).css({
+            //         "border-radius": "0",
+            //         "border": "0",
+            //         "padding": "0",
+            //         "margin": "0",
+            //         "background": "transparent",
+            //         "box-shadow": "none"
+            //     });
+            // });
+
+            $(".vertical-panel-wrapper .item").on("mouseenter", function () {
+                let a = $(this).find('input')[0]?.className;
+                if (a === 'editInput') return;
+                $(this).css({overflow: "auto"});
+            });
         }
 
         static #handleData(data) {
@@ -327,6 +396,7 @@
             $("." + `${xy === "x" ? "horizontal" : "vertical"}` + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data));
             this.#removeField();
+            xy === 'y' && this.#handleCSS();
         }
 
         #addDefaultField(xy, data) {
@@ -386,54 +456,73 @@
                     ? $(this).css({padding: "0 12px"})
                     : $(this).css({padding: "12px 0", width: "100%"});
                 $(this).focus();
-                let sel = window.getSelection();
-                sel.collapse($(this)[0], 1);
-                $(this).on('keydown', function (e) {
-                    if (e.keyCode === 13) e.preventDefault();
-                });
-                $(this).on("blur", function () {
-                    $(this).removeAttr("contenteditable");
-                    $(this).css({background: "", outline: "", padding: "", width: ""});
-                    $(this).text().trim() === "" && $(this).text(currentVal);
-                    if (xy === "h") xTitles[currentIndex] = $(this).text();
-                    else yTitles[currentIndex] = $(this).text();
-                });
+                // 选中所有文本
+                let selector = window.getSelection();
+                selector.removeAllRanges();
+                let range = document.createRange();
+                selector.addRange(range);
+                range.selectNodeContents($(this)[0]);
+                selector.addRange(range);
+                // 光标移动到末尾
+                selector.collapse($(this)[0], 1);
+                $(this)
+                    .on('keydown', function (e) {
+                        if (e.keyCode === 13) {
+                            e.preventDefault();
+                            $(this).removeAttr("contenteditable");
+                            $(this).css({textOverflow: "ellipsis"});
+                            $(this).css({background: "", outline: "", padding: "", width: ""});
+                            $(this).text().trim() === "" && $(this).text(currentVal);
+                            if (xy === "h") xTitles[currentIndex] = $(this).text();
+                            else yTitles[currentIndex] = $(this).text();
+                        }
+                    })
+                    .on("blur", function () {
+                        $(this).removeAttr("contenteditable");
+                        $(this).css({background: "", outline: "", padding: "", width: ""});
+                        $(this).text().trim() === "" && $(this).text(currentVal);
+                        if (xy === "h") xTitles[currentIndex] = $(this).text();
+                        else yTitles[currentIndex] = $(this).text();
+                    });
             });
         }
 
         // TODO
         // 更新文本内容
-        updateVal(currentEle, value) {
-            $(currentEle).html('<input class="spanVal" type="text" value="' + value + '" />');
-            $(".spanVal").focus();
-            $(".spanVal").keyup(function (event) {
-                if (event.keyCode === 13) {
-                    $(currentEle).html($(".spanVal").val().trim());
-                }
-            });
-            $(document).click(function () {
-                $(currentEle).html($(".spanVal").val().trim());
-            });
-        }
-
-        // 更新文本内容
-        a() {
+        edit() {
+            let self = this;
+            let {xTitles, yTitles} = Lane.#handleData(this.#data);
             this.root.on("dblclick", "span", function () {
-                let td = $(this); //为后面文本框变成文本铺垫
-                let text = $(this).text();
-                let input = $('<input type="text" class="edit" value="' + text + '">');
+                $(this).parent().css({overflow: "visible"});
+                let target = $(this);
+                let xy = $(this).parents('.item-wrapper').parent()[0]
+                    .className.substr(0, 1) === 'h' ? 'x' : 'y';
+                let oldText = $(this).text();
+                let newText;
+                let currentIndex = Lane.#arrayIndex(xy === "x" ? xTitles : yTitles, oldText);
+                // let size = xy === 'y' ? $(this).parents('.item').outerHeight() : '';
+                let size = xy === 'y' && 180;
+                let input = $('<input class="editInput" ' +
+                    'style="width:' + size + 'px;" type="text" value="' + oldText + '"/>');
                 $(this).html(input);
+                input.click((e) => e.stopPropagation());
+                input.select();
 
-                $('input').click(function () {
-                    return false;
-                }); //阻止表单默认点击行为
+                function updateVal() {
+                    newText = input.val().trim();
+                    if (newText === "") newText = oldText;
+                    target.html(newText);
+                    if (newText === oldText) return;
+                    if (xy === "x") xTitles[currentIndex] = newText;
+                    else yTitles[currentIndex] = newText;
+                }
 
-                $('input').select(); //点击自动全选中表单的内容
-
-                $('input').blur(function () {
-                    let newText = $(this).val();
-                    td.html(newText);
-                }); //表单失去焦点文本框变成文本
+                input.on({
+                    'blur': () => updateVal(),
+                    'keydown': (e) => {
+                        e.keyCode === 13 && updateVal();
+                    }
+                });
             });
         }
 
@@ -633,7 +722,7 @@
     // v.add("x", {title: "5-后勤部", size: 140})
 
     v.add("y", {title: "1-起草", size: 120});
-    v.add("y", {title: "2-审审批审批审批审批批", size: 120});
+    v.add("y", {title: "2-审", size: 120});
     v.add("y", {title: "3-处理", size: 80});
     // v.add("y", {title: "4-test", size: 120});
     // console.log(v.getData())
