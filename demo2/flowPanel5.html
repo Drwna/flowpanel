@@ -41,7 +41,6 @@
             line-height: var(--panel-size);
             padding: 0 calc(0.5em + var(--panel-icon-size)) 0 0;
             border-right: 1px solid black;
-            overflow: auto;
         }
         .horizontal-panel-wrapper .item:hover {
             resize: horizontal;
@@ -54,6 +53,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: auto;
         }
         .panel .item > span {
             text-align: center;
@@ -443,10 +443,11 @@
         edit() {
             let {xTitles, yTitles} = Lane.#handleData(this.#data);
             this.root.on("dblclick", "span", function () {
-                $(this).parent().css({overflow: "visible"});
                 let target = $(this);
                 let xy = $(this).parents('.item-wrapper').parent()[0]
                     .className.substr(0, 1) === 'h' ? 'x' : 'y';
+                xy === 'y' &&
+                $(this).parent().css({overflow: "visible"});
                 let oldText = $(this).text();
                 let newText;
                 let currentIndex = Lane.#arrayIndex(xy === "x" ? xTitles : yTitles, oldText);
