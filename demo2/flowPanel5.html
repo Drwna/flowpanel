@@ -267,8 +267,9 @@
         #init() {
             Lane.#renderXY("x", this.root);
             Lane.#renderXY("y", this.root);
-            this.#addDefaultField("x", {title: "xxx"});
-            this.#addDefaultField("y", {title: "yyy"});
+            window.localStorage.setItem("panel_id", '0');
+            this.#addDefaultField("x");
+            this.#addDefaultField("y");
             this.edit();
             this.#togglePanel();
             this.#drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
@@ -388,19 +389,29 @@
             if (!xy || !data) throw new Error("需要传入xy和data");
             if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y");
             if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("data需要传入title");
-            xy === "x" ? this.#data.horz.push(data?.title) : this.#data.vert.push(data?.title);
+            xy === "x" ? this.#data.horz.push(data.title) : this.#data.vert.push(data.title);
             $("." + `${xy === "x" ? "horizontal" : "vertical"}` + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data));
             this.#removeField();
             xy === 'y' && this.#handleCSS();
         }
 
-        #addDefaultField(xy, data) {
+        #addDefaultField(xy) {
             let self = this;
+            let id, title;
+
+            function createId() {
+                id++;
+                window.localStorage.setItem('panel_id', id.toString());
+                return id;
+            }
+
             $("." + `${xy === "y" ? "vertical" : "horizontal"}` +
                 "-panel-wrapper>.item-icon-add"
             ).on("click", function () {
-                self.add(xy, data);
+                id = parseInt(window.localStorage.getItem('panel_id') || '0') || 0;
+                title = "新增字段-" + xy + createId();
+                self.add(xy, {title});
                 self.#removeField();
             });
         }
@@ -474,6 +485,7 @@
                         e.keyCode === 13 && updateVal();
                     }
                 });
+                $(document).off('mousedown').on('mousedown', () => updateVal());
             });
         }
 
@@ -588,6 +600,7 @@
                                 thisDivHalfW = thisDivWidth / 2;
                                 thisDivHalfH = thisDivHeight / 2;
                                 thisDiv.attr("class", name2);
+                                thisDiv.children('span').css({padding: 0});
                                 thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
                                 // 创建新元素 插入拖拽元素之前的位置(虚线框)
                                 tempDiv = $(`<div class="${name3}"></div>`);
