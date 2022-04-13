@@ -239,7 +239,8 @@
             this.#handleCSS();
             this.#addDefaultField("x", {title: "xxx"});
             this.#addDefaultField("y", {title: "yyy"});
-            this.#editable();
+            // this.#editable();
+            this.a();
             this.#togglePanel();
             this.#drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
             this.#drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
@@ -387,6 +388,9 @@
                 $(this).focus();
                 let sel = window.getSelection();
                 sel.collapse($(this)[0], 1);
+                $(this).on('keydown', function (e) {
+                    if (e.keyCode === 13) e.preventDefault();
+                });
                 $(this).on("blur", function () {
                     $(this).removeAttr("contenteditable");
                     $(this).css({background: "", outline: "", padding: "", width: ""});
@@ -394,6 +398,42 @@
                     if (xy === "h") xTitles[currentIndex] = $(this).text();
                     else yTitles[currentIndex] = $(this).text();
                 });
+            });
+        }
+
+        // TODO
+        // 更新文本内容
+        updateVal(currentEle, value) {
+            $(currentEle).html('<input class="spanVal" type="text" value="' + value + '" />');
+            $(".spanVal").focus();
+            $(".spanVal").keyup(function (event) {
+                if (event.keyCode === 13) {
+                    $(currentEle).html($(".spanVal").val().trim());
+                }
+            });
+            $(document).click(function () {
+                $(currentEle).html($(".spanVal").val().trim());
+            });
+        }
+
+        // 更新文本内容
+        a() {
+            this.root.on("dblclick", "span", function () {
+                let td = $(this); //为后面文本框变成文本铺垫
+                let text = $(this).text();
+                let input = $('<input type="text" class="edit" value="' + text + '">');
+                $(this).html(input);
+
+                $('input').click(function () {
+                    return false;
+                }); //阻止表单默认点击行为
+
+                $('input').select(); //点击自动全选中表单的内容
+
+                $('input').blur(function () {
+                    let newText = $(this).val();
+                    td.html(newText);
+                }); //表单失去焦点文本框变成文本
             });
         }
 
