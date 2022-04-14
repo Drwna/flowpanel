@@ -17,9 +17,10 @@
         }
 
         :root {
-            --panel-border: 1px solid red;
+            --panel-border: 1px solid #aaa6a6;
             --panel-size: 40px;
             --panel-icon-size: 18px;
+            --panel-icon-add-wrapper: 30px;
         }
 
         body, .panel * {
@@ -41,7 +42,7 @@
             height: var(--panel-size);
             line-height: var(--panel-size);
             padding: 0 calc(0.5em + var(--panel-icon-size)) 0 0;
-            border-right: 1px solid black;
+            border-right: var(--panel-border);
         }
         .horizontal-panel-wrapper .item:hover {
             resize: horizontal;
@@ -73,9 +74,17 @@
             height: calc(var(--panel-size) - 6px);
             line-height: calc(var(--panel-size) - 6px);
             font-size: inherit;
-            width: 94%;
-            outline: 1px solid green;
-            background: blanchedalmond;
+            width: 100%;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+        }
+        .horizontal-panel-wrapper .item input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+            0 0 8px rgba(102, 175, 233, 0.6);
         }
         .vertical-panel-wrapper span {
             height: 100%;
@@ -85,9 +94,11 @@
             text-align: center;
             height: calc(var(--panel-size) - 6px);
             font-size: inherit;
-            outline: 1px solid green;
-            background: blanchedalmond;
-            margin-left: 30px;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+            margin-left: var(--panel-icon-add-wrapper);
             position: absolute;
             left: 50%; top: 50%;
             -webkit-transform: translate(-28%, -50%);
@@ -95,6 +106,12 @@
             -ms-transform: translate(-28, -50%);
             -o-transform: translate(-28%, -50%);
             transform: translate(-28%, -50%);
+        }
+        .vertical-panel-wrapper .item input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+            0 0 8px rgba(102, 175, 233, 0.6);
         }
         .item-wrapper {
             -webkit-user-select: none;
@@ -113,7 +130,7 @@
             height: calc(100% - var(--panel-size));
         }
         .vertical-panel-wrapper .item {
-            border-bottom: 1px solid black;
+            border-bottom: var(--panel-border);
             padding: 0 0 calc(0.5em + var(--panel-icon-size)) 0;
             width: var(--panel-size);
             -webkit-writing-mode: vertical-rl;
@@ -139,7 +156,7 @@
         }
         .item-icon-add {
             display: none;
-            width: 30px;
+            width: var(--panel-icon-add-wrapper);
             position: absolute;
             z-index: 9;
         }
@@ -154,12 +171,12 @@
         }
         .horizontal-panel-wrapper > .item-icon-add {
             height: var(--panel-size);
-            width: 30px;
+            width: var(--panel-icon-add-wrapper);
             line-height: var(--panel-size);
             padding: 0 10px;
         }
         .vertical-panel-wrapper > .item-icon-add {
-            height: 30px;
+            height: var(--panel-icon-add-wrapper);
             width: var(--panel-size);
             text-align: center;
             padding: 6px 0;
@@ -221,6 +238,8 @@
             outline: 1px solid grey;
             background: grey;
             z-index: 11;
+            border-radius: 4px;
+            color: #FFFFFF;
         }
         .xPlaceholderItem {
             display: flex;
@@ -241,6 +260,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            border-radius: 4px;
+            color: #FFFFFF;
         }
         .yDragItem span {
             text-align: center;
@@ -272,11 +293,10 @@
         #init() {
             Lane.#renderXY("x", this.root);
             Lane.#renderXY("y", this.root);
-            window.localStorage.setItem("panel_id", '0');
-            this.#addDefaultField("x");
-            this.#addDefaultField("y");
             this.#edit();
             this.#togglePanel();
+            this.#addDefaultField("x");
+            this.#addDefaultField("y");
             this.#drags("x", "dragX", "xItem", "xDragItem", "xPlaceholderItem");
             this.#drags("y", "dragY", "yItem", "yDragItem", "yPlaceholderItem");
         }
@@ -318,37 +338,6 @@
                 .mouseleave(function () {
                     $(this).css({display: "none"});
                 });
-            // setTimeout(() => {
-            //     $(".vertical-panel-wrapper>.item-wrapper").css({
-            //         "border-radius": "5px",
-            //         "border": "1px solid #ccc",
-            //         "padding": "10px",
-            //         "margin": "5px",
-            //         "background": "#fff",
-            //         "box-shadow": "0 0 5px #ccc"
-            //     });
-            // }, 100);
-
-            // $('.vertical-panel-wrapper .item').hover(function () {
-            //     $(this).css({
-            //         "border-radius": "5px",
-            //         "border": "1px solid #ccc",
-            //         "padding": "10px",
-            //         "margin": "5px",
-            //         "background": "#fff",
-            //         "box-shadow": "0 0 5px #ccc"
-            //     });
-            // }, function () {
-            //     $(this).css({
-            //         "border-radius": "0",
-            //         "border": "0",
-            //         "padding": "0",
-            //         "margin": "0",
-            //         "background": "transparent",
-            //         "box-shadow": "none"
-            //     });
-            // });
-
             $(".vertical-panel-wrapper .item").on("mouseenter", function () {
                 let a = $(this).find('input')[0]?.className;
                 if (a === 'editInput') return;
@@ -495,6 +484,7 @@
         }
 
         #togglePanel() {
+            window.localStorage.setItem("panel_id", '0');
             let self = this;
             $(".panel .toggle-panel").on("dblclick", function () {
                 let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item"),
