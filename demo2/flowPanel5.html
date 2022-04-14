@@ -462,6 +462,7 @@
                 input.select();
 
                 function updateVal() {
+                    if (!input) return;
                     newText = input.val().trim() === "" ? oldText : input.val().trim();
                     target.html(newText);
                     if (newText === oldText) return;
@@ -474,7 +475,10 @@
                         e.keyCode === 13 && updateVal();
                     }
                 });
-                $(document).off('mousedown').on('mousedown', () => updateVal());
+                $(document).on('mousedown', () => {
+                    updateVal();
+                    $(document).off('mousedown');
+                });
             });
         }
 
