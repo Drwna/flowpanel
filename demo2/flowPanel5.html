@@ -306,17 +306,17 @@
                 <div class="${xy === "y" ? "vertical" : "horizontal"}-panel-wrapper">
                  ${xy === "y" ? "<div class='toggle-panel'><div class='tc'></div></div>" : ""}
                      <i class="item-icon-add">
-                                         <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                         xmlns="http://www.w3.org/2000/svg" p-id="1633">
-                                         <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
-                                         229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
-                                         512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
-                                         463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572
-                                         0v-160.036572H303.981714a47.981714 47.981714 0 0 1 0-95.963428h160V304.018286a48.018286
-                                         48.018286 0 0 1 96.036572 0v160h160a47.981714
-                                         47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
-                                         </svg>
-                                         </i>
+                         <svg t="1648779147774" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg" p-id="1633">
+                             <path d="M512 1024C229.229714 1024 0 794.770286 0 512S229.229714 0 512 0s512
+                             229.229714 512 512-229.229714 512-512 512z m0-928C282.258286 96 96 282.258286 96
+                             512S282.258286 928 512 928 928 741.741714 928 512 741.741714 96 512 96z m208.018286
+                             463.981714h-160v160.036572a48.018286 48.018286 0 0 1-96.036572
+                             0v-160.036572H303.981714a47.981714 47.981714 0 0 1 0-95.963428h160V304.018286a48.018286
+                             48.018286 0 0 1 96.036572 0v160h160a47.981714
+                             47.981714 0 0 1 0 95.963428z" fill="" p-id="1634"></path>
+                         </svg>
+                     </i>
                  <div id="drag${xy.toUpperCase()}" class="item-wrapper"></div>
                 </div>`));
         }
@@ -373,9 +373,11 @@
 
         getData(xy) {
             return xy
-                ? xy === "x"
-                    ? Lane.#handleData(this.#data).xTitles
-                    : Lane.#handleData(this.#data).yTitles
+                ? /^([xy])$/.test(xy)
+                    ? xy === 'x'
+                        ? Lane.#handleData(this.#data).xTitles
+                        : Lane.#handleData(this.#data).yTitles
+                    : new Error("参数错误")
                 : this.#data;
         }
 
@@ -391,8 +393,7 @@
         }
 
         #addDefaultField(xy) {
-            let self = this;
-            let id, title;
+            let id;
 
             function createId() {
                 id++;
@@ -402,11 +403,10 @@
 
             $("." + `${xy === "y" ? "vertical" : "horizontal"}` +
                 "-panel-wrapper>.item-icon-add"
-            ).on("click", function () {
+            ).on("click", () => {
                 id = parseInt(window.localStorage.getItem('panel_id') || '0') || 0;
-                title = "新增字段-" + xy + createId();
-                self.add(xy, {title});
-                self.#removeField();
+                this.add(xy, {title: "新增字段-" + xy + createId()});
+                this.#removeField();
             });
         }
 
@@ -417,16 +417,15 @@
             return -1;
         }
 
-        static #removeArray(arr, val) {
+        static #removeArrayValue(arr, val) {
             Lane.#arrayIndex(arr, val) > -1 &&
             arr.splice(Lane.#arrayIndex(arr, val), 1);
         }
 
         #delete(xy, el) {
-            let {xTitles, yTitles} = Lane.#handleData(this.#data);
             xy === "x"
-                ? Lane.#removeArray(xTitles, el[0].innerText)
-                : Lane.#removeArray(yTitles, el[0].innerText);
+                ? Lane.#removeArrayValue(Lane.#handleData(this.#data).xTitles, el[0].innerText)
+                : Lane.#removeArrayValue(Lane.#handleData(this.#data).yTitles, el[0].innerText);
             el.remove();
         }
 
@@ -439,9 +438,8 @@
                     .css({height: `calc(100% - ${$(".toggle-panel").outerWidth()}px)`})
                     .parent().children(".item-icon-add")
                     .css({display: "none"});
-                let xy = $(this).parents(".item-wrapper").parent()[0].className
-                    .substr(0, 1) === "h" ? "x" : "y";
-                self.#delete(xy, $(this).parent());
+                self.#delete($(this).parents(".item-wrapper").parent()[0].className
+                    .substr(0, 1) === "h" ? "x" : "y", $(this).parent());
             });
         }
 
@@ -456,7 +454,6 @@
                 let oldText = $(this).text();
                 let newText;
                 let currentIndex = Lane.#arrayIndex(xy === "x" ? xTitles : yTitles, oldText);
-                // let size = xy === 'y' ? $(this).parents('.item').outerHeight() : '';
                 let size = xy === 'y' && 180;
                 let input = $('<input class="editInput" ' +
                     'style="width:' + size + 'px;" type="text" value="' + oldText + '"/>');
@@ -465,12 +462,10 @@
                 input.select();
 
                 function updateVal() {
-                    newText = input.val().trim();
-                    if (newText === "") newText = oldText;
+                    newText = input.val().trim() === "" ? oldText : input.val().trim();
                     target.html(newText);
                     if (newText === oldText) return;
-                    if (xy === "x") xTitles[currentIndex] = newText;
-                    else yTitles[currentIndex] = newText;
+                    xy === 'x' ? xTitles[currentIndex] = newText : yTitles[currentIndex] = newText;
                 }
 
                 input.on({
@@ -485,8 +480,7 @@
 
         #togglePanel() {
             window.localStorage.setItem("panel_id", '0');
-            let self = this;
-            $(".panel .toggle-panel").on("dblclick", function () {
+            $(".panel .toggle-panel").on("dblclick", () => {
                 let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item"),
                     y = $(".vertical-panel-wrapper>.item-wrapper").children(".item");
                 let xLength = x.length,
@@ -496,25 +490,25 @@
                     for (let i = 0; i < xLength; i++) {
                         size = x[i].offsetWidth;
                         title = x[i].innerText;
-                        self.#delete("x", $(x[i]));
-                        self.add("y", {title, size});
+                        this.#delete("x", $(x[i]));
+                        this.add("y", {title, size});
                         size = y[i].offsetHeight;
                         title = y[i].innerText;
-                        self.#delete("y", $(y[i]));
-                        self.add("x", {title, size});
+                        this.#delete("y", $(y[i]));
+                        this.add("x", {title, size});
                     }
                 } else {
                     if (xLength > yLength) {
                         for (let i = 0; i < xLength; i++) {
                             size = x[i].offsetWidth;
                             title = x[i].innerText;
-                            self.#delete("x", $(x[i]));
-                            self.add("y", {title, size});
+                            this.#delete("x", $(x[i]));
+                            this.add("y", {title, size});
                             try {
                                 size = y[i].offsetHeight;
                                 title = y[i].innerText;
-                                self.#delete("y", $(y[i]));
-                                self.add("x", {title, size});
+                                this.#delete("y", $(y[i]));
+                                this.add("x", {title, size});
                             } catch (e) {
                             }
                         }
@@ -522,13 +516,13 @@
                         for (let i = 0; i < yLength; i++) {
                             size = y[i].offsetHeight;
                             title = y[i].innerText;
-                            self.#delete("y", $(y[i]));
-                            self.add("x", {title, size});
+                            this.#delete("y", $(y[i]));
+                            this.add("x", {title, size});
                             try {
                                 size = x[i].offsetWidth;
                                 title = x[i].innerText;
-                                self.#delete("x", $(x[i]));
-                                self.add("y", {title, size});
+                                this.#delete("x", $(x[i]));
+                                this.add("y", {title, size});
                             } catch (e) {
                             }
                         }
@@ -540,10 +534,11 @@
         #updateData(xy) {
             let a = xy === 'x' ? '.horizontal-panel-wrapper' : '.vertical-panel-wrapper';
             let length = $(a + '>.item-wrapper').children().length;
+            let item, size, title;
             for (let i = 0; i < length; i++) {
-                let item = $(a + '>.item-wrapper>.item');
-                let title = item[0].innerText;
-                let size = xy === 'x' ? item[0].offsetWidth : item[0].offsetHeight;
+                item = $(a + '>.item-wrapper>.item');
+                title = item[0].innerText;
+                size = xy === 'x' ? item[0].offsetWidth : item[0].offsetHeight;
                 this.#delete(xy, $(item[0]));
                 this.add(xy, {title, size});
             }
@@ -684,9 +679,12 @@
     v.add("y", {title: "2-审", size: 120});
     v.add("y", {title: "3-处理", size: 80});
     // v.add("y", {title: "4-test", size: 120});
-    // console.log(v.getData())
-    // console.log(v.getData("x"))
-    // console.log(v.getData("y"))
+
+    // console.log(v.getData());
+    // console.log(v.getData(''));
+    // console.log(v.getData('x'));
+    // console.log(v.getData('y'));
+    // console.log(v.getData('o'));
 </script>
 
 </body>
