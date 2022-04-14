@@ -23,7 +23,7 @@
             --panel-icon-add-wrapper: 30px;
         }
 
-        body, .panel * {
+        .panel * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -585,11 +585,11 @@
                                 // 拖拽对象
                                 thisDiv = $(this);
                                 // 记录拖拽元素初始位置
-                                initPos.x = thisDiv.offset().left;
-                                initPos.y = thisDiv.offset().top;
+                                initPos.x = thisDiv.offset().left - 8;
+                                initPos.y = thisDiv.offset().top - 8;
                                 // 鼠标元素相对偏移量
-                                range.x = event.pageX - thisDiv.offset().left;
-                                range.y = event.pageY - thisDiv.offset().top;
+                                range.x = event.pageX - thisDiv.offset().left - 8;
+                                range.y = event.pageY - thisDiv.offset().top - 8;
                                 thisDivWidth = thisDiv.width();
                                 thisDivHeight = thisDiv.height();
                                 thisDivHalfW = thisDivWidth / 2;
