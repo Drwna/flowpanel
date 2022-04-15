@@ -382,9 +382,9 @@
         }
 
         add(xy, data) {
-            if (!xy || !data) throw new Error("需要传入xy和data");
-            if (xy !== "x" && xy !== "y") throw new Error("参数只能是x或y");
-            if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("data需要传入title");
+            if (!xy || !data) throw new Error("参数错误");
+            if (xy !== "x" && xy !== "y") throw new Error("xy参数错误");
+            if (!data.title || data.title.match(/^[ ]*$/)) throw new Error("标题不能为空");
             xy === "x" ? this.#data.horz.push(data.title) : this.#data.vert.push(data.title);
             $("." + `${xy === "x" ? "horizontal" : "vertical"}` + "-panel-wrapper>.item-wrapper")
                 .append(Lane.#itemContent(xy, data));
