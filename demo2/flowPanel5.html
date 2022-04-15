@@ -508,13 +508,10 @@
                             title = x[i].innerText;
                             this.#delete("x", $(x[i]));
                             this.add("y", {title, size});
-                            try {
-                                size = y[i].offsetHeight;
-                                title = y[i].innerText;
-                                this.#delete("y", $(y[i]));
-                                this.add("x", {title, size});
-                            } catch (e) {
-                            }
+                            size = y[i]?.offsetHeight;
+                            title = y[i]?.innerText;
+                            title && this.#delete("y", $(y[i]));
+                            title && this.add("x", {title, size});
                         }
                     } else {
                         for (let i = 0; i < yLength; i++) {
@@ -522,13 +519,10 @@
                             title = y[i].innerText;
                             this.#delete("y", $(y[i]));
                             this.add("x", {title, size});
-                            try {
-                                size = x[i].offsetWidth;
-                                title = x[i].innerText;
-                                this.#delete("x", $(x[i]));
-                                this.add("y", {title, size});
-                            } catch (e) {
-                            }
+                            size = x[i]?.offsetWidth;
+                            title = x[i]?.innerText;
+                            title && this.#delete("x", $(x[i]));
+                            title && this.add("y", {title, size});
                         }
                     }
                 }
