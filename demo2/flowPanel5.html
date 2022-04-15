@@ -482,47 +482,38 @@
             });
         }
 
+        #toggleValue(x, y, i, f = true) {
+            let title, size;
+            size = f ? x[i].offsetWidth : y[i].offsetHeight;
+            title = f ? x[i].innerText : y[i].innerText;
+            f ? this.#delete('x', $(x[i])) : this.#delete('y', $(y[i]));
+            f ? this.add('y', {title, size}) : this.add('x', {title, size});
+
+            title = f ? y[i]?.innerText : x[i]?.innerText;
+            if (!title) return;
+            size = f ? y[i].offsetHeight : x[i].offsetWidth;
+            f ? this.#delete('y', $(y[i])) : this.#delete('x', $(x[i]));
+            f ? this.add('x', {title, size}) : this.add('y', {title, size});
+        }
+
         #togglePanel() {
             window.localStorage.setItem("panel_id", '0');
             $(".panel .toggle-panel").on("dblclick", () => {
                 let x = $(".horizontal-panel-wrapper>.item-wrapper").children(".item"),
                     y = $(".vertical-panel-wrapper>.item-wrapper").children(".item");
-                let xLength = x.length,
-                    yLength = y.length;
-                let size, title;
+                let xLength = x.length, yLength = y.length;
                 if (xLength === yLength) {
                     for (let i = 0; i < xLength; i++) {
-                        size = x[i].offsetWidth;
-                        title = x[i].innerText;
-                        this.#delete("x", $(x[i]));
-                        this.add("y", {title, size});
-                        size = y[i].offsetHeight;
-                        title = y[i].innerText;
-                        this.#delete("y", $(y[i]));
-                        this.add("x", {title, size});
+                        this.#toggleValue(x, y, i);
                     }
                 } else {
                     if (xLength > yLength) {
                         for (let i = 0; i < xLength; i++) {
-                            size = x[i].offsetWidth;
-                            title = x[i].innerText;
-                            this.#delete("x", $(x[i]));
-                            this.add("y", {title, size});
-                            size = y[i]?.offsetHeight;
-                            title = y[i]?.innerText;
-                            title && this.#delete("y", $(y[i]));
-                            title && this.add("x", {title, size});
+                            this.#toggleValue(x, y, i);
                         }
                     } else {
                         for (let i = 0; i < yLength; i++) {
-                            size = y[i].offsetHeight;
-                            title = y[i].innerText;
-                            this.#delete("y", $(y[i]));
-                            this.add("x", {title, size});
-                            size = x[i]?.offsetWidth;
-                            title = x[i]?.innerText;
-                            title && this.#delete("x", $(x[i]));
-                            title && this.add("y", {title, size});
+                            this.#toggleValue(x, y, i, false);
                         }
                     }
                 }
