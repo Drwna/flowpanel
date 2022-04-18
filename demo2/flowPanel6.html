@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <title>float demo</title>
+    <style>
+        :root {
+            --panel-size: 40px;
+        }
+        .panel > * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .panel {
+            border: 1px solid rgb(80, 77, 77);
+            padding: 8px;
+            width: 800px;
+            height: 600px;
+        }
+
+        .toggle {
+            width: var(--panel-size);
+            height: var(--panel-size);
+            line-height: var(--panel-size);
+            text-align: center;
+            border: 1px solid black;
+            float: left;
+            color: grey;
+        }
+        .toggle:hover {
+            color: black;
+        }
+
+        .horz {
+            width: 600px;
+            height: var(--panel-size);
+            background-color: rgba(235, 230, 230, 0.5);
+            border-top: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            display: flex;
+            position: relative;
+        }
+        .horz > .icon-add {
+            position: absolute;
+            top: 50%; left: 0;
+            transform: translateY(-50%);
+            width: 21px;
+            padding-left: 6px;
+            display: none;
+        }
+        .horz:hover > .icon-add {
+            display: block;
+            color: grey;
+        }
+        .horz > .icon-add:hover {
+            color: black;
+            background-color: red;
+        }
+        .horz > .item-wrapper {
+            height: 100%;
+            display: flex;
+        }
+        .horz .item {
+            width: 160px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            border-right: 1px solid black;
+        }
+        .horz .item span {
+            width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
+            background-color: yellow;
+        }
+        .horz .item:first-child span {
+            margin-left: 27px;
+        }
+        .horz .item:hover {
+            overflow: auto;
+            resize: horizontal;
+        }
+        .horz .icon-delete {
+            position: absolute;
+            top: 50%; right: 0;
+            transform: translateY(-50%);
+            width: 21px;
+            padding-right: 6px;
+            display: none;
+        }
+        .horz .item:hover .icon-delete {
+            display: block;
+            color: grey;
+        }
+        .horz .item:hover .icon-delete:hover {
+            color: black;
+            background-color: red;
+        }
+
+        .vert {
+            height: 600px;
+            width: var(--panel-size);
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            display: flex;
+            position: relative;
+        }
+        .vert > .icon-add {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            height: 21px;
+            padding-top: 6px;
+            display: none;
+        }
+        .vert:hover > .icon-add {
+            display: block;
+            color: grey;
+        }
+        .vert > .icon-add:hover {
+            color: black;
+            background-color: red;
+        }
+        .vert > .item-wrapper {
+            width: 100%;
+        }
+        .vert .item {
+            width: 100%;
+            height: 140px;
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-lr;
+            /* 垂直方向自右而左的书写方式。即top-bottom-right-left */
+            display: flex;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid black;
+        }
+        .vert .item:hover {
+            overflow: auto;
+            resize: vertical;
+        }
+        .vert .item span {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
+            background-color: yellow;
+        }
+        .vert .item:first-child span {
+            margin-top: 27px;
+        }
+        .vert .icon-delete {
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            height: 21px;
+            padding-bottom: 6px;
+            display: none;
+        }
+        .vert .item:hover .icon-delete {
+            display: block;
+            color: grey;
+        }
+        .vert .item:hover .icon-delete:hover {
+            color: black;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="panel">
+    <i class="toggle fa fa-refresh fa-lg"></i>
+    <div class="horz">
+        <div class="item-wrapper">
+            <div class="item">
+                <span>人事部</span>
+                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+            </div>
+            <div class="item">
+                <span>开发部</span>
+                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+            </div>
+            <div class="item">
+                <span>后勤部</span>
+                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+            </div>
+        </div>
+        <i class="icon-add fa fa-plus-circle fa-lg"></i>
+    </div>
+    <div class="vert">
+        <div class="item-wrapper">
+            <div class="item">
+                <span>起草</span>
+                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+            </div>
+            <div class="item">
+                <span>审批</span>
+                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+            </div>
+            <div class="item">
+                <span>处理</span>
+                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+            </div>
+        </div>
+        <i class="icon-add fa fa-plus-circle fa-lg"></i>
+    </div>
+</div>
+</body>
+</html>
