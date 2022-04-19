@@ -417,12 +417,14 @@
             }
         }
 
-        getData(vh) {
-            return vh
-                ? vh === "h" ?
-                    this.#data.horz :
-                    this.#data.vert :
-                this.#data;
+        getData(hv) {
+            return hv
+                ? /^([hv])$/.test(hv)
+                    ? hv === "h"
+                        ? this.#data.horz
+                        : this.#data.vert
+                    : new Error("参数错误")
+                : this.#data;
         }
 
     }
@@ -437,6 +439,7 @@
     // console.log(v.getData());
     // console.log(v.getData("h"));
     // console.log(v.getData("v"));
+    // console.log(v.getData("a"));
 
 </script>
 </body>
