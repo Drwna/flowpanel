@@ -21,8 +21,8 @@
         }
         .panel {
             border: 1px solid rgb(80, 77, 77);
-            padding: 8px;
-            width: 800px;
+            /*padding: 8px;*/
+            width: 1000px;
             height: 600px;
         }
         .panel .item-wrapper {
@@ -72,7 +72,6 @@
         }
         .horz > .icon-add:hover {
             color: black;
-            background-color: red;
         }
         .horz > .item-wrapper {
             height: 100%;
@@ -114,7 +113,6 @@
         }
         .horz .item:hover .icon-delete:hover {
             color: black;
-            background-color: red;
         }
 
         .vert {
@@ -140,7 +138,6 @@
         }
         .vert > .icon-add:hover {
             color: black;
-            background-color: red;
         }
         .vert > .item-wrapper {
             width: 100%;
@@ -182,7 +179,6 @@
         }
         .vert .item:hover .icon-delete:hover {
             color: black;
-            background-color: red;
         }
 
         .horz input {
@@ -247,8 +243,8 @@
             <div class="panel-wrapper">
                 <i class="toggle fa fa-refresh fa-lg"></i>
                 <div class="horz">
-                    <div ids="xItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<horz.length; i++" class="item" >
+                    <div ids="xItems" class="item-wrapper" id="dragX">
+                        <div jst-for="let i=0; i<horz.length; i++" class="item xItem" >
                             <span jst-text="{{horz[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -279,42 +275,53 @@
             this.render(data);
         }
 
-        render(data, vh) {
-            vh ?
-                vh === "h" ?
-                    new jst($(".horz")[0]).render(data) :
-                    new jst($(".vert")[0]).render(data) :
-                new jst($(".panel-wrapper")[0]).render(data);
+        render(data) {
+            new jst($(".panel-wrapper")[0]).render(data);
         }
 
         bindEvent() {
-            let self = this;
             this.root.on({
-                "click": function (e) {
-                    let target = e.target.className.toLowerCase();
-                    if (target.includes("icon-add")) {
-                        console.log("add");
-                    } else if (target.includes('icon-delete')) {
-                        console.log("delete");
+                "click": (e) => {
+                    e.stopPropagation();
+                    let target = $(e.target);
+                    let targetName = e.target.className.toLowerCase();
+                    let hv;
+                    // 添加默认字段
+                    if (targetName.includes("icon-add")) {
+                        hv = target.parent().attr("class").substr(0, 1);
+                        this.addDefaultField(hv);
+                    } else if (targetName.includes('icon-delete')) {
+                        hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                        this.removeField(hv, target);
                     }
                 },
-                "dblclick": function (e) {
-                    let targetName = e.target.className.toLowerCase();
-                    // 双击切换
-                    if (targetName.includes("toggle")) {
-                        self.toggle();
-                    }
-                    // 双击编辑
-                    if (e.target.nodeName.toLowerCase().includes("span")) {
-                        self.edit($(e.target));
+                "dblclick": (e) => {
+                    e.stopPropagation();
+                    if (e.target.className.toLowerCase().includes("toggle")) {
+                        // 双击切换
+                        this.toggle();
+                    } else if (e.target.nodeName.toLowerCase().includes("span")) {
+                        // 双击编辑
+                        this.edit($(e.target));
                     }
                 },
             });
         }
 
+        addDefaultField(hv) {
+            let title = "新增字段";
+            hv === "h" ? this.#data.horz.push(title) : this.#data.vert.push(title);
+            this.render(this.#data);
+        }
+
+        removeField(hv, target) {
+            let index = target.parent().index();
+            hv === "h" ? this.#data.horz.splice(index, 1) : this.#data.vert.splice(index, 1);
+            this.render(this.#data);
+        }
+
         edit(target) {
             // 还可优化
-            console.log("函数 edit");
             let currentTag = target;
             let hv = currentTag.parents(".item-wrapper")
                 .parent()[0].className.substr(0, 1);
@@ -323,7 +330,6 @@
             let input = $(`<input type='text' value=${oldText} />`);
 
             let updateValue = (o) => {
-                console.log('执行了一次');
                 newText = input.val().trim() === "" ? oldText : input.val().trim();
                 currentTag.html(newText);
                 o?.remove();
@@ -332,7 +338,7 @@
                 hv === "h" ?
                     this.#data.horz[index] = newText :
                     this.#data.vert[index] = newText;
-                this.reRender(this.#data, hv);
+                this.render(this.#data);
                 console.log(this.#data);
             };
 
@@ -388,14 +394,14 @@
             // TODO: 待优化
         }
 
-        add(vh, data) {
+        add(hv, data) {
             console.log("函数 add");
             let {title, size} = data;
-            vh === "h" ?
+            hv === "h" ?
                 this.#data.horz.push(title) :
                 this.#data.vert.push(title);
             console.log("添加后： ", this.#data);
-            this.render(this.#data, vh);
+            this.render(this.#data);
 
             // TODO: 添加数据 待优化
             if (size) {
@@ -411,21 +417,26 @@
             }
         }
 
-        delete() {
-
+        getData(vh) {
+            return vh
+                ? vh === "h" ?
+                    this.#data.horz :
+                    this.#data.vert :
+                this.#data;
         }
 
-        update() {
-
-        }
     }
 
-    let a = new Panel($('.panel'));
+    let v = new Panel($('.panel'));
 
 
-    // a.add("h", {title: "第一个",});
-    // a.add("h", {title: "第2个", size: 380});
-    // a.add("v", {title: "第2个", size: 380});
+    // v.add("h", {title: "第   aa一个",});
+    // v.add("h", {title: "第2个", size: 380});
+    // v.add("v", {title: "第2个", size: 380});
+
+    // console.log(v.getData());
+    // console.log(v.getData("h"));
+    // console.log(v.getData("v"));
 
 </script>
 </body>
