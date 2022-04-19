@@ -80,7 +80,7 @@
         }
         .horz .item {
             /* 待 js 设置 width */
-            width: 160px;
+            width: 200px;
             height: 100%;
             position: relative;
             display: flex;
@@ -239,7 +239,7 @@
     class Panel {
 
         #data = {
-            horz: ["人事部", "开开发部开发部开发部发部", "行政部"],
+            horz: ["人事部", "开开发部开发部开发部发部", "人事部", "人事部",],
             vert: ["起起草起草起草起草草", "审批", "处理"],
         };
 
@@ -257,7 +257,7 @@
                 </div>
                 <div class="vert">
                     <div id="yItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<horz.length; i++" class="item">
+                        <div jst-for="let i=0; i<vert.length; i++" class="item">
                             <span jst-text="{{vert[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -270,13 +270,21 @@
 
         constructor(root) {
             this.root = root;
-            this.render(root, this.#template, this.#data);
+            this.init(root, this.#template, this.#data);
             this.bindEvent();
         }
 
-        render(root, template, data) {
+        init(root, template, data) {
             template.appendTo(root);
-            new jst($(".panel-wrapper")[0]).render(data);
+            this.render(data);
+        }
+
+        render(data, vh) {
+            vh ?
+                vh === "h" ?
+                    new jst($(".horz")[0]).render(data) :
+                    new jst($(".vert")[0]).render(data) :
+                new jst($(".panel-wrapper")[0]).render(data);
         }
 
         bindEvent() {
@@ -294,7 +302,7 @@
                     let targetName = e.target.className.toLowerCase();
                     // 双击切换
                     if (targetName.includes("toggle")) {
-                        console.log("toggle");
+                        self.toggle();
                     }
                     // 双击编辑
                     if (e.target.nodeName.toLowerCase().includes("span")) {
@@ -305,8 +313,8 @@
         }
 
         edit(target) {
-
-            console.log("edit");
+            // 还可优化
+            console.log("函数 edit");
             let currentTag = target;
             let hv = currentTag.parents(".item-wrapper")
                 .parent()[0].className.substr(0, 1);
@@ -314,13 +322,19 @@
             let newText;
             let input = $(`<input type='text' value=${oldText} />`);
 
-            function updateValue(v) {
-                console.log('update');
+            let updateValue = (o) => {
+                console.log('执行了一次');
                 newText = input.val().trim() === "" ? oldText : input.val().trim();
                 currentTag.html(newText);
-                v?.overlayDiv.remove();
-                v?.input.remove();
-            }
+                o?.remove();
+                if (newText === oldText) return;
+                let index = target.parent().index();
+                hv === "h" ?
+                    this.#data.horz[index] = newText :
+                    this.#data.vert[index] = newText;
+                this.reRender(this.#data, hv);
+                console.log(this.#data);
+            };
 
             if (hv === 'h') {
                 currentTag.html(input);
@@ -340,7 +354,6 @@
                 input.appendTo(overlayDiv);
                 overlayDiv.appendTo($(document.body));
 
-                let io = {overlayDiv, input,};
                 let item = currentTag.parent();
                 let position = item[0].getBoundingClientRect();
 
@@ -350,20 +363,52 @@
                 }).select();
 
                 overlayDiv.on({
-                    "click": () => updateValue(io),
+                    "click": () => updateValue(overlayDiv),
                     "keydown": (e) => {
-                        e.keyCode === 13 && updateValue(io);
+                        e.keyCode === 13 && updateValue(overlayDiv);
                     },
                 });
                 $(window).scroll(() => {
-                    updateValue(io);
+                    // 待解决 滚动时执行了一次
+                    updateValue(overlayDiv);
                     $(window).off("scroll");
                 });
             }
         }
 
-        add() {
+        toggle() {
+            console.log("函数 toggle");
+            console.log("交换前： ", this.#data.horz, this.#data.vert);
+            let temp = this.#data.horz;
+            this.#data.horz = this.#data.vert;
+            this.#data.vert = temp;
+            console.log("交换后： ", this.#data.horz, this.#data.vert);
+            this.render(this.#data);
+            // 交换尺寸
+            // TODO: 待优化
+        }
 
+        add(vh, data) {
+            console.log("函数 add");
+            let {title, size} = data;
+            vh === "h" ?
+                this.#data.horz.push(title) :
+                this.#data.vert.push(title);
+            console.log("添加后： ", this.#data);
+            this.render(this.#data, vh);
+
+            // TODO: 添加数据 待优化
+            if (size) {
+                setTimeout(() => {
+                    let wrapper = $("div[ids=xItems]");
+                    console.log("wrapper: ", wrapper);
+                    for (let i = 0; i < wrapper.children().length; i++) {
+                        let item = wrapper.children().eq(i).children();
+                        if (title === item.text())
+                            item.parent().css({width: size,});
+                    }
+                }, 0);
+            }
         }
 
         delete() {
@@ -376,6 +421,11 @@
     }
 
     let a = new Panel($('.panel'));
+
+
+    // a.add("h", {title: "第一个",});
+    // a.add("h", {title: "第2个", size: 380});
+    // a.add("v", {title: "第2个", size: 380});
 
 </script>
 </body>
