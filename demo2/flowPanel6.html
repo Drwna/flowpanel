@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
@@ -25,6 +25,16 @@
             width: 800px;
             height: 600px;
         }
+        .panel .item-wrapper {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .panel .item > span {
+            cursor: default;
+            background-color: yellowgreen;
+        }
 
         .toggle {
             width: var(--panel-size);
@@ -42,7 +52,6 @@
         .horz {
             width: 600px;
             height: var(--panel-size);
-            background-color: rgba(235, 230, 230, 0.5);
             border-top: 1px solid black;
             border-right: 1px solid black;
             border-bottom: 1px solid black;
@@ -70,25 +79,25 @@
             display: flex;
         }
         .horz .item {
+            /* 待 js 设置 width */
             width: 160px;
             height: 100%;
             position: relative;
             display: flex;
             border-right: 1px solid black;
+            background-color: wheat;
         }
         .horz .item span {
             width: 100%; height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: default;
-            background-color: yellow;
-        }
-        .horz .item:first-child span {
-            margin-left: 27px;
+            padding: 0 27px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            line-height: var(--panel-size);
         }
         .horz .item:hover {
-            overflow: auto;
+            overflow: hidden;
             resize: horizontal;
         }
         .horz .icon-delete {
@@ -109,7 +118,7 @@
         }
 
         .vert {
-            height: 600px;
+            height: 500px;
             width: var(--panel-size);
             border-left: 1px solid black;
             border-right: 1px solid black;
@@ -148,20 +157,16 @@
             border-bottom: 1px solid black;
         }
         .vert .item:hover {
-            overflow: auto;
+            overflow: hidden;
             resize: vertical;
         }
         .vert .item span {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: default;
-            background-color: yellow;
-        }
-        .vert .item:first-child span {
-            margin-top: 27px;
+            height: 100%; width: 100%;
+            padding: 27px 0;
+            line-height: var(--panel-size);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .vert .icon-delete {
             position: absolute;
@@ -179,45 +184,200 @@
             color: black;
             background-color: red;
         }
+
+        .horz input {
+            text-align: center;
+            height: 80%; width: 90%;
+            font-size: inherit;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+        }
+        .horz input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+            0 0 8px rgba(102, 175, 233, 0.6);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+        .overlay input {
+            position: fixed;
+            width: 200px;
+            height: 34px;
+            text-align: center;
+            font-size: inherit;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+        }
+        .overlay input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+            0 0 8px rgba(102, 175, 233, 0.6);
+        }
     </style>
 </head>
 <body>
-<div class="panel">
-    <i class="toggle fa fa-refresh fa-lg"></i>
-    <div class="horz">
-        <div class="item-wrapper">
-            <div class="item">
-                <span>人事部</span>
-                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+<div class="panel"></div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="jstx/src/jst-core.js"></script>
+<script>
+
+    class Panel {
+
+        #data = {
+            horz: ["人事部", "开开发部开发部开发部发部", "行政部"],
+            vert: ["起起草起草起草起草草", "审批", "处理"],
+        };
+
+        #template = $(`
+            <div class="panel-wrapper">
+                <i class="toggle fa fa-refresh fa-lg"></i>
+                <div class="horz">
+                    <div ids="xItems" class="item-wrapper">
+                        <div jst-for="let i=0; i<horz.length; i++" class="item" >
+                            <span jst-text="{{horz[i]}}"></span>
+                            <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+                        </div>
+                    </div>
+                    <i class="icon-add fa fa-plus-circle fa-lg"></i>
+                </div>
+                <div class="vert">
+                    <div id="yItems" class="item-wrapper">
+                        <div jst-for="let i=0; i<horz.length; i++" class="item">
+                            <span jst-text="{{vert[i]}}"></span>
+                            <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+                        </div>
+                    </div>
+                    <i class="icon-add fa fa-plus-circle fa-lg"></i>
+                </div>
+                </div>
             </div>
-            <div class="item">
-                <span>开发部</span>
-                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-            </div>
-            <div class="item">
-                <span>后勤部</span>
-                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-            </div>
-        </div>
-        <i class="icon-add fa fa-plus-circle fa-lg"></i>
-    </div>
-    <div class="vert">
-        <div class="item-wrapper">
-            <div class="item">
-                <span>起草</span>
-                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-            </div>
-            <div class="item">
-                <span>审批</span>
-                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-            </div>
-            <div class="item">
-                <span>处理</span>
-                <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-            </div>
-        </div>
-        <i class="icon-add fa fa-plus-circle fa-lg"></i>
-    </div>
-</div>
+        `);
+
+        constructor(root) {
+            this.root = root;
+            this.render(root, this.#template, this.#data);
+            this.bindEvent();
+        }
+
+        render(root, template, data) {
+            template.appendTo(root);
+            new jst($(".panel-wrapper")[0]).render(data);
+        }
+
+        bindEvent() {
+            let self = this;
+            this.root.on({
+                "click": function (e) {
+                    let target = e.target.className.toLowerCase();
+                    if (target.includes("icon-add")) {
+                        console.log("add");
+                    } else if (target.includes('icon-delete')) {
+                        console.log("delete");
+                    }
+                },
+                "dblclick": function (e) {
+                    let targetName = e.target.className.toLowerCase();
+                    // 双击切换
+                    if (targetName.includes("toggle")) {
+                        console.log("toggle");
+                    }
+                    // 双击编辑
+                    if (e.target.nodeName.toLowerCase().includes("span")) {
+                        console.log("edit");
+                        let currentTag = $(e.target);
+                        let hv = currentTag.parents(".item-wrapper")
+                            .parent()[0].className.substr(0, 1);
+                        let oldText = e.target.innerText;
+                        let newText;
+                        let input = $(`<input type='text' value=${oldText} />`);
+
+                        function updateValue() {
+                            console.log('update');
+                            newText = input.val().trim() === "" ? oldText : input.val().trim();
+                            currentTag.html(newText);
+                        }
+
+                        if (hv === 'h') {
+                            currentTag.html(input);
+                            input.select().on({
+                                "click": () => updateValue(),
+                                "keydown": (e) => {
+                                    e.keyCode === 13 && updateValue();
+                                },
+                            });
+                            // $(document).one("mousedown", function () {
+                            //     if (!input) return;
+                            //     let newText = input.val().trim() === "" ? oldText : input.val().trim();
+                            //     currentTag.html(newText);
+                            //     console.log(newText, 1);
+                            // });
+                        } else {
+                            let overlayDiv = $(`<div class="overlay"></div>`);
+
+                            input.appendTo(overlayDiv);
+                            overlayDiv.appendTo($(document.body));
+
+                            let item = currentTag.parent();
+                            let position = item[0].getBoundingClientRect();
+
+                            input.css({
+                                "top": position.top + item.height() / 2 - input.height() / 2,
+                                "left": position.left,
+                            }).select();
+
+                            overlayDiv.on({
+                                "click": () => {
+                                    updateValue();
+                                    overlayDiv.remove();
+                                    input.remove();
+                                },
+                            });
+                            $(window).scroll(function () {
+                                updateValue();
+                                overlayDiv.remove();
+                                input.remove();
+                                $(this).off("scroll");
+                            });
+                        }
+                    }
+                },
+            });
+        }
+
+        edit() {
+
+        }
+
+
+        add() {
+
+        }
+
+        delete() {
+
+        }
+
+        update() {
+
+        }
+    }
+
+    let a = new Panel($('.panel'));
+
+</script>
 </body>
 </html>
