@@ -207,7 +207,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            /*background-color: rgba(0, 0, 0, 0.5);*/
+            background-color: transparent;
             z-index: 9999;
         }
         .overlay input {
@@ -297,71 +298,69 @@
                     }
                     // 双击编辑
                     if (e.target.nodeName.toLowerCase().includes("span")) {
-                        console.log("edit");
-                        let currentTag = $(e.target);
-                        let hv = currentTag.parents(".item-wrapper")
-                            .parent()[0].className.substr(0, 1);
-                        let oldText = e.target.innerText;
-                        let newText;
-                        let input = $(`<input type='text' value=${oldText} />`);
-
-                        function updateValue() {
-                            console.log('update');
-                            newText = input.val().trim() === "" ? oldText : input.val().trim();
-                            currentTag.html(newText);
-                        }
-
-                        if (hv === 'h') {
-                            currentTag.html(input);
-                            input.select().on({
-                                "click": () => updateValue(),
-                                "keydown": (e) => {
-                                    e.keyCode === 13 && updateValue();
-                                },
-                            });
-                            // $(document).one("mousedown", function () {
-                            //     if (!input) return;
-                            //     let newText = input.val().trim() === "" ? oldText : input.val().trim();
-                            //     currentTag.html(newText);
-                            //     console.log(newText, 1);
-                            // });
-                        } else {
-                            let overlayDiv = $(`<div class="overlay"></div>`);
-
-                            input.appendTo(overlayDiv);
-                            overlayDiv.appendTo($(document.body));
-
-                            let item = currentTag.parent();
-                            let position = item[0].getBoundingClientRect();
-
-                            input.css({
-                                "top": position.top + item.height() / 2 - input.height() / 2,
-                                "left": position.left,
-                            }).select();
-
-                            overlayDiv.on({
-                                "click": () => {
-                                    updateValue();
-                                    overlayDiv.remove();
-                                    input.remove();
-                                },
-                            });
-                            $(window).scroll(function () {
-                                updateValue();
-                                overlayDiv.remove();
-                                input.remove();
-                                $(this).off("scroll");
-                            });
-                        }
+                        self.edit($(e.target));
                     }
                 },
             });
         }
 
-        edit() {
+        edit(target) {
 
+            console.log("edit");
+            let currentTag = target;
+            let hv = currentTag.parents(".item-wrapper")
+                .parent()[0].className.substr(0, 1);
+            let oldText = target[0].innerText;
+            let newText;
+            let input = $(`<input type='text' value=${oldText} />`);
+
+            function updateValue(v) {
+                console.log('update');
+                newText = input.val().trim() === "" ? oldText : input.val().trim();
+                currentTag.html(newText);
+                v?.overlayDiv.remove();
+                v?.input.remove();
+            }
+
+            if (hv === 'h') {
+                currentTag.html(input);
+                input.select().on({
+                    "blur": () => updateValue(),
+                    "keydown": (e) => {
+                        e.keyCode === 13 && updateValue();
+                    },
+                });
+                $(window).scroll(() => {
+                    updateValue();
+                    $(window).off("scroll");
+                });
+            } else {
+                let overlayDiv = $(`<div class="overlay"></div>`);
+
+                input.appendTo(overlayDiv);
+                overlayDiv.appendTo($(document.body));
+
+                let io = {overlayDiv, input,};
+                let item = currentTag.parent();
+                let position = item[0].getBoundingClientRect();
+
+                input.css({
+                    "top": position.top + item.height() / 2 - input.height() / 2,
+                    "left": position.left,
+                }).select();
+
+                overlayDiv.on({
+                    "click": () => updateValue(io),
+                    "keydown": (e) => {
+                        e.keyCode === 13 && updateValue(io);
+                    },
+                });
+                $(window).scroll(() => {
+                    updateValue(io);
+                    $(window).off("scroll");
+                });
+            }
         }
-
 
         add() {
 
