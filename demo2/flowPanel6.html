@@ -32,8 +32,11 @@
             user-select: none;
         }
         .panel .item > span {
-            cursor: default;
             background-color: yellowgreen;
+            cursor: default;
+        }
+        .panel .icon-add, .panel .icon-delete {
+            cursor: default;
         }
 
         .toggle {
@@ -72,6 +75,7 @@
         }
         .horz > .icon-add:hover {
             color: black;
+            cursor: pointer;
         }
         .horz > .item-wrapper {
             height: 100%;
@@ -104,15 +108,19 @@
             top: 50%; right: 0;
             transform: translateY(-50%);
             width: 21px;
+            height: var(--panel-size);
+            line-height: var(--panel-size);
             padding-right: 6px;
             display: none;
         }
+
         .horz .item:hover .icon-delete {
             display: block;
             color: grey;
         }
         .horz .item:hover .icon-delete:hover {
             color: black;
+            cursor: pointer;
         }
 
         .vert {
@@ -138,6 +146,7 @@
         }
         .vert > .icon-add:hover {
             color: black;
+            cursor: pointer;
         }
         .vert > .item-wrapper {
             width: 100%;
@@ -172,6 +181,8 @@
             height: 21px;
             padding-bottom: 6px;
             display: none;
+            width: var(--panel-size);
+            line-height: var(--panel-size);
         }
         .vert .item:hover .icon-delete {
             display: block;
@@ -179,6 +190,7 @@
         }
         .vert .item:hover .icon-delete:hover {
             color: black;
+            cursor: pointer;
         }
 
         .horz input {
@@ -235,7 +247,7 @@
     class Panel {
 
         #data = {
-            horz: ["人事部", "开开发部开发部开发部发部", "人事部", "人事部",],
+            horz: ["人事部1", "开开发部开发部开发部发部", "人事部2", "人事部3",],
             vert: ["起起草起草起草起草草", "审批", "处理"],
         };
 
@@ -243,8 +255,8 @@
             <div class="panel-wrapper">
                 <i class="toggle fa fa-refresh fa-lg"></i>
                 <div class="horz">
-                    <div ids="xItems" class="item-wrapper" id="dragX">
-                        <div jst-for="let i=0; i<horz.length; i++" class="item xItem" >
+                    <div ids="xItems" class="item-wrapper">
+                        <div draggable="true" jst-for="let i=0; i<horz.length; i++" class="item xItem" >
                             <span jst-text="{{horz[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -252,14 +264,13 @@
                     <i class="icon-add fa fa-plus-circle fa-lg"></i>
                 </div>
                 <div class="vert">
-                    <div id="yItems" class="item-wrapper">
+                    <div ids="yItems" class="item-wrapper">
                         <div jst-for="let i=0; i<vert.length; i++" class="item">
                             <span jst-text="{{vert[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
                     </div>
                     <i class="icon-add fa fa-plus-circle fa-lg"></i>
-                </div>
                 </div>
             </div>
         `);
@@ -268,6 +279,7 @@
             this.root = root;
             this.init(root, this.#template, this.#data);
             this.bindEvent();
+            this.end();
         }
 
         init(root, template, data) {
@@ -302,9 +314,19 @@
                         this.toggle();
                     } else if (e.target.nodeName.toLowerCase().includes("span")) {
                         // 双击编辑
-                        this.edit($(e.target));
+                        // this.edit($(e.target));
                     }
                 },
+                // "mousedown": (e) => {
+                // let target = e.target;
+                // let cursorStyle = window.getComputedStyle(target).cursor;
+                // let tagName = target.tagName.toLowerCase();
+                //
+                // if (cursorStyle !== "auto" && cursorStyle !== "pointer" && tagName === "span") {
+                //     console.log("执行拖曳");
+                //     this.dragSort();
+                // }
+                // },
             });
         }
 
@@ -427,6 +449,237 @@
                 : this.#data;
         }
 
+
+        end() {
+            setTimeout(() => {
+                // this.dragSort("h");
+                this.drag2();
+            }, 1000);
+        }
+
+        dragSort(hv) {
+            let range = {x: 0, y: 0};
+            let lastPosition = {x: 0, y: 0, x1: 0, y1: 0};
+            let targetPosition = {x: 0, y: 0, x1: 0, y1: 0};
+            let thisDiv = null, move = null, choose = null;
+
+            // 拖曳对象的索引、高度、宽度的初始化
+            let thisDivWidth = 0, thisDivHeight = 0,
+                thisDivHalfWidth = 0, thisDivHalfHeight = 0,
+                targetFirstX = 0, targetFirstY = 0;
+
+            // 要插入的目标元素的对象，临时虚线框的对象
+            let targetDiv = null, targetFirst = null, tempDiv = null;
+
+            // 记录鼠标按下时的位置
+            let initPosition = {x: 0, y: 0};
+
+
+            console.log("要拖曳的元素包裹器", $("div[ids=xItems]"));
+            $("div[ids=xItems]").on("mousedown", ".item", function (e) {
+
+                let target = e.target;
+                let cursorStyle = window.getComputedStyle(target).cursor;
+                if (cursorStyle !== "default") {
+                    return;
+                }
+
+                choose = true;
+
+                thisDiv = $(this);
+
+                // 记录拖曳元素初始位置
+                initPosition.x = thisDiv.position().left;
+                initPosition.y = thisDiv.position().top;
+                console.log("initPosition: ", initPosition.x, initPosition.y);
+
+
+                // 鼠标元素相对偏移量
+                range.x = e.pageX - thisDiv.position().left;
+                range.y = e.pageY - thisDiv.position().top;
+                // console.log("鼠标相对偏移量： ", range.x, range.y);
+
+                thisDivWidth = thisDiv.width();
+                thisDivHeight = thisDiv.height();
+                // console.log("拖曳元素的宽高度： ", thisDivWidth, thisDivHeight);
+
+                thisDivHalfWidth = thisDivWidth / 2;
+                thisDivHalfHeight = thisDivHeight / 2;
+                // console.log("拖曳元素的一半宽高度： ", thisDivHalfWidth, thisDivHalfHeight);
+
+                // console.log("thisDiv: ", thisDiv);
+                console.log("===========================");
+
+                // 拖曳的样式
+                thisDiv.css({
+                    bgColor: "grey",
+                    color: "white",
+                    zIndex: "999",
+                    position: "absolute",
+                    left: initPosition.x,
+                    top: initPosition.y,
+                    width: thisDivWidth,
+                    height: thisDivHeight,
+                    borderRadius: "5px",
+                    borderShadow: "0 0 5px #ccc",
+                });
+                hv === "h" ? thisDiv.css({
+                    border: "1px solid black",
+                    borderTop: "none",
+                    borderBottom: "none",
+                }) : thisDiv.css({
+                    border: "1px solid black",
+                    borderLeft: "none",
+                    borderRight: "none",
+                });
+
+
+                // 插入虚线框
+                tempDiv = $("<div></div>");
+                tempDiv.css({
+                    // position: "absolute",
+                    // left: initPosition.x,
+                    // top: initPosition.y,
+                    width: thisDivWidth - 1,
+                    height: thisDivHeight,
+                    border: "1px dashed black",
+                    zIndex: "999",
+                });
+                tempDiv.insertBefore(thisDiv);
+            });
+
+            $(document)
+                .on("mouseup", function () {
+
+                    if (!choose) {
+                        return;
+                    }
+
+                    if (!move) {
+                        thisDiv.css({
+                            bgColor: "white",
+                            color: "black",
+                            zIndex: "",
+                            position: "relative",
+                            left: "",
+                            top: "",
+                            borderRadius: "",
+                            borderShadow: "none",
+                        });
+                        tempDiv.remove();
+                        choose = false;
+                        return;
+                    }
+
+                    thisDiv.insertBefore(tempDiv);
+                    tempDiv.remove();
+                    thisDiv.css({
+                        bgColor: "",
+                        color: "",
+                        zIndex: "",
+                        position: "",
+                        left: "",
+                        top: "",
+                        width: "",
+                        height: "",
+                        borderRadius: "",
+                    });
+                    choose = false;
+                    move = false;
+                })
+                .on("mousemove", function (e) {
+
+
+                    if (!choose) return false;
+
+                    move = true;
+                    lastPosition.x = e.pageX - range.x;
+                    lastPosition.y = e.pageY - range.y;
+                    lastPosition.x1 = lastPosition.x + thisDivWidth;
+                    lastPosition.y1 = lastPosition.y + thisDivHeight;
+
+                    // 拖曳元素随鼠标移动
+                    thisDiv.css({
+                        "left": hv === "h" ? lastPosition.x : "",
+                        "top": hv === "v" ? lastPosition.y : "",
+                    });
+
+                    // 按照重新排列过的顺序，再次获取各个元素的位置
+                    let $main = $("div[ids=xItems]").children(".item");
+
+                    $main.each(function () {
+                        let targetDiv = $(this);
+
+                        targetPosition.x = targetDiv.position().left;
+                        targetPosition.y = targetDiv.position().top;
+                        targetPosition.x1 = targetPosition.x + targetDiv.width() / 2;
+                        targetPosition.y1 = targetPosition.y + targetDiv.height() / 2;
+                        targetFirst = $main.eq(0);
+                        targetFirstX = targetFirst.position().left + thisDivHalfWidth / 2;
+                        targetFirstY = targetFirst.position().top + thisDivHalfHeight / 2;
+
+                        // 根据拖曳对象坐标与目标元素对象坐标对比，来显示虚线框在节点前或后的位置
+                        if (lastPosition.x > targetPosition.x) {
+                            // 拖曳对象 移动到第一个位置
+                            if (lastPosition.x <= targetFirstX && lastPosition.y <= targetFirstY) {
+                                tempDiv.insertBefore(targetFirst);
+                            }
+                            // 判断要插入目标元素的位置，直接插入
+                            if (lastPosition.x <= targetPosition.x + thisDivHalfWidth && lastPosition.x1 >= targetPosition.x1 && lastPosition.y <= targetPosition.y + thisDivHalfHeight && lastPosition.y1 >= targetPosition.y1) {
+                                tempDiv.insertBefore(targetDiv);
+                            }
+                        } else {
+                            // 拖曳对象，移动到第一个位置
+                            if (lastPosition.x <= targetFirstX && lastPosition.y <= targetFirstY) {
+                                tempDiv.insertBefore(targetFirst);
+                            }
+                            // 判断要插入目标元素的位置，直接插入
+                            if (lastPosition.x1 >= targetPosition.x - thisDivHalfWidth && lastPosition.x1 >= targetPosition.x1 && lastPosition.y >= targetPosition.y - thisDivHalfHeight && lastPosition.y1 >= targetPosition.y1) {
+                                tempDiv.insertAfter(targetDiv);
+                            }
+                        }
+
+
+                    });
+
+                });
+
+        }
+
+        drag2() {
+            let node = document.querySelector(".item-wrapper");
+            let draging = null;
+            // 使用事件委托，将li事件绑定到ul上
+            node.ondragstart = function (e) {
+                e.dataTransfer.setData("text/plain", e.target.innerText);
+                draging = e.target;
+            };
+            node.ondragover = function (e) {
+                e.preventDefault();
+                let target = e.target;
+                // 判断是否是li元素
+                if (target.nodeName.toLowerCase() === "div" && target !== draging) {
+                    // _index是实现的获取index
+                    if (_index(draging) < _index(target)) {
+                        target.parentNode.insertBefore(draging, target.nextSibling);
+                    } else {
+                        target.parentNode.insertBefore(draging, target);
+                    }
+                }
+
+                function _index(el) {
+                    let index = 0;
+                    if (!el || !el.parentNode) {
+                        return -1;
+                    }
+                    while (el && (el = el.previousElementSibling)) {
+                        index++;
+                    }
+                    return index;
+                }
+            };
+
+        }
     }
 
     let v = new Panel($('.panel'));
