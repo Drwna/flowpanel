@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <title>float demo</title>
+    <style>
+        :root {
+            --panel-size: 40px;
+        }
+        .panel > * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .panel {
+            border: 1px solid rgb(80, 77, 77);
+            /*padding: 8px;*/
+            width: 1000px;
+            height: 600px;
+        }
+        .panel .item-wrapper {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .panel .item > span {
+            background-color: yellowgreen;
+            cursor: default;
+        }
+        .panel .icon-add, .panel .icon-delete {
+            cursor: default;
+        }
+
+        .toggle {
+            width: var(--panel-size);
+            height: var(--panel-size);
+            line-height: var(--panel-size);
+            text-align: center;
+            border: 1px solid black;
+            float: left;
+            color: grey;
+        }
+        .toggle:hover {
+            color: black;
+        }
+
+        .horz {
+            width: 600px;
+            height: var(--panel-size);
+            border-top: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            display: flex;
+            position: relative;
+        }
+        .horz > .icon-add {
+            position: absolute;
+            top: 50%; left: 0;
+            transform: translateY(-50%);
+            width: 21px;
+            padding-left: 6px;
+            display: none;
+        }
+        .horz:hover > .icon-add {
+            display: block;
+            color: grey;
+        }
+        .horz > .icon-add:hover {
+            color: black;
+            cursor: pointer;
+        }
+        .horz > .item-wrapper {
+            height: 100%;
+            display: flex;
+        }
+        .horz .item {
+            /* 待 js 设置 width */
+            width: 200px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            border-right: 1px solid black;
+            background-color: wheat;
+        }
+        .horz .item span {
+            width: 100%; height: 100%;
+            padding: 0 27px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            line-height: var(--panel-size);
+        }
+        .horz .item:hover {
+            overflow: hidden;
+            resize: horizontal;
+        }
+        .horz .icon-delete {
+            position: absolute;
+            top: 50%; right: 0;
+            transform: translateY(-50%);
+            width: 21px;
+            height: var(--panel-size);
+            line-height: var(--panel-size);
+            padding-right: 6px;
+            display: none;
+        }
+
+        .horz .item:hover .icon-delete {
+            display: block;
+            color: grey;
+        }
+        .horz .item:hover .icon-delete:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        .vert {
+            height: 500px;
+            width: var(--panel-size);
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            display: flex;
+            position: relative;
+        }
+        .vert > .icon-add {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            height: 21px;
+            padding-top: 6px;
+            display: none;
+        }
+        .vert:hover > .icon-add {
+            display: block;
+            color: grey;
+        }
+        .vert > .icon-add:hover {
+            color: black;
+            cursor: pointer;
+        }
+        .vert > .item-wrapper {
+            width: 100%;
+        }
+        .vert .item {
+            width: 100%;
+            height: 140px;
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-lr;
+            /* 垂直方向自右而左的书写方式。即top-bottom-right-left */
+            display: flex;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid black;
+        }
+        .vert .item:hover {
+            overflow: hidden;
+            resize: vertical;
+        }
+        .vert .item span {
+            height: 100%; width: 100%;
+            padding: 27px 0;
+            line-height: var(--panel-size);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .vert .icon-delete {
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            height: 21px;
+            padding-bottom: 6px;
+            display: none;
+            width: var(--panel-size);
+            line-height: var(--panel-size);
+        }
+        .vert .item:hover .icon-delete {
+            display: block;
+            color: grey;
+        }
+        .vert .item:hover .icon-delete:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        .horz input {
+            text-align: center;
+            height: 80%; width: 90%;
+            font-size: inherit;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+        }
+        .horz input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+            0 0 8px rgba(102, 175, 233, 0.6);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /*background-color: rgba(0, 0, 0, 0.5);*/
+            background-color: transparent;
+            z-index: 9999;
+        }
+        .overlay input {
+            position: fixed;
+            width: 200px;
+            height: 34px;
+            text-align: center;
+            font-size: inherit;
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+        }
+        .overlay input:focus {
+            border-color: #66afe9;
+            outline: 0;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+            0 0 8px rgba(102, 175, 233, 0.6);
+        }
+
+        .xDragItem {
+            position: absolute;
+            height: 100%;
+            line-height: var(--panel-size);
+            text-align: center;
+            background-color: grey;
+            color: white;
+            border-radius: 5px;
+            padding: 0 5px;
+            box-shadow: 0 0 5px #ccc;
+            z-index: 4;
+        }
+
+        .xPlaceholder {
+            outline: 1px dashed black;
+            height: 100%;
+            background-color: lightblue;
+        }
+
+        .yDragItem {
+            position: absolute;
+            width: 100%;
+            line-height: var(--panel-size);
+            text-align: center;
+            white-space: nowrap;
+            background-color: grey;
+            color: white;
+            padding: 5px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #ccc;
+            z-index: 4;
+
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-lr;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+        .yPlaceholder {
+            outline: 1px dashed black;
+            /*width: 100%;*/
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+<div class="panel"></div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="jstx/src/jst-core.js"></script>
+<script>
+
+    class Panel {
+
+        #data = {
+            horz: ["人事部1", "开开发部开发部开发部发部", "人事部2", "人事部3",],
+            vert: ["起起草起草起草起草草", "审批", "处理"],
+        };
+
+        #template = $(`
+            <div class="panel-wrapper">
+                <i class="toggle fa fa-refresh fa-lg"></i>
+                <div class="horz">
+                    <div ids="xItems" class="item-wrapper">
+                        <div jst-for="let i=0; i<horz.length; i++" id="xitem-{{i}}" class="item xItem">
+                            <span jst-text="{{horz[i]}}"></span>
+                            <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+                        </div>
+                    </div>
+                    <i class="icon-add fa fa-plus-circle fa-lg"></i>
+                </div>
+                <div class="vert">
+                    <div ids="yItems" class="item-wrapper">
+                        <div jst-for="let i=0; i<vert.length; i++" class="item yItem">
+                            <span jst-text="{{vert[i]}}"></span>
+                            <i class="icon-delete fa fa-minus-circle fa-lg"></i>
+                        </div>
+                    </div>
+                    <i class="icon-add fa fa-plus-circle fa-lg"></i>
+                </div>
+            </div>
+        `);
+
+        constructor(root) {
+            this.root = root;
+            this.init(root, this.#template, this.#data);
+            this.bindEvent();
+            this.end();
+        }
+
+        init(root, template, data) {
+            template.appendTo(root);
+            this.render(data);
+        }
+
+        render(data) {
+            new jst($(".panel-wrapper")[0]).render(data);
+        }
+
+        bindEvent() {
+            this.root.on({
+                "click": (e) => {
+                    e.stopPropagation();
+                    let target = $(e.target);
+                    let targetName = e.target.className.toLowerCase();
+                    let hv;
+                    // 添加默认字段
+                    if (targetName.includes("icon-add")) {
+                        hv = target.parent().attr("class").substr(0, 1);
+                        this.addDefaultField(hv);
+                    } else if (targetName.includes('icon-delete')) {
+                        hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                        this.removeField(hv, target);
+                    }
+                },
+                "dblclick": (e) => {
+                    e.stopPropagation();
+                    if (e.target.className.toLowerCase().includes("toggle")) {
+                        // 双击切换
+                        this.toggle();
+                    } else if (e.target.nodeName.toLowerCase().includes("span")) {
+                        // 双击编辑
+                        // this.edit($(e.target));
+                    }
+                },
+                // "mousedown": (e) => {
+                // let target = e.target;
+                // let cursorStyle = window.getComputedStyle(target).cursor;
+                // let tagName = target.tagName.toLowerCase();
+                //
+                // if (cursorStyle !== "auto" && cursorStyle !== "pointer" && tagName === "span") {
+                //     console.log("执行拖曳");
+                //     this.dragSort();
+                // }
+                // },
+            });
+        }
+
+        addDefaultField(hv) {
+            let title = "新增字段";
+            hv === "h" ? this.#data.horz.push(title) : this.#data.vert.push(title);
+            this.render(this.#data);
+        }
+
+        removeField(hv, target) {
+            let index = target.parent().index();
+            hv === "h" ? this.#data.horz.splice(index, 1) : this.#data.vert.splice(index, 1);
+            this.render(this.#data);
+        }
+
+        edit(target) {
+            // 还可优化
+            let currentTag = target;
+            let hv = currentTag.parents(".item-wrapper")
+                .parent()[0].className.substr(0, 1);
+            let oldText = target[0].innerText;
+            let newText;
+            let input = $(`<input type='text' value=${oldText} />`);
+
+            let updateValue = (o) => {
+                newText = input.val().trim() === "" ? oldText : input.val().trim();
+                currentTag.html(newText);
+                o?.remove();
+                if (newText === oldText) return;
+                let index = target.parent().index();
+                hv === "h" ?
+                    this.#data.horz[index] = newText :
+                    this.#data.vert[index] = newText;
+                this.render(this.#data);
+                console.log(this.#data);
+            };
+
+            if (hv === 'h') {
+                currentTag.html(input);
+                input.select().on({
+                    "blur": () => updateValue(),
+                    "keydown": (e) => {
+                        e.keyCode === 13 && updateValue();
+                    },
+                });
+                $(window).scroll(() => {
+                    updateValue();
+                    $(window).off("scroll");
+                });
+            } else {
+                let overlayDiv = $(`<div class="overlay"></div>`);
+
+                input.appendTo(overlayDiv);
+                overlayDiv.appendTo($(document.body));
+
+                let item = currentTag.parent();
+                let position = item[0].getBoundingClientRect();
+
+                input.css({
+                    "top": position.top + item.height() / 2 - input.height() / 2,
+                    "left": position.left,
+                }).select();
+
+                overlayDiv.on({
+                    "click": () => updateValue(overlayDiv),
+                    "keydown": (e) => {
+                        e.keyCode === 13 && updateValue(overlayDiv);
+                    },
+                });
+                $(window).scroll(() => {
+                    // 待解决 滚动时执行了一次
+                    updateValue(overlayDiv);
+                    $(window).off("scroll");
+                });
+            }
+        }
+
+        toggle() {
+            console.log("函数 toggle");
+            console.log("交换前： ", this.#data.horz, this.#data.vert);
+            let temp = this.#data.horz;
+            this.#data.horz = this.#data.vert;
+            this.#data.vert = temp;
+            console.log("交换后： ", this.#data.horz, this.#data.vert);
+            this.render(this.#data);
+            // 交换尺寸
+            // TODO: 待优化
+        }
+
+        add(hv, data) {
+            console.log("函数 add");
+            let {title, size} = data;
+            hv === "h" ?
+                this.#data.horz.push(title) :
+                this.#data.vert.push(title);
+            console.log("添加后： ", this.#data);
+            this.render(this.#data);
+
+            // TODO: 添加数据 待优化
+            if (size) {
+                setTimeout(() => {
+                    let wrapper = $("div[ids=xItems]");
+                    console.log("wrapper: ", wrapper);
+                    for (let i = 0; i < wrapper.children().length; i++) {
+                        let item = wrapper.children().eq(i).children();
+                        if (title === item.text())
+                            item.parent().css({width: size,});
+                    }
+                }, 0);
+            }
+        }
+
+        getData(hv) {
+            return hv
+                ? /^([hv])$/.test(hv)
+                    ? hv === "h"
+                        ? this.#data.horz
+                        : this.#data.vert
+                    : new Error("参数错误")
+                : this.#data;
+        }
+
+
+        end() {
+            setTimeout(() => {
+                this.drags("h", "xItems", "xItem", "xDragItem", "xPlaceholder");
+                this.drags("v", "yItems", "yItem", "yDragItem", "yPlaceholder");
+            }, 100);
+        }
+
+        drags(hv, box, name, name2, name3) {
+
+            let range = {x: 0, y: 0};
+            let lastPos = {x: 0, y: 0, x1: 0, y1: 0};
+            let tarPos = {x: 0, y: 0, x1: 0, y1: 0};
+            let thisDiv = null, move = false, choose = false;
+            let thisDivWidth = 0, thisDivHeight = 0,
+                thisDivHalfW = 0, thisDivHalfH = 0,
+                tarFirstX = 0, tarFirstY = 0;
+            let tarDiv = null, tarFirst, tempDiv;
+            let initPos = {x: 0, y: 0};
+
+
+            console.log($(`#${box}`));
+            $(`div[ids=${[box]}`)
+                .on('mousedown', `.${name}`, function (e) {
+
+                    let size = hv === "h" ? $(e.target).parent().outerWidth() : $(e.target).parent().outerHeight();
+                    let tgt = e.target;
+                    let cursorStyle = window.getComputedStyle(tgt).cursor;
+                    console.log("鼠标样式：", cursorStyle);
+                    if (cursorStyle !== "auto" && cursorStyle !== "pointer") {
+                        choose = true;
+                        // 拖拽对象
+                        thisDiv = $(this);
+                        // 记录拖拽元素初始位置
+                        initPos.x = thisDiv.position().left;
+                        initPos.y = thisDiv.position().top;
+                        // 鼠标元素相对偏移量
+                        range.x = e.pageX - thisDiv.position().left;
+                        range.y = e.pageY - thisDiv.position().top;
+                        thisDivWidth = thisDiv.width();
+                        thisDivHeight = thisDiv.height();
+                        thisDivHalfW = thisDivWidth / 2;
+                        thisDivHalfH = thisDivHeight / 2;
+                        thisDiv.attr("class", name2);
+                        // thisDiv.children('span').css({padding: 0});
+                        thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
+                        // 创建新元素 插入拖拽元素之前的位置(虚线框)
+                        tempDiv = $(`<div class="${name3}"></div>`);
+                        console.log("thiDiv宽度: ", thisDiv.outerWidth());
+
+                        if (hv === "h") {
+                            tempDiv.css({width: size});
+                            thisDiv.css({width: size});
+                        } else {
+                            tempDiv.css({height: size});
+                            thisDiv.css({height: size});
+                        }
+
+
+                        tempDiv.insertBefore(thisDiv);
+                    }
+
+                    // /*
+                    $(document)
+                        .on('mouseup', function () {
+                            if (!choose) return false;
+                            if (!move) {
+                                // thisDiv.css({left: '', top: ''});
+                                thisDiv.addClass("item" + " " + name);
+                                thisDiv.removeClass(name2);
+                                tempDiv.remove();
+                                choose = false;
+                                return false;
+                            }
+                            thisDiv.insertBefore(tempDiv);
+                            thisDiv.css({left: "", top: ""});
+                            thisDiv.addClass("item" + " " + name);
+                            thisDiv.removeClass(name2);
+                            tempDiv.remove();
+                            move = false;
+                            choose = false;
+                        })
+
+                    // */
+
+                    // /*
+                    .on('mousemove', function (event) {
+                        if (!choose) return false;
+                        move = true;
+                        lastPos.x = event.pageX - range.x;
+                        lastPos.y = event.pageY - range.y;
+                        lastPos.x1 = lastPos.x + thisDivWidth;
+                        lastPos.y1 = lastPos.y + thisDivHeight;
+
+
+                        console.log("lastPos: ", lastPos);
+                        hv === "h" ? thisDiv.css({"left": lastPos.x,}) : thisDiv.css({"top": lastPos.y});
+
+                        let $main = $('.' + name);
+                        console.log($main);
+                        //按照重新排列过的顺序 再次获取 各个元素的坐标，
+
+                        console.log("===========================");
+
+                        $main.each(function () {
+                            tarDiv = $(this);
+                            tarPos.x = tarDiv.position().left;
+                            tarPos.y = tarDiv.position().top;
+                            tarPos.x1 = tarPos.x + tarDiv.width() / 2;
+                            tarPos.y1 = tarPos.y + tarDiv.height() / 2;
+                            tarFirst = $main.eq(0);
+                            tarFirstX = tarFirst.offset().left + thisDivHalfW / 2;
+                            tarFirstY = tarFirst.offset().top + thisDivHalfH / 2;
+
+                            // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
+                            if (lastPos.x > tarPos.x) {
+                                //拖拽对象 移动到第一个位置
+                                if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY)
+                                    tempDiv.insertBefore(tarFirst);
+                                // 判断要插入目标元素的 坐标后， 直接插入
+                                if (lastPos.x <= tarPos.x + thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y <= tarPos.y + thisDivHalfH && lastPos.y1 >= tarPos.y1)
+                                    tempDiv.insertAfter(tarDiv);
+                            } else {
+                                //拖拽对象 移动到第一个位置
+                                if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY)
+                                    tempDiv.insertBefore(tarFirst);
+                                // 判断要插入目标元素的 坐标后， 直接插入
+                                if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1)
+                                    tempDiv.insertAfter(tarDiv);
+                            }
+                        });
+                    });
+                // */
+
+
+                });
+
+        }
+
+
+    }
+
+    let v = new Panel($('.panel'));
+
+
+    // v.add("h", {title: "第   aa一个",});
+    // v.add("h", {title: "第2个", size: 380});
+    // v.add("v", {title: "第2个", size: 380});
+
+    // console.log(v.getData());
+    // console.log(v.getData("h"));
+    // console.log(v.getData("v"));
+    // console.log(v.getData("a"));
+</script>
+</body>
+</html>
