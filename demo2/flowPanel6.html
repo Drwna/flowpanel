@@ -236,6 +236,51 @@
             box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
             0 0 8px rgba(102, 175, 233, 0.6);
         }
+
+        .xDragItem {
+            position: absolute;
+            height: 100%;
+            line-height: var(--panel-size);
+            text-align: center;
+            background-color: grey;
+            color: white;
+            border-radius: 5px;
+            padding: 0 5px;
+            box-shadow: 0 0 5px #ccc;
+            z-index: 4;
+        }
+
+        .xPlaceholder {
+            outline: 1px dashed black;
+            height: 100%;
+            background-color: lightblue;
+        }
+
+        .yDragItem {
+            position: absolute;
+            width: 100%;
+            line-height: var(--panel-size);
+            text-align: center;
+            white-space: nowrap;
+            background-color: grey;
+            color: white;
+            padding: 5px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #ccc;
+            z-index: 4;
+
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-lr;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+        .yPlaceholder {
+            outline: 1px dashed black;
+            /*width: 100%;*/
+            background-color: lightblue;
+        }
     </style>
 </head>
 <body>
@@ -256,7 +301,7 @@
                 <i class="toggle fa fa-refresh fa-lg"></i>
                 <div class="horz">
                     <div ids="xItems" class="item-wrapper">
-                        <div draggable="true" jst-for="let i=0; i<horz.length; i++" class="item xItem" >
+                        <div jst-for="let i=0; i<horz.length; i++" id="xitem-{{i}}" class="item xItem">
                             <span jst-text="{{horz[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -265,7 +310,7 @@
                 </div>
                 <div class="vert">
                     <div ids="yItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<vert.length; i++" class="item">
+                        <div jst-for="let i=0; i<vert.length; i++" class="item yItem">
                             <span jst-text="{{vert[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -452,234 +497,143 @@
 
         end() {
             setTimeout(() => {
-                // this.dragSort("h");
-                this.drag2();
-            }, 1000);
+                this.drags("h", "xItems", "xItem", "xDragItem", "xPlaceholder");
+                this.drags("v", "yItems", "yItem", "yDragItem", "yPlaceholder");
+            }, 100);
         }
 
-        dragSort(hv) {
+        drags(hv, box, name, name2, name3) {
+
             let range = {x: 0, y: 0};
-            let lastPosition = {x: 0, y: 0, x1: 0, y1: 0};
-            let targetPosition = {x: 0, y: 0, x1: 0, y1: 0};
-            let thisDiv = null, move = null, choose = null;
-
-            // 拖曳对象的索引、高度、宽度的初始化
+            let lastPos = {x: 0, y: 0, x1: 0, y1: 0};
+            let tarPos = {x: 0, y: 0, x1: 0, y1: 0};
+            let thisDiv = null, move = false, choose = false;
             let thisDivWidth = 0, thisDivHeight = 0,
-                thisDivHalfWidth = 0, thisDivHalfHeight = 0,
-                targetFirstX = 0, targetFirstY = 0;
-
-            // 要插入的目标元素的对象，临时虚线框的对象
-            let targetDiv = null, targetFirst = null, tempDiv = null;
-
-            // 记录鼠标按下时的位置
-            let initPosition = {x: 0, y: 0};
+                thisDivHalfW = 0, thisDivHalfH = 0,
+                tarFirstX = 0, tarFirstY = 0;
+            let tarDiv = null, tarFirst, tempDiv;
+            let initPos = {x: 0, y: 0};
 
 
-            console.log("要拖曳的元素包裹器", $("div[ids=xItems]"));
-            $("div[ids=xItems]").on("mousedown", ".item", function (e) {
+            console.log($(`#${box}`));
+            $(`div[ids=${[box]}`)
+                .on('mousedown', `.${name}`, function (e) {
 
-                let target = e.target;
-                let cursorStyle = window.getComputedStyle(target).cursor;
-                if (cursorStyle !== "default") {
-                    return;
-                }
+                    let size = hv === "h" ? $(e.target).parent().outerWidth() : $(e.target).parent().outerHeight();
+                    let tgt = e.target;
+                    let cursorStyle = window.getComputedStyle(tgt).cursor;
+                    console.log("鼠标样式：", cursorStyle);
+                    if (cursorStyle !== "auto" && cursorStyle !== "pointer") {
+                        choose = true;
+                        // 拖拽对象
+                        thisDiv = $(this);
+                        // 记录拖拽元素初始位置
+                        initPos.x = thisDiv.position().left;
+                        initPos.y = thisDiv.position().top;
+                        // 鼠标元素相对偏移量
+                        range.x = e.pageX - thisDiv.position().left;
+                        range.y = e.pageY - thisDiv.position().top;
+                        thisDivWidth = thisDiv.width();
+                        thisDivHeight = thisDiv.height();
+                        thisDivHalfW = thisDivWidth / 2;
+                        thisDivHalfH = thisDivHeight / 2;
+                        thisDiv.attr("class", name2);
+                        // thisDiv.children('span').css({padding: 0});
+                        thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
+                        // 创建新元素 插入拖拽元素之前的位置(虚线框)
+                        tempDiv = $(`<div class="${name3}"></div>`);
+                        console.log("thiDiv宽度: ", thisDiv.outerWidth());
 
-                choose = true;
-
-                thisDiv = $(this);
-
-                // 记录拖曳元素初始位置
-                initPosition.x = thisDiv.position().left;
-                initPosition.y = thisDiv.position().top;
-                console.log("initPosition: ", initPosition.x, initPosition.y);
-
-
-                // 鼠标元素相对偏移量
-                range.x = e.pageX - thisDiv.position().left;
-                range.y = e.pageY - thisDiv.position().top;
-                // console.log("鼠标相对偏移量： ", range.x, range.y);
-
-                thisDivWidth = thisDiv.width();
-                thisDivHeight = thisDiv.height();
-                // console.log("拖曳元素的宽高度： ", thisDivWidth, thisDivHeight);
-
-                thisDivHalfWidth = thisDivWidth / 2;
-                thisDivHalfHeight = thisDivHeight / 2;
-                // console.log("拖曳元素的一半宽高度： ", thisDivHalfWidth, thisDivHalfHeight);
-
-                // console.log("thisDiv: ", thisDiv);
-                console.log("===========================");
-
-                // 拖曳的样式
-                thisDiv.css({
-                    bgColor: "grey",
-                    color: "white",
-                    zIndex: "999",
-                    position: "absolute",
-                    left: initPosition.x,
-                    top: initPosition.y,
-                    width: thisDivWidth,
-                    height: thisDivHeight,
-                    borderRadius: "5px",
-                    borderShadow: "0 0 5px #ccc",
-                });
-                hv === "h" ? thisDiv.css({
-                    border: "1px solid black",
-                    borderTop: "none",
-                    borderBottom: "none",
-                }) : thisDiv.css({
-                    border: "1px solid black",
-                    borderLeft: "none",
-                    borderRight: "none",
-                });
-
-
-                // 插入虚线框
-                tempDiv = $("<div></div>");
-                tempDiv.css({
-                    // position: "absolute",
-                    // left: initPosition.x,
-                    // top: initPosition.y,
-                    width: thisDivWidth - 1,
-                    height: thisDivHeight,
-                    border: "1px dashed black",
-                    zIndex: "999",
-                });
-                tempDiv.insertBefore(thisDiv);
-            });
-
-            $(document)
-                .on("mouseup", function () {
-
-                    if (!choose) {
-                        return;
-                    }
-
-                    if (!move) {
-                        thisDiv.css({
-                            bgColor: "white",
-                            color: "black",
-                            zIndex: "",
-                            position: "relative",
-                            left: "",
-                            top: "",
-                            borderRadius: "",
-                            borderShadow: "none",
-                        });
-                        tempDiv.remove();
-                        choose = false;
-                        return;
-                    }
-
-                    thisDiv.insertBefore(tempDiv);
-                    tempDiv.remove();
-                    thisDiv.css({
-                        bgColor: "",
-                        color: "",
-                        zIndex: "",
-                        position: "",
-                        left: "",
-                        top: "",
-                        width: "",
-                        height: "",
-                        borderRadius: "",
-                    });
-                    choose = false;
-                    move = false;
-                })
-                .on("mousemove", function (e) {
-
-
-                    if (!choose) return false;
-
-                    move = true;
-                    lastPosition.x = e.pageX - range.x;
-                    lastPosition.y = e.pageY - range.y;
-                    lastPosition.x1 = lastPosition.x + thisDivWidth;
-                    lastPosition.y1 = lastPosition.y + thisDivHeight;
-
-                    // 拖曳元素随鼠标移动
-                    thisDiv.css({
-                        "left": hv === "h" ? lastPosition.x : "",
-                        "top": hv === "v" ? lastPosition.y : "",
-                    });
-
-                    // 按照重新排列过的顺序，再次获取各个元素的位置
-                    let $main = $("div[ids=xItems]").children(".item");
-
-                    $main.each(function () {
-                        let targetDiv = $(this);
-
-                        targetPosition.x = targetDiv.position().left;
-                        targetPosition.y = targetDiv.position().top;
-                        targetPosition.x1 = targetPosition.x + targetDiv.width() / 2;
-                        targetPosition.y1 = targetPosition.y + targetDiv.height() / 2;
-                        targetFirst = $main.eq(0);
-                        targetFirstX = targetFirst.position().left + thisDivHalfWidth / 2;
-                        targetFirstY = targetFirst.position().top + thisDivHalfHeight / 2;
-
-                        // 根据拖曳对象坐标与目标元素对象坐标对比，来显示虚线框在节点前或后的位置
-                        if (lastPosition.x > targetPosition.x) {
-                            // 拖曳对象 移动到第一个位置
-                            if (lastPosition.x <= targetFirstX && lastPosition.y <= targetFirstY) {
-                                tempDiv.insertBefore(targetFirst);
-                            }
-                            // 判断要插入目标元素的位置，直接插入
-                            if (lastPosition.x <= targetPosition.x + thisDivHalfWidth && lastPosition.x1 >= targetPosition.x1 && lastPosition.y <= targetPosition.y + thisDivHalfHeight && lastPosition.y1 >= targetPosition.y1) {
-                                tempDiv.insertBefore(targetDiv);
-                            }
+                        if (hv === "h") {
+                            tempDiv.css({width: size});
+                            thisDiv.css({width: size});
                         } else {
-                            // 拖曳对象，移动到第一个位置
-                            if (lastPosition.x <= targetFirstX && lastPosition.y <= targetFirstY) {
-                                tempDiv.insertBefore(targetFirst);
-                            }
-                            // 判断要插入目标元素的位置，直接插入
-                            if (lastPosition.x1 >= targetPosition.x - thisDivHalfWidth && lastPosition.x1 >= targetPosition.x1 && lastPosition.y >= targetPosition.y - thisDivHalfHeight && lastPosition.y1 >= targetPosition.y1) {
-                                tempDiv.insertAfter(targetDiv);
-                            }
+                            tempDiv.css({height: size});
+                            thisDiv.css({height: size});
                         }
 
 
+                        tempDiv.insertBefore(thisDiv);
+                    }
+
+                    // /*
+                    $(document)
+                        .on('mouseup', function () {
+                            if (!choose) return false;
+                            if (!move) {
+                                // thisDiv.css({left: '', top: ''});
+                                thisDiv.addClass("item" + " " + name);
+                                thisDiv.removeClass(name2);
+                                tempDiv.remove();
+                                choose = false;
+                                return false;
+                            }
+                            thisDiv.insertBefore(tempDiv);
+                            thisDiv.css({left: "", top: ""});
+                            thisDiv.addClass("item" + " " + name);
+                            thisDiv.removeClass(name2);
+                            tempDiv.remove();
+                            move = false;
+                            choose = false;
+                        })
+
+                    // */
+
+                    // /*
+                    .on('mousemove', function (event) {
+                        if (!choose) return false;
+                        move = true;
+                        lastPos.x = event.pageX - range.x;
+                        lastPos.y = event.pageY - range.y;
+                        lastPos.x1 = lastPos.x + thisDivWidth;
+                        lastPos.y1 = lastPos.y + thisDivHeight;
+
+
+                        console.log("lastPos: ", lastPos);
+                        hv === "h" ? thisDiv.css({"left": lastPos.x,}) : thisDiv.css({"top": lastPos.y});
+
+                        let $main = $('.' + name);
+                        console.log($main);
+                        //按照重新排列过的顺序 再次获取 各个元素的坐标，
+
+                        console.log("===========================");
+
+                        $main.each(function () {
+                            tarDiv = $(this);
+                            tarPos.x = tarDiv.position().left;
+                            tarPos.y = tarDiv.position().top;
+                            tarPos.x1 = tarPos.x + tarDiv.width() / 2;
+                            tarPos.y1 = tarPos.y + tarDiv.height() / 2;
+                            tarFirst = $main.eq(0);
+                            tarFirstX = tarFirst.offset().left + thisDivHalfW / 2;
+                            tarFirstY = tarFirst.offset().top + thisDivHalfH / 2;
+
+                            // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
+                            if (lastPos.x > tarPos.x) {
+                                //拖拽对象 移动到第一个位置
+                                if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY)
+                                    tempDiv.insertBefore(tarFirst);
+                                // 判断要插入目标元素的 坐标后， 直接插入
+                                if (lastPos.x <= tarPos.x + thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y <= tarPos.y + thisDivHalfH && lastPos.y1 >= tarPos.y1)
+                                    tempDiv.insertAfter(tarDiv);
+                            } else {
+                                //拖拽对象 移动到第一个位置
+                                if (lastPos.x <= tarFirstX && lastPos.y <= tarFirstY)
+                                    tempDiv.insertBefore(tarFirst);
+                                // 判断要插入目标元素的 坐标后， 直接插入
+                                if (lastPos.x >= tarPos.x - thisDivHalfW && lastPos.x1 >= tarPos.x1 && lastPos.y >= tarPos.y - thisDivHalfH && lastPos.y1 >= tarPos.y1)
+                                    tempDiv.insertAfter(tarDiv);
+                            }
+                        });
                     });
+                // */
+
 
                 });
 
         }
 
-        drag2() {
-            let node = document.querySelector(".item-wrapper");
-            let draging = null;
-            // 使用事件委托，将li事件绑定到ul上
-            node.ondragstart = function (e) {
-                e.dataTransfer.setData("text/plain", e.target.innerText);
-                draging = e.target;
-            };
-            node.ondragover = function (e) {
-                e.preventDefault();
-                let target = e.target;
-                // 判断是否是li元素
-                if (target.nodeName.toLowerCase() === "div" && target !== draging) {
-                    // _index是实现的获取index
-                    if (_index(draging) < _index(target)) {
-                        target.parentNode.insertBefore(draging, target.nextSibling);
-                    } else {
-                        target.parentNode.insertBefore(draging, target);
-                    }
-                }
 
-                function _index(el) {
-                    let index = 0;
-                    if (!el || !el.parentNode) {
-                        return -1;
-                    }
-                    while (el && (el = el.previousElementSibling)) {
-                        index++;
-                    }
-                    return index;
-                }
-            };
-
-        }
     }
 
     let v = new Panel($('.panel'));
@@ -693,7 +647,6 @@
     // console.log(v.getData("h"));
     // console.log(v.getData("v"));
     // console.log(v.getData("a"));
-
 </script>
 </body>
 </html>
