@@ -88,7 +88,6 @@
             position: relative;
             display: flex;
             border-right: 1px solid black;
-            background-color: wheat;
         }
         .horz .item span {
             width: 100%; height: 100%;
@@ -245,7 +244,7 @@
             background-color: grey;
             color: white;
             border-radius: 5px;
-            padding: 0 5px;
+            padding: 0 20px;
             box-shadow: 0 0 5px #ccc;
             z-index: 4;
         }
@@ -264,7 +263,7 @@
             white-space: nowrap;
             background-color: grey;
             color: white;
-            padding: 5px 0;
+            padding: 20px 0;
             border-radius: 5px;
             box-shadow: 0 0 5px #ccc;
             z-index: 4;
@@ -328,9 +327,7 @@
         init(root, template, data) {
             template.appendTo(root);
             this.render(data);
-            // this.bindEvent();
-            this.bindEvent2();
-            // this.renderEnd();
+            this.bindEvent();
         }
 
         render(data) {
@@ -338,54 +335,6 @@
         }
 
         bindEvent() {
-
-            this.root.on({
-                "mousedown": (e) => {
-                    e.stopPropagation();
-                    let target = $(e.target);
-                    let targetName = e.target.className.toLowerCase();
-                    let hv;
-                    let cursorStyle = target.css("cursor");
-
-
-                    // console.log("鼠标当前位置：", e.offsetX, e.offsetY);
-
-                    if (targetName.includes("icon-add")) {
-                        // 添加默认字段
-                        hv = target.parent().attr("class").substr(0, 1);
-                        this.addDefaultField(hv);
-                    } else if (targetName.includes('icon-delete')) {
-                        // 删除字段
-                        hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
-                        this.removeField(hv, target);
-                    } else if (cursorStyle === "default" && targetName === "") {
-                        target = $(e.target).parent();
-                        hv = target.parent().attr("ids").substr(0, 1);
-                        console.log(hv);
-                        console.log(e.which);
-                        console.log(e.detail);
-
-                        // hv === "h" ?
-                        //     this.drag(e, target, hv, "hItems", "hItem", "hDragItem", "hPlaceholder") :
-                        //     this.drag(e, target, hv, "vItems", "vItem", "vDragItem", "vPlaceholder");
-                    }
-
-                },
-                "dblclick": (e) => {
-                    e.stopPropagation();
-                    if (e.target.className.toLowerCase().includes("toggle")) {
-                        // 双击切换
-                        this.toggle();
-                    } else if (e.target.nodeName.toLowerCase().includes("span")) {
-                        // 双击编
-                        this.edit($(e.target));
-                    }
-                },
-            });
-        }
-
-        bindEvent2() {
-
             this.root.on("dblclick", (e) => {
                 if (e.target.className.toLowerCase().includes("toggle")) {
                     // 双击切换
@@ -396,11 +345,13 @@
                 }
             });
 
-            this.root.on("click", (e) => {
+            this.root.on("mousedown", (e) => {
                 e.stopPropagation();
                 let target = $(e.target);
                 let targetName = e.target.className.toLowerCase();
                 let hv;
+                let tgt = e.target;
+                let cursorStyle = window.getComputedStyle(tgt).cursor;
 
                 if (targetName.includes("icon-add")) {
                     hv = target.parent().attr("class").substr(0, 1);
@@ -410,13 +361,14 @@
                     hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
                     this.removeField(hv, target);
 
+                } else if (cursorStyle === "default" && targetName === "") {
+                    target = $(e.target).parent();
+                    hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                    this.drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
                 }
 
             });
 
-            setTimeout(() => {
-                this.drag("h", "hItems", "hItem", "hDragItem", "hPlaceholder");
-            }, 0);
 
         }
 
@@ -506,6 +458,23 @@
             // TODO: 待优化
         }
 
+        updateData(hv) {
+            // console.log("函数 updateData");
+            // console.log("更新前： ", this.#data.horz, this.#data.vert);
+            // this.#data.horz = this.#data.horz.map(item => item.trim());
+            // this.#data.vert = this.#data.vert.map(item => item.trim());
+            // console.log("更新后： ", this.#data.horz, this.#data.vert);
+            // this.render(this.#data);
+            console.log($(`div[${hv}]`));
+            // $(`div[${hv}]`).each((index, item) => {
+            //     let text = $(item).text().trim();
+            //     if (text === "") return;
+            //     hv === "h" ?
+            //         this.#data.horz[index] = text :
+            //         this.#data.vert[index] = text;
+            // });
+        }
+
         add(hv, data) {
             console.log("函数 add");
             let {title, size} = data;
@@ -539,17 +508,8 @@
                 : this.#data;
         }
 
-        renderEnd() {
-            // 渲染后执行
-            setTimeout(() => {
-                // this.drags("h", "xItems", "xItem", "xDragItem", "xPlaceholder");
-            }, 0);
-        }
+        drag(e, target, hv, box, name, name2, name3) {
 
-
-        drag(hv, box, name, name2, name3) {
-
-            // 拖曳用到的变量
             let range = {x: 0, y: 0};
             let lastPos = {x: 0, y: 0, x1: 0, y1: 0};
             let tarPos = {x: 0, y: 0, x1: 0, y1: 0};
@@ -562,82 +522,42 @@
 
             let flag = false;
             let stop = null;
-            let downClickTime = 0;
-            let upClickTime = 0;
-            let time = 0;
 
-            // $(`div[ids=${box}]`)
-            this.root.on("mousedown", `.${name}`, function (e) {
+            clearTimeout(stop);
+            stop = setTimeout(() => {
+                flag = true;
+                let size = hv === "h" ?
+                    $(e.target).parent().outerWidth() :
+                    $(e.target).parent().outerHeight();
+                choose = true;
+                thisDiv = target;
+                initPos.x = thisDiv.position().left;
+                initPos.y = thisDiv.position().top;
+                range.x = e.pageX - thisDiv.position().left;
+                range.y = e.pageY - thisDiv.position().top;
+                thisDivWidth = thisDiv.width();
+                thisDivHeight = thisDiv.height();
+                thisDivHalfW = thisDivWidth / 2;
+                thisDivHalfH = thisDivHeight / 2;
 
-                downClickTime = new Date().getTime();
-                time = downClickTime - upClickTime;
+                thisDiv.attr("class", name2);
+                thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
+                tempDiv = $(`<div class="${name3}"></div>`);
 
-                console.log('1');
+                hv === "h" ?
+                    (thisDiv.css({width: size}) && tempDiv.css({width: size}))
+                    : (thisDiv.css({height: size}) && tempDiv.css({height: size}));
 
-                if (time < 300) {
-                    console.log("双击");
+                tempDiv.insertBefore(thisDiv);
 
-                } else {
-                    console.log("单击");
-
-                    let cursor = $(this).css("cursor");
-                    console.log("cursor: ", cursor);
-
-                    clearTimeout(stop);
-                    stop = setTimeout(() => {
-
-                        console.log("拖曳");
-
-
-                        let size = hv === "h" ? $(e.target).parent().outerWidth() : $(e.target).parent().outerHeight();
-                        choose = true;
-                        // 拖拽对象
-                        thisDiv = $(this);
-                        // 记录拖拽元素初始位置
-                        initPos.x = thisDiv.position().left;
-                        initPos.y = thisDiv.position().top;
-                        // 鼠标元素相对偏移量
-                        range.x = e.pageX - thisDiv.position().left;
-                        range.y = e.pageY - thisDiv.position().top;
-
-                        thisDivWidth = thisDiv.width();
-                        thisDivHeight = thisDiv.height();
-                        thisDivHalfW = thisDivWidth / 2;
-                        thisDivHalfH = thisDivHeight / 2;
-
-                        thisDiv.attr("class", name2);
-                        thisDiv.css({left: initPos.x + 'px', top: initPos.y + 'px'});
-                        // 创建新元素 插入拖拽元素之前的位置(虚线框)
-                        tempDiv = $(`<div class="${name3}"></div>`);
-
-                        if (hv === "h") {
-                            tempDiv.css({width: size});
-                            thisDiv.css({width: size});
-                        } else {
-                            tempDiv.css({height: size});
-                            thisDiv.css({height: size});
-                        }
-                        tempDiv.insertBefore(thisDiv);
-                    }, 250);
-
-                }
-                $(this).on("mouseup", function () {
-                    thisDiv?.css({left: "", top: ""});
-                    $(this).off("mousemove");
-                });
-
-            });
+            }, 200);
 
             $(document)
                 .on('mouseup', function () {
                     if (!flag) clearTimeout(stop);
-                    upClickTime = new Date().getTime();
 
                     if (!choose) return false;
                     if (!move) {
-                        thisDiv.addClass("item" + " " + name);
-                        thisDiv.removeClass(name2);
-                        tempDiv.remove();
                         choose = false;
                         return false;
                     }
@@ -660,7 +580,6 @@
                     hv === "h" ? thisDiv.css({"left": lastPos.x,}) : thisDiv.css({"top": lastPos.y});
 
                     let $main = $('.' + name);
-                    //按照重新排列过的顺序 再次获取 各个元素的坐标，
 
                     $main.each(function () {
                         tarDiv = $(this);
