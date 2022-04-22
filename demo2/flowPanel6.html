@@ -244,9 +244,11 @@
             background-color: grey;
             color: white;
             border-radius: 5px;
-            padding: 0 20px;
             box-shadow: 0 0 5px #ccc;
             z-index: 4;
+        }
+        .hDragItem span {
+            padding: 0 20px;
         }
 
         .hPlaceholder {
@@ -263,17 +265,16 @@
             white-space: nowrap;
             background-color: grey;
             color: white;
-            padding: 20px 0;
             border-radius: 5px;
             box-shadow: 0 0 5px #ccc;
             z-index: 4;
-
             -webkit-writing-mode: vertical-rl;
             writing-mode: vertical-lr;
-
             overflow: hidden;
             text-overflow: ellipsis;
-
+        }
+        .vDragItem span {
+            padding: 20px 0;
         }
         .vPlaceholder {
             outline: 1px dashed black;
@@ -459,20 +460,13 @@
         }
 
         updateData(hv) {
-            // console.log("函数 updateData");
-            // console.log("更新前： ", this.#data.horz, this.#data.vert);
-            // this.#data.horz = this.#data.horz.map(item => item.trim());
-            // this.#data.vert = this.#data.vert.map(item => item.trim());
-            // console.log("更新后： ", this.#data.horz, this.#data.vert);
-            // this.render(this.#data);
-            console.log($(`div[${hv}]`));
-            // $(`div[${hv}]`).each((index, item) => {
-            //     let text = $(item).text().trim();
-            //     if (text === "") return;
-            //     hv === "h" ?
-            //         this.#data.horz[index] = text :
-            //         this.#data.vert[index] = text;
-            // });
+            let items = $(`div[ids="${hv === 'h' ? 'hItems' : 'vItems'}"]`).children();
+            items.each((index, item) => {
+                let text = $(item).text().trim();
+                hv === "h" ?
+                    this.#data.horz[index] = text
+                    : this.#data.vert[index] = text;
+            });
         }
 
         add(hv, data) {
@@ -553,7 +547,7 @@
             }, 200);
 
             $(document)
-                .on('mouseup', function () {
+                .on('mouseup', () => {
                     if (!flag) clearTimeout(stop);
 
                     if (!choose) return false;
@@ -568,6 +562,8 @@
                     tempDiv.remove();
                     move = false;
                     choose = false;
+                    // 拖曳结束后，更新数据
+                    this.updateData(hv);
                 })
                 .on('mousemove', function (e) {
                     if (!choose) return false;
