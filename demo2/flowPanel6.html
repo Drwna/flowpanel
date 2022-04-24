@@ -366,6 +366,9 @@
                         target = target.parent();
                         let hv = target.parent().attr("ids").substr(0, 1);
                         this.#drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
+
+                    } else if (cursorStyle === "auto") {
+                        this.#resize();
                     }
                 }
             });
@@ -376,7 +379,7 @@
             hv === "h" ?
                 this.#data.horz.push(title) && this.#data.horz_size.push(200)
                 : this.#data.vert.push(title) && this.#data.vert_size.push(200);
-            this.render(this.#data);
+            this.#render(this.#data);
         }
 
         #removeField(hv, target) {
@@ -466,6 +469,29 @@
                     this.#data.horz[index] = text && (this.#data.horz_size[index] = parseInt($(item).innerWidth())) :
                     this.#data.vert[index] = text && (this.#data.vert_size[index] = parseInt($(item).innerHeight()));
             });
+        }
+
+        #resize() {
+            let config = {
+                attributes: true,
+                attributeFilter: ["style"],
+                childList: false,
+                characterData: false,
+                subtree: false,
+            };
+            let observer = new MutationObserver((entrisy) => {
+                entrisy.forEach((target) => {
+                    target = target.target;
+                    let hv = target.className.substr(5, 1);
+                    let index = $(target).index();
+                    hv === 'h' ?
+                        this.#data.horz_size[index] = parseInt($(target).innerWidth()) :
+                        this.#data.vert_size[index] = parseInt($(target).innerHeight());
+                });
+            });
+
+            $(".panel .item")
+                .each((index, item) => observer.observe(item, config));
         }
 
         add(hv, data) {
