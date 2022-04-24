@@ -336,47 +336,46 @@
         }
 
         bindEvent() {
-            this.root.on("dblclick", (e) => {
-                if (e.target.className.toLowerCase().includes("toggle")) {
-                    // 双击切换
-                    this.toggle();
-                } else if (e.target.nodeName.toLowerCase().includes("span")) {
-                    // 双击编辑
-                    this.edit($(e.target));
+            this.root.on({
+                "dblclick": (e) => {
+                    if (e.target.className.toLowerCase().includes("toggle")) {
+                        // 双击切换
+                        this.toggle();
+                    } else if (e.target.nodeName.toLowerCase().includes("span")) {
+                        // 双击编辑
+                        this.edit($(e.target));
+                    }
+                },
+                "mousedown": (e) => {
+                    e.stopPropagation();
+                    let target = $(e.target);
+                    let targetName = e.target.className.toLowerCase();
+                    let hv;
+                    let cursorStyle = window.getComputedStyle(e.target).cursor;
+
+                    if (targetName.includes("icon-add")) {
+                        hv = target.parent().attr("class").substr(0, 1);
+                        this.addDefaultField(hv);
+
+                    } else if (targetName.includes("icon-delete")) {
+                        hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                        target = target.parent();
+                        this.removeField(hv, target);
+
+                    } else if (cursorStyle === "default" && targetName === "") {
+                        target = target.parent();
+                        let hv = target.parent().attr("ids").substr(0, 1);
+                        this.drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
+                    }
                 }
             });
-
-            this.root.on("mousedown", (e) => {
-                e.stopPropagation();
-                let target = $(e.target);
-                let targetName = e.target.className.toLowerCase();
-                let hv;
-                let cursorStyle = window.getComputedStyle(e.target).cursor;
-
-                if (targetName.includes("icon-add")) {
-                    hv = target.parent().attr("class").substr(0, 1);
-                    this.addDefaultField(hv);
-
-                } else if (targetName.includes("icon-delete")) {
-                    hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
-                    target = target.parent();
-                    this.removeField(hv, target);
-
-                } else if (cursorStyle === "default" && targetName === "") {
-                    target = target.parent();
-                    let hv = target.parent().attr("ids").substr(0, 1);
-                    this.drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
-                }
-
-            });
-
         }
 
         addDefaultField(hv) {
             let title = "新增字段";
             hv === "h" ?
-                this.#data.horz.push(title) && this.#data.horz_size.push("")
-                : this.#data.vert.push(title) && this.#data.vert_size.push("");
+                this.#data.horz.push(title) && this.#data.horz_size.push(200)
+                : this.#data.vert.push(title) && this.#data.vert_size.push(200);
             this.render(this.#data);
         }
 
@@ -474,13 +473,13 @@
                 this.#data.horz.includes(data.title) ?
                     console.error("标题有重复") :
                     this.#data.horz.push(data.title) &&
-                    this.#data.horz_size.push(data.size || "") &&
+                    this.#data.horz_size.push(data.size || 200) &&
                     this.render(this.#data);
             } else if (hv === "v") {
                 this.#data.vert.includes(data.title) ?
                     console.error("标题有重复") :
                     this.#data.vert.push(data.title) &&
-                    this.#data.vert_size.push(data.size || "") &&
+                    this.#data.vert_size.push(data.size || 200) &&
                     this.render(this.#data);
             } else {
                 throw new Error("hv 参数错误");
@@ -579,8 +578,8 @@
                         tarPos.x1 = tarPos.x + tarDiv.width() / 2;
                         tarPos.y1 = tarPos.y + tarDiv.height() / 2;
                         tarFirst = $main.eq(0);
-                        tarFirstX = tarFirst.position().left + thisDivHalfW / 2;
-                        tarFirstY = tarFirst.position().top + thisDivHalfH / 2;
+                        tarFirstX = tarFirst.position().left + thisDivHalfW / 2 + tarFirst.width() / 2;
+                        tarFirstY = tarFirst.position().top + thisDivHalfH / 2 + tarFirst.height() / 2;
 
                         // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
                         if (lastPos.x > tarPos.x) {
