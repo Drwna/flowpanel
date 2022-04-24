@@ -322,28 +322,28 @@
 
         constructor(root) {
             this.root = root;
-            this.init(root, this.#template, this.#data);
+            this.#init(root, this.#template, this.#data);
         }
 
-        init(root, template, data) {
+        #init(root, template, data) {
             template.appendTo(root);
-            this.render(data);
-            this.bindEvent();
+            this.#render(data);
+            this.#bindEvent();
         }
 
-        render(data) {
+        #render(data) {
             new jst($(".panel-wrapper")[0]).render(data);
         }
 
-        bindEvent() {
+        #bindEvent() {
             this.root.on({
                 "dblclick": (e) => {
                     if (e.target.className.toLowerCase().includes("toggle")) {
                         // 双击切换
-                        this.toggle();
+                        this.#toggle();
                     } else if (e.target.nodeName.toLowerCase().includes("span")) {
                         // 双击编辑
-                        this.edit($(e.target));
+                        this.#edit($(e.target));
                     }
                 },
                 "mousedown": (e) => {
@@ -355,23 +355,23 @@
 
                     if (targetName.includes("icon-add")) {
                         hv = target.parent().attr("class").substr(0, 1);
-                        this.addDefaultField(hv);
+                        this.#addDefaultField(hv);
 
                     } else if (targetName.includes("icon-delete")) {
                         hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
                         target = target.parent();
-                        this.removeField(hv, target);
+                        this.#removeField(hv, target);
 
                     } else if (cursorStyle === "default" && targetName === "") {
                         target = target.parent();
                         let hv = target.parent().attr("ids").substr(0, 1);
-                        this.drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
+                        this.#drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
                     }
                 }
             });
         }
 
-        addDefaultField(hv) {
+        #addDefaultField(hv) {
             let title = "新增字段";
             hv === "h" ?
                 this.#data.horz.push(title) && this.#data.horz_size.push(200)
@@ -379,7 +379,7 @@
             this.render(this.#data);
         }
 
-        removeField(hv, target) {
+        #removeField(hv, target) {
             let index = target.index();
             hv === "h" ?
                 this.#data.horz.splice(index, 1) && this.#data.horz_size.splice(index, 1)
@@ -387,7 +387,7 @@
             target.remove();
         }
 
-        edit(target) {
+        #edit(target) {
             // 还可优化
             let currentTag = target;
             let hv = currentTag.parents(".item-wrapper")
@@ -448,17 +448,17 @@
             }
         }
 
-        toggle() {
+        #toggle() {
             let temp = this.#data.horz;
             this.#data.horz = this.#data.vert;
             this.#data.vert = temp;
             let tempSize = this.#data.horz_size;
             this.#data.horz_size = this.#data.vert_size;
             this.#data.vert_size = tempSize;
-            this.render(this.#data);
+            this.#render(this.#data);
         }
 
-        updateData(hv) {
+        #updateData(hv) {
             let items = $(`div[ids="${hv === 'h' ? 'hItems' : 'vItems'}"]`).children();
             items.each((index, item) => {
                 let text = $(item).text().trim();
@@ -474,13 +474,13 @@
                     console.error("标题有重复") :
                     this.#data.horz.push(data.title) &&
                     this.#data.horz_size.push(data.size || 200) &&
-                    this.render(this.#data);
+                    this.#render(this.#data);
             } else if (hv === "v") {
                 this.#data.vert.includes(data.title) ?
                     console.error("标题有重复") :
                     this.#data.vert.push(data.title) &&
                     this.#data.vert_size.push(data.size || 200) &&
-                    this.render(this.#data);
+                    this.#render(this.#data);
             } else {
                 throw new Error("hv 参数错误");
             }
@@ -496,7 +496,7 @@
                 : this.#data;
         }
 
-        drag(e, target, hv, box, name, name2, name3) {
+        #drag(e, target, hv, box, name, name2, name3) {
 
             let range = {x: 0, y: 0};
             let lastPos = {x: 0, y: 0, x1: 0, y1: 0};
@@ -557,7 +557,7 @@
                     move = false;
                     choose = false;
                     // 拖曳结束后，更新数据
-                    this.updateData(hv);
+                    this.#updateData(hv);
                 })
                 .on('mousemove', function (e) {
                     if (!choose) return false;
@@ -612,7 +612,7 @@
     v.add("h", {title: "第aa一个"});
     // v.add("h", {title: "第2个", size: 380});
     // v.add("h", {title: "第3个", size: 380});
-    // v.add("h", {title: "第2个1", size: 100});
+    v.add("v", {title: "第2个1", size: 100});
     v.add("v", {title: "第2个", size: 380});
 
     // console.log(v.getData());
