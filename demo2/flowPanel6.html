@@ -467,8 +467,10 @@
             items.each((index, item) => {
                 let text = $(item).text().trim();
                 hv === "h" ?
-                    this.#data.horz[index] = text && (this.#data.horz_size[index] = parseInt($(item).innerWidth())) :
-                    this.#data.vert[index] = text && (this.#data.vert_size[index] = parseInt($(item).innerHeight()));
+                    (this.#data.horz[index] = text) &&
+                    (this.#data.horz_size[index] = parseInt($(item).innerWidth())) :
+                    (this.#data.vert[index] = text) &&
+                    (this.#data.vert_size[index] = parseInt($(item).innerHeight()));
             });
         }
 
