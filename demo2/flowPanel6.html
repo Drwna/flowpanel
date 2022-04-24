@@ -364,11 +364,12 @@
 
                     } else if (cursorStyle === "default" && targetName === "") {
                         target = target.parent();
-                        let hv = target.parent().attr("ids").substr(0, 1);
+                        hv = target.parent().attr("ids").substr(0, 1);
                         this.#drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
 
-                    } else if (cursorStyle === "auto") {
-                        this.#resize();
+                    } else if (targetName.includes("item") && cursorStyle === "auto") {
+                        hv = target.parent().attr("ids").substr(0, 1);
+                        this.#resize(hv, target[0]);
                     }
                 }
             });
@@ -471,7 +472,7 @@
             });
         }
 
-        #resize() {
+        #resize(hv, target) {
             let config = {
                 attributes: true,
                 attributeFilter: ["style"],
@@ -479,19 +480,20 @@
                 characterData: false,
                 subtree: false,
             };
-            let observer = new MutationObserver((entrisy) => {
-                entrisy.forEach((target) => {
-                    target = target.target;
-                    let hv = target.className.substr(5, 1);
-                    let index = $(target).index();
-                    hv === 'h' ?
-                        this.#data.horz_size[index] = parseInt($(target).innerWidth()) :
-                        this.#data.vert_size[index] = parseInt($(target).innerHeight());
+            let observer = new MutationObserver(entrisy => {
+                entrisy.forEach(mutation => {
+                    target = $(mutation.target);
+                    let index = target.index();
+                    if (hv === "h") {
+                        target.innerWidth() <= 55 && target.css({width: "65px"});
+                        this.#data.horz_size[index] = parseInt(target.innerWidth());
+                    } else {
+                        target.innerHeight() <= 55 && target.css({height: "65px"});
+                        this.#data.vert_size[index] = parseInt(target.innerHeight());
+                    }
                 });
             });
-
-            $(".panel .item")
-                .each((index, item) => observer.observe(item, config));
+            observer.observe(target, config);
         }
 
         add(hv, data) {
@@ -518,8 +520,8 @@
                     ? hv === "h"
                         ? this.#data.horz
                         : this.#data.vert
-                    : new Error("参数错误")
-                : this.#data;
+                    : hv === "all" ? this.#data : new Error("参数错误")
+                : {horz: this.#data.horz, vert: this.#data.vert};
         }
 
         #drag(e, target, hv, box, name, name2, name3) {
@@ -643,9 +645,10 @@
 
     // console.log(v.getData());
 
+    // console.log(v.getData("xxx"));
+    // console.log(v.getData("all"));
     // console.log(v.getData("h"));
     // console.log(v.getData("v"));
-    // console.log(v.getData("a"));
 </script>
 </body>
 </html>
