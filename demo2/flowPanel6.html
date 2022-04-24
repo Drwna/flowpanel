@@ -288,8 +288,10 @@
     class Panel {
 
         #data = {
-            horz: ["人事部1", "开开发部开发部开发部发部", "人事部2"],
-            vert: ["起起草起草起草起草草", "审批", "处理"],
+            horz: [],
+            vert: [],
+            horz_size: [],
+            vert_size: [],
         };
 
         #template = $(`
@@ -297,7 +299,8 @@
                 <i class="toggle fa fa-refresh fa-lg"></i>
                 <div class="horz">
                     <div ids="hItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<horz.length; i++" id="hitem-{{i}}" class="item hItem">
+                        <div jst-for="let i=0; i<horz.length; i++" class="item hItem"
+                             style="width: {{horz_size[i]}}px;">
                             <span jst-text="{{horz[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -306,7 +309,8 @@
                 </div>
                 <div class="vert">
                     <div ids="vItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<vert.length; i++" class="item vItem">
+                        <div jst-for="let i=0; i<vert.length; i++" class="item vItem"
+                             style="height: {{vert_size[i]}}px;">
                             <span jst-text="{{vert[i]}}"></span>
                             <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                         </div>
@@ -355,6 +359,7 @@
 
                 } else if (targetName.includes("icon-delete")) {
                     hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                    target = target.parent();
                     this.removeField(hv, target);
 
                 } else if (cursorStyle === "default" && targetName === "") {
@@ -369,14 +374,18 @@
 
         addDefaultField(hv) {
             let title = "新增字段";
-            hv === "h" ? this.#data.horz.push(title) : this.#data.vert.push(title);
+            hv === "h" ?
+                this.#data.horz.push(title) && this.#data.horz_size.push("")
+                : this.#data.vert.push(title) && this.#data.vert_size.push("");
             this.render(this.#data);
         }
 
         removeField(hv, target) {
-            let index = target.parent().index();
-            hv === "h" ? this.#data.horz.splice(index, 1) : this.#data.vert.splice(index, 1);
-            this.render(this.#data);
+            let index = target.index();
+            hv === "h" ?
+                this.#data.horz.splice(index, 1) && this.#data.horz_size.splice(index, 1)
+                : this.#data.vert.splice(index, 1) && this.#data.vert_size.splice(index, 1);
+            target.remove();
         }
 
         edit(target) {
@@ -397,7 +406,6 @@
                 hv === "h" ?
                     this.#data.horz[index] = newText :
                     this.#data.vert[index] = newText;
-                this.render(this.#data);
                 console.log(this.#data);
             };
 
@@ -442,15 +450,13 @@
         }
 
         toggle() {
-            console.log("函数 toggle");
-            console.log("交换前： ", this.#data.horz, this.#data.vert);
             let temp = this.#data.horz;
             this.#data.horz = this.#data.vert;
             this.#data.vert = temp;
-            console.log("交换后： ", this.#data.horz, this.#data.vert);
+            let tempSize = this.#data.horz_size;
+            this.#data.horz_size = this.#data.vert_size;
+            this.#data.vert_size = tempSize;
             this.render(this.#data);
-            // 交换尺寸
-            // TODO: 待优化
         }
 
         updateData(hv) {
@@ -458,31 +464,26 @@
             items.each((index, item) => {
                 let text = $(item).text().trim();
                 hv === "h" ?
-                    this.#data.horz[index] = text
-                    : this.#data.vert[index] = text;
+                    this.#data.horz[index] = text && (this.#data.horz_size[index] = parseInt($(item).innerWidth())) :
+                    this.#data.vert[index] = text && (this.#data.vert_size[index] = parseInt($(item).innerHeight()));
             });
         }
 
         add(hv, data) {
-            console.log("函数 add");
-            let {title, size} = data;
-            hv === "h" ?
-                this.#data.horz.push(title) :
-                this.#data.vert.push(title);
-            console.log("添加后： ", this.#data);
-            this.render(this.#data);
-
-            // TODO: 添加数据 待优化
-            if (size) {
-                setTimeout(() => {
-                    let wrapper = $("div[ids=xItems]");
-                    console.log("wrapper: ", wrapper);
-                    for (let i = 0; i < wrapper.children().length; i++) {
-                        let item = wrapper.children().eq(i).children();
-                        if (title === item.text())
-                            item.parent().css({width: size,});
-                    }
-                }, 0);
+            if (hv === "h") {
+                this.#data.horz.includes(data.title) ?
+                    console.error("标题有重复") :
+                    this.#data.horz.push(data.title) &&
+                    this.#data.horz_size.push(data.size || "") &&
+                    this.render(this.#data);
+            } else if (hv === "v") {
+                this.#data.vert.includes(data.title) ?
+                    console.error("标题有重复") :
+                    this.#data.vert.push(data.title) &&
+                    this.#data.vert_size.push(data.size || "") &&
+                    this.render(this.#data);
+            } else {
+                throw new Error("hv 参数错误");
             }
         }
 
@@ -608,9 +609,12 @@
     let v = new Panel($('.panel'));
 
 
-    // v.add("h", {title: "第   aa一个",});
+    v.add("h", {title: "第   aa一个", size: 400});
+    v.add("h", {title: "第aa一个"});
     // v.add("h", {title: "第2个", size: 380});
-    // v.add("v", {title: "第2个", size: 380});
+    // v.add("h", {title: "第3个", size: 380});
+    // v.add("h", {title: "第2个1", size: 100});
+    v.add("v", {title: "第2个", size: 380});
 
     // console.log(v.getData());
 
