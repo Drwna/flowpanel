@@ -82,7 +82,6 @@
             display: flex;
         }
         .horz .item {
-            /* 待 js 设置 width */
             width: 200px;
             height: 100%;
             position: relative;
@@ -98,7 +97,7 @@
             text-align: center;
             line-height: var(--panel-size);
         }
-        .horz .item:hover {
+        .horz:hover .item {
             overflow: hidden;
             resize: horizontal;
         }
@@ -111,11 +110,11 @@
             line-height: var(--panel-size);
             padding-right: 6px;
             display: none;
+            color: grey;
         }
 
         .horz .item:hover .icon-delete {
             display: block;
-            color: grey;
         }
         .horz .item:hover .icon-delete:hover {
             color: black;
@@ -137,11 +136,11 @@
             transform: translateX(-50%);
             height: 21px;
             padding-top: 6px;
+            color: grey;
             display: none;
         }
         .vert:hover > .icon-add {
             display: block;
-            color: grey;
         }
         .vert > .icon-add:hover {
             color: black;
@@ -155,13 +154,12 @@
             height: 140px;
             -webkit-writing-mode: vertical-rl;
             writing-mode: vertical-lr;
-            /* 垂直方向自右而左的书写方式。即top-bottom-right-left */
             display: flex;
             text-align: center;
             position: relative;
             border-bottom: 1px solid black;
         }
-        .vert .item:hover {
+        .vert:hover .item {
             overflow: hidden;
             resize: vertical;
         }
@@ -214,7 +212,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /*background-color: rgba(0, 0, 0, 0.5);*/
             background-color: transparent;
             z-index: 9999;
         }
@@ -278,7 +275,6 @@
         }
         .vPlaceholder {
             outline: 1px dashed black;
-            /*width: 100%;*/
             background-color: lightblue;
         }
     </style>
@@ -351,8 +347,7 @@
                 let target = $(e.target);
                 let targetName = e.target.className.toLowerCase();
                 let hv;
-                let tgt = e.target;
-                let cursorStyle = window.getComputedStyle(tgt).cursor;
+                let cursorStyle = window.getComputedStyle(e.target).cursor;
 
                 if (targetName.includes("icon-add")) {
                     hv = target.parent().attr("class").substr(0, 1);
@@ -363,13 +358,12 @@
                     this.removeField(hv, target);
 
                 } else if (cursorStyle === "default" && targetName === "") {
-                    target = $(e.target).parent();
-                    hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                    target = target.parent();
+                    let hv = target.parent().attr("ids").substr(0, 1);
                     this.drag(e, target, hv, `${hv}Items`, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
                 }
 
             });
-
 
         }
 
