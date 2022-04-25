@@ -343,7 +343,8 @@
                         this.#toggle();
                     } else if (e.target.nodeName.toLowerCase().includes("span")) {
                         // 双击编辑
-                        this.#edit($(e.target));
+                        let hv = $(e.target).parents(".item-wrapper").parent().attr("class").substr(0, 1);
+                        this.#edit(hv, $(e.target));
                     }
                 },
                 "mousedown": (e) => {
@@ -393,8 +394,7 @@
             target.remove();
         }
 
-        #edit(target) {
-            let hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+        #edit(hv, target) {
             let oldText = target[0].innerText;
             let newText;
             let input = $(`<input type='text'/>`).val(oldText);
@@ -403,7 +403,7 @@
                 newText = input.val().trim() === "" ? oldText : input.val().trim();
                 target.html(newText);
                 o?.remove();
-                $(window).off("scroll");
+                $(window).off("mousewheel");
                 if (newText === oldText) return;
                 let index = target.parent().index();
                 hv === "h" ?
@@ -413,8 +413,8 @@
 
             let eventListener = (param, pos) => {
                 pos && input.css(pos);
-                $(window).scroll(() => updateValue(param));
-                return input.select().on({
+                $(window).on("mousewheel", () => updateValue(param));
+                input.select().on({
                     "blur": () => updateValue(param),
                     "keydown": (e) => {
                         e.keyCode === 13 && updateValue(param);
@@ -422,16 +422,15 @@
                 });
             };
 
-            if (hv === 'h') {
+            if (hv === "h") {
                 target.html(input);
                 eventListener();
             } else {
                 let overlayDiv = $(`<div class="overlay"></div>`);
                 overlayDiv.append(input).appendTo($(document.body));
                 let item = target.parent();
-                let position = item[0].getBoundingClientRect();
-                let top = position.top + item.height() / 2 - input.height() / 2;
-                let left = position.left;
+                let {left, top} = item.offset();
+                top = top + item.height() / 2 - input.height() / 2;
                 eventListener(overlayDiv, {top, left});
             }
         }
