@@ -377,24 +377,24 @@
 
         #addDefaultField(hv) {
             let title = "新增字段";
+            let {horz, vert, horz_size: hs, vert_size: vs} = this.#data;
             hv === "h" ?
-                this.#data.horz.push(title) && this.#data.horz_size.push(200)
-                : this.#data.vert.push(title) && this.#data.vert_size.push(200);
+                horz.push(title) && hs.push(200)
+                : vert.push(title) && vs.push(200);
             this.#render(this.#data);
         }
 
         #removeField(hv, target) {
             let index = target.index();
+            let {horz, vert, horz_size: hs, vert_size: vs} = this.#data;
             hv === "h" ?
-                this.#data.horz.splice(index, 1) && this.#data.horz_size.splice(index, 1)
-                : this.#data.vert.splice(index, 1) && this.#data.vert_size.splice(index, 1);
+                horz.splice(index, 1) && hs.splice(index, 1)
+                : vert.splice(index, 1) && vs.splice(index, 1);
             target.remove();
         }
 
         #edit(target) {
-            // 还可优化
-            let currentTag = target;
-            let hv = currentTag.parents(".item-wrapper")
+            let hv = target.parents(".item-wrapper")
                 .parent()[0].className.substr(0, 1);
             let oldText = target[0].innerText;
             let newText;
@@ -402,18 +402,17 @@
 
             let updateValue = (o) => {
                 newText = input.val().trim() === "" ? oldText : input.val().trim();
-                currentTag.html(newText);
+                target.html(newText);
                 o?.remove();
                 if (newText === oldText) return;
                 let index = target.parent().index();
                 hv === "h" ?
                     this.#data.horz[index] = newText :
                     this.#data.vert[index] = newText;
-                console.log(this.#data);
             };
 
             if (hv === 'h') {
-                currentTag.html(input);
+                target.html(input);
                 input.select().on({
                     "blur": () => updateValue(),
                     "keydown": (e) => {
@@ -427,16 +426,16 @@
             } else {
                 let overlayDiv = $(`<div class="overlay"></div>`);
 
-                input.appendTo(overlayDiv);
-                overlayDiv.appendTo($(document.body));
+                overlayDiv.append(input)
+                    .appendTo($(document.body));
 
-                let item = currentTag.parent();
+                let item = target.parent();
                 let position = item[0].getBoundingClientRect();
 
-                input.css({
+                input.select().css({
                     "top": position.top + item.height() / 2 - input.height() / 2,
                     "left": position.left,
-                }).select();
+                });
 
                 overlayDiv.on({
                     "click": () => updateValue(overlayDiv),
@@ -453,24 +452,21 @@
         }
 
         #toggle() {
-            let temp = this.#data.horz;
-            this.#data.horz = this.#data.vert;
-            this.#data.vert = temp;
-            let tempSize = this.#data.horz_size;
-            this.#data.horz_size = this.#data.vert_size;
-            this.#data.vert_size = tempSize;
+            let {horz, vert, horz_size, vert_size} = this.#data;
+            [horz, vert, horz_size, vert_size] = [vert, horz, vert_size, horz_size];
+            this.#data = {horz, vert, horz_size, vert_size};
             this.#render(this.#data);
         }
 
         #updateData(hv) {
+            let {horz, vert, horz_size: hs, vert_size: vs} = this.#data;
             let items = $(`.${hv === "h" ? "horz" : "vert"} .item`);
             items.each((index, item) => {
-                let text = $(item).text().trim();
+                item = $(item);
+                let text = item.text().trim();
                 hv === "h" ?
-                    (this.#data.horz[index] = text) &&
-                    (this.#data.horz_size[index] = parseInt($(item).innerWidth())) :
-                    (this.#data.vert[index] = text) &&
-                    (this.#data.vert_size[index] = parseInt($(item).innerHeight()));
+                    (horz[index] = text) && (hs[index] = parseInt(item.innerWidth())) :
+                    (vert[index] = text) && (vs[index] = parseInt(item.innerHeight()));
             });
         }
 
@@ -604,16 +600,15 @@
         add(hv, data) {
             if (!hv) throw new Error("hv is required");
             if (hv !== "h" && hv !== "v") throw new Error("hv must be h or v");
-            if (!data || !data.title || /^[ ]*$/.test(data.title))
-                throw new Error("title is required");
+            if (!data || !data.title || /^[ ]*$/.test(data.title)) throw new Error("title is required");
+            let {horz, vert, horz_size: hs, vert_size: vs} = this.#data;
+            let {title, size} = data;
             hv === "h" ?
-                this.#data.horz.includes(data.title) ?
-                    console.error("title is exist") :
-                    this.#data.horz.push(data.title) && this.#data.horz_size.push(data.size || 200)
+                horz.includes(title) ? console.error("title is exist") :
+                    horz.push(title) && hs.push(size || 200)
                 :
-                this.#data.vert.includes(data.title) ?
-                    console.error("title is exist") :
-                    this.#data.vert.push(data.title) && this.#data.vert_size.push(data.size || 200);
+                vert.includes(title) ? console.error("title is exist") :
+                    vert.push(title) && vs.push(size || 200);
             this.#render(this.#data);
         }
 
@@ -623,7 +618,7 @@
                     ? hv === "h"
                         ? this.#data.horz
                         : this.#data.vert
-                    : hv === "all" ? this.#data : new Error("参数错误")
+                    : hv === "all" ? this.#data : new Error("parameter must be h or v or all")
                 : {horz: this.#data.horz, vert: this.#data.vert};
         }
 
@@ -642,7 +637,7 @@
 
     // console.log(j.getData());
 
-    // console.log(j.getData("xxx"));
+    console.log(j.getData("xxx"));
     // console.log(j.getData("all"));
     // console.log(j.getData("h"));
     // console.log(j.getData("v"));
