@@ -467,10 +467,10 @@
                     target = $(mutation.target);
                     let index = target.index();
                     if (hv === "h") {
-                        target.innerWidth() <= 55 && target.css({width: "65px"});
+                        target.innerWidth() <= 140 && target.css({width: "140px"});
                         this.#data.horz_size[index] = parseInt(target.innerWidth());
                     } else {
-                        target.innerHeight() <= 55 && target.css({height: "65px"});
+                        target.innerHeight() <= 140 && target.css({height: "140px"});
                         this.#data.vert_size[index] = parseInt(target.innerHeight());
                     }
                 });
@@ -479,7 +479,6 @@
         }
 
         #drag(e, target, hv, item, dragItem, placeholder) {
-
             let range = {x: 0, y: 0};
             let lastPos = {x: 0, y: 0, x1: 0, y1: 0};
             let tarPos = {x: 0, y: 0, x1: 0, y1: 0};
@@ -526,6 +525,10 @@
 
                     if (!choose) return false;
                     if (!move) {
+                        thisDiv.insertBefore(tempDiv)
+                            .css({left: "", top: ""})
+                            .attr("class", "item" + " " + item);
+                        tempDiv.remove();
                         choose = false;
                         return false;
                     }
@@ -589,10 +592,10 @@
             let {title, size} = data;
             hv === "h" ?
                 horz.includes(title) ? console.error("title is exist") :
-                    horz.push(title) && hs.push(size || 200)
+                    horz.push(title) && hs.push(size <= 140 ? 140 : size)
                 :
                 vert.includes(title) ? console.error("title is exist") :
-                    vert.push(title) && vs.push(size || 200);
+                    vert.push(title) && vs.push(size <= 140 ? 140 : size);
             this.#render(this.#data);
         }
 
@@ -616,6 +619,7 @@
     j.add("h", {title: "第aa一个"});
     j.add("h", {title: "第2个", size: 380});
     j.add("h", {title: "第3个", size: 380});
+    // 最小尺寸为:140
     j.add("v", {title: "第2个1", size: 100});
     j.add("v", {title: "第2个", size: 380});
 
