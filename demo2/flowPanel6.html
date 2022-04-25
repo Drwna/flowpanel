@@ -584,10 +584,9 @@
                     thisDiv.addClass("item" + " " + name);
                     thisDiv.removeClass(name2);
                     tempDiv.remove();
+                    move && this.#updateData(hv);
                     move = false;
                     choose = false;
-                    // 拖曳结束后，更新数据
-                    this.#updateData(hv);
                 })
                 .on('mousemove', function (e) {
                     if (!choose) return false;
@@ -608,8 +607,8 @@
                         tarPos.x1 = tarPos.x + tarDiv.width() / 2;
                         tarPos.y1 = tarPos.y + tarDiv.height() / 2;
                         tarFirst = $main.eq(0);
-                        tarFirstX = tarFirst.position().left + thisDivHalfW / 2 + tarFirst.width() / 2;
-                        tarFirstY = tarFirst.position().top + thisDivHalfH / 2 + tarFirst.height() / 2;
+                        tarFirstX = tarFirst.position().left + thisDivHalfW / 2;
+                        tarFirstY = tarFirst.position().top + thisDivHalfH / 2;
 
                         // 根据 拖拽对象x坐标 与 目标元素对象x坐标 对比，来显示 虚线div 在节点前、后出现的位置
                         if (lastPos.x > tarPos.x) {
@@ -635,22 +634,22 @@
 
     }
 
-    let v = new Panel($('.panel'));
+    let j = new Panel($('.panel'));
 
 
-    v.add("h", {title: "第   aa一个", size: 400});
-    v.add("h", {title: "第aa一个"});
-    // v.add("h", {title: "第2个", size: 380});
-    // v.add("h", {title: "第3个", size: 380});
-    v.add("v", {title: "第2个1", size: 100});
-    v.add("v", {title: "第2个", size: 380});
+    j.add("h", {title: "第   aa一个", size: 400});
+    j.add("h", {title: "第aa一个"});
+    j.add("h", {title: "第2个", size: 380});
+    j.add("h", {title: "第3个", size: 380});
+    j.add("v", {title: "第2个1", size: 100});
+    j.add("v", {title: "第2个", size: 380});
 
-    // console.log(v.getData());
+    console.log(j.getData());
 
-    // console.log(v.getData("xxx"));
-    // console.log(v.getData("all"));
-    // console.log(v.getData("h"));
-    // console.log(v.getData("v"));
+    // console.log(j.getData("xxx"));
+    // console.log(j.getData("all"));
+    // console.log(j.getData("h"));
+    // console.log(j.getData("v"));
 </script>
 </body>
 </html>
