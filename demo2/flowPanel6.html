@@ -499,21 +499,19 @@
         }
 
         add(hv, data) {
-            if (hv === "h") {
+            if (!hv) throw new Error("hv is required");
+            if (hv !== "h" && hv !== "v") throw new Error("hv must be h or v");
+            if (!data || !data.title || /^[ ]*$/.test(data.title))
+                throw new Error("title is required");
+            hv === "h" ?
                 this.#data.horz.includes(data.title) ?
-                    console.error("标题有重复") :
-                    this.#data.horz.push(data.title) &&
-                    this.#data.horz_size.push(data.size || 200) &&
-                    this.#render(this.#data);
-            } else if (hv === "v") {
+                    console.error("title is exist") :
+                    this.#data.horz.push(data.title) && this.#data.horz_size.push(data.size || 200)
+                :
                 this.#data.vert.includes(data.title) ?
-                    console.error("标题有重复") :
-                    this.#data.vert.push(data.title) &&
-                    this.#data.vert_size.push(data.size || 200) &&
-                    this.#render(this.#data);
-            } else {
-                throw new Error("hv 参数错误");
-            }
+                    console.error("title is exist") :
+                    this.#data.vert.push(data.title) && this.#data.vert_size.push(data.size || 200);
+            this.#render(this.#data);
         }
 
         getData(hv) {
@@ -638,13 +636,14 @@
 
 
     j.add("h", {title: "第   aa一个", size: 400});
-    j.add("h", {title: "第aa一个"});
-    j.add("h", {title: "第2个", size: 380});
-    j.add("h", {title: "第3个", size: 380});
-    j.add("v", {title: "第2个1", size: 100});
-    j.add("v", {title: "第2个", size: 380});
+    j.add("v", {title: " "});
+    // j.add("h", {title: "第aa一个"});
+    // j.add("h", {title: "第2个", size: 380});
+    // j.add("h", {title: "第3个", size: 380});
+    // j.add("v", {title: "第2个1", size: 100});
+    // j.add("v", {title: "第2个", size: 380});
 
-    console.log(j.getData());
+    // console.log(j.getData());
 
     // console.log(j.getData("xxx"));
     // console.log(j.getData("all"));
