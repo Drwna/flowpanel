@@ -394,8 +394,7 @@
         }
 
         #edit(target) {
-            let hv = target.parents(".item-wrapper")
-                .parent()[0].className.substr(0, 1);
+            let hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
             let oldText = target[0].innerText;
             let newText;
             let input = $(`<input type='text'/>`).val(oldText);
@@ -404,6 +403,7 @@
                 newText = input.val().trim() === "" ? oldText : input.val().trim();
                 target.html(newText);
                 o?.remove();
+                $(window).off("scroll");
                 if (newText === oldText) return;
                 let index = target.parent().index();
                 hv === "h" ?
@@ -411,43 +411,28 @@
                     this.#data.vert[index] = newText;
             };
 
+            let eventListener = (param, pos) => {
+                pos && input.css(pos);
+                $(window).scroll(() => updateValue(param));
+                return input.select().on({
+                    "blur": () => updateValue(param),
+                    "keydown": (e) => {
+                        e.keyCode === 13 && updateValue(param);
+                    }
+                });
+            };
+
             if (hv === 'h') {
                 target.html(input);
-                input.select().on({
-                    "blur": () => updateValue(),
-                    "keydown": (e) => {
-                        e.keyCode === 13 && updateValue();
-                    },
-                });
-                $(window).scroll(() => {
-                    updateValue();
-                    $(window).off("scroll");
-                });
+                eventListener();
             } else {
                 let overlayDiv = $(`<div class="overlay"></div>`);
-
-                overlayDiv.append(input)
-                    .appendTo($(document.body));
-
+                overlayDiv.append(input).appendTo($(document.body));
                 let item = target.parent();
                 let position = item[0].getBoundingClientRect();
-
-                input.select().css({
-                    "top": position.top + item.height() / 2 - input.height() / 2,
-                    "left": position.left,
-                });
-
-                overlayDiv.on({
-                    "click": () => updateValue(overlayDiv),
-                    "keydown": (e) => {
-                        e.keyCode === 13 && updateValue(overlayDiv);
-                    },
-                });
-                $(window).scroll(() => {
-                    // 待解决 滚动时执行了一次
-                    updateValue(overlayDiv);
-                    $(window).off("scroll");
-                });
+                let top = position.top + item.height() / 2 - input.height() / 2;
+                let left = position.left;
+                eventListener(overlayDiv, {top, left});
             }
         }
 
