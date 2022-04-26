@@ -298,7 +298,7 @@
             <div class="panel-wrapper">
                 <i class="toggle fa fa-refresh fa-lg"></i>
                 <div class="horz">
-                    <div class="item-wrapper">
+                    <div ids="hItems" class="item-wrapper">
                         <div jst-for="let i=0; i<horz.length; i++" class="item hItem"
                              style="width: {{horz_size[i]}}px;">
                             <span jst-text="{{horz[i]}}"></span>
@@ -308,7 +308,7 @@
                     <i class="icon-add fa fa-plus-circle fa-lg"></i>
                 </div>
                 <div class="vert">
-                    <div class="item-wrapper">
+                    <div ids="vItems" class="item-wrapper">
                         <div jst-for="let i=0; i<vert.length; i++" class="item vItem"
                              style="height: {{vert_size[i]}}px;">
                             <span jst-text="{{vert[i]}}"></span>
@@ -341,13 +341,35 @@
             this.root.on("click", ".icon-delete", (e) => this.#removeField($(e.target)));
             this.root.on("click", ".icon-add", (e) => this.#addDefaultField($(e.target)));
             this.root.on("mousedown", ".item", (e) => {
-                let cursorStyle = window.getComputedStyle(e.target).cursor;
-                cursorStyle === "auto" && this.#resize($(e.target)[0]);
-            });
+                // resize
+                if ($(e.target).hasClass("item")
+                    && window.getComputedStyle(e.target).cursor === "auto") {
+                    this.#resize(e.target);
+                    return;
+                }
 
-            /* 拖曳
-            this.#drag(e, target, hv, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
-            */
+                let mousePosX = e.pageX, mousePosY = e.pageY;
+                let isDragging = false;
+                let distanceX, distanceY;
+
+                this.root.on("mousemove", (event) => {
+                    // 判断是否在指定元素上移动
+                    if (event.target.tagName.toLowerCase() !== "span") return;
+                    distanceX = Math.abs(event.pageX - mousePosX);
+                    distanceY = Math.abs(event.pageY - mousePosY);
+                    // 判断鼠标是否移动一定距离，如果移动则开始拖曳
+                    if (distanceX > 10 || distanceY > 10) {
+                        isDragging = true;
+                        let hv = $(e.target).parents(".item-wrapper").parents().attr("class").substr(0, 1);
+                        this.#drag(e, hv, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
+                        this.root.off("mousemove");
+                    }
+                });
+                this.root.on("mouseup", () => {
+                    isDragging = false;
+                    this.root.off("mousemove");
+                });
+            });
         }
 
         #addDefaultField(target) {
@@ -456,65 +478,49 @@
             observer.observe(target, config);
         }
 
-        #drag(e, target, hv, item, dragItem, placeholder) {
+        #drag(e, hv, item, dragItem, placeholder) {
             let range = {x: 0, y: 0};
             let lastPos = {x: 0, y: 0, x1: 0, y1: 0};
             let tarPos = {x: 0, y: 0, x1: 0, y1: 0};
-            let thisDiv = null, move = false, choose = false;
+            let move = false, choose = false;
             let thisDivWidth = 0, thisDivHeight = 0,
                 thisDivHalfW = 0, thisDivHalfH = 0,
                 tarFirstX = 0, tarFirstY = 0;
             let tarDiv = null, tarFirst, tempDiv;
             let initPos = {x: 0, y: 0};
+            let target = $(e.target).parent();
+            let size = hv === "h" ? target.outerWidth() : target.outerHeight();
 
-            let flag = false;
-            let stop = null;
+            choose = true;
+            initPos.x = target.position().left;
+            initPos.y = target.position().top;
+            range.x = e.pageX - target.position().left;
+            range.y = e.pageY - target.position().top;
+            thisDivWidth = target.width();
+            thisDivHeight = target.height();
+            thisDivHalfW = thisDivWidth / 2;
+            thisDivHalfH = thisDivHeight / 2;
 
-            clearTimeout(stop);
-            stop = setTimeout(() => {
-                flag = true;
-                let size = hv === "h" ? target.outerWidth() : target.outerHeight();
-                choose = true;
-                thisDiv = target;
-                initPos.x = thisDiv.position().left;
-                initPos.y = thisDiv.position().top;
-                range.x = e.pageX - thisDiv.position().left;
-                range.y = e.pageY - thisDiv.position().top;
-                thisDivWidth = thisDiv.width();
-                thisDivHeight = thisDiv.height();
-                thisDivHalfW = thisDivWidth / 2;
-                thisDivHalfH = thisDivHeight / 2;
-
-                thisDiv.attr("class", dragItem)
-                    .css({left: initPos.x + 'px', top: initPos.y + 'px'});
-                tempDiv = $(`<div class="${placeholder}"></div>`);
-
-                hv === "h" ?
-                    (thisDiv.css({width: size}) && tempDiv.css({width: size}))
-                    : (thisDiv.css({height: size}) && tempDiv.css({height: size}));
-
-                tempDiv.insertBefore(thisDiv);
-
-            }, 200);
+            target.attr("class", dragItem)
+                .css({left: initPos.x + 'px', top: initPos.y + 'px'});
+            tempDiv = $(`<div class="${placeholder}"></div>`);
+            hv === "h" ?
+                (target.css({width: size}) && tempDiv.css({width: size}))
+                : (target.css({height: size}) && tempDiv.css({height: size}));
+            tempDiv.insertBefore(target);
 
             $(document)
                 .on('mouseup', () => {
-                    if (!flag) clearTimeout(stop);
-
                     if (!choose) return false;
-                    if (!move) {
-                        thisDiv.insertBefore(tempDiv)
-                            .css({left: "", top: ""})
-                            .attr("class", "item" + " " + item);
-                        tempDiv.remove();
-                        choose = false;
-                        return false;
-                    }
-                    thisDiv.insertBefore(tempDiv)
+                    target.insertBefore(tempDiv)
                         .css({left: "", top: ""})
                         .attr("class", "item" + " " + item);
                     tempDiv.remove();
-                    move && this.#updateData(hv);
+                    if (!move) {
+                        choose = false;
+                        return false;
+                    }
+                    this.#updateData(hv);
                     move = false;
                     choose = false;
                 })
@@ -526,9 +532,9 @@
                     lastPos.x1 = lastPos.x + thisDivWidth;
                     lastPos.y1 = lastPos.y + thisDivHeight;
 
-                    hv === "h" ? thisDiv.css({"left": lastPos.x,}) : thisDiv.css({"top": lastPos.y});
+                    hv === "h" ? target.css({"left": lastPos.x,}) : target.css({"top": lastPos.y});
 
-                    let $main = $('.' + item);
+                    let $main = $(`.${item}`);
 
                     $main.each(function () {
                         tarDiv = $(this);
@@ -558,7 +564,6 @@
                         }
                     });
                 });
-
 
         }
 
