@@ -32,7 +32,7 @@
             user-select: none;
         }
         .panel .item > span {
-            background-color: yellowgreen;
+            background-color: lightgoldenrodyellow;
             cursor: default;
         }
         .panel .icon-add, .panel .icon-delete {
@@ -594,24 +594,28 @@
 
     }
 
-    let j = new Panel($('.panel'));
+    let JFlow = {
+        panel: (selector) => {
+            return new Panel(selector);
+        }
+    };
 
+    let j = JFlow.panel($('.panel'));
 
-    j.add("h", {title: "第   aa一个", size: 400});
+    j.add("h", {title: "人事部", size: 300});
     // j.add("v", {title: " "});
-    j.add("h", {title: "第aa一个"});
-    j.add("h", {title: "第2个", size: 380});
-    j.add("h", {title: "第3个", size: 380});
+    j.add("h", {title: "行政部"});
+    j.add("h", {title: "开发部", size: 380});
     // 最小尺寸为:140
-    j.add("v", {title: "第2个1", size: 100});
-    j.add("v", {title: "第2个", size: 380});
-
-    // console.log(j.getData());
-
+    j.add("v", {title: "起草", size: 300});
+    j.add("v", {title: "处理", size: 80});
+    //
     console.log(j.getData("xxx"));
-    // console.log(j.getData("all"));
+    console.log(j.getData());
     // console.log(j.getData("h"));
     // console.log(j.getData("v"));
+    // console.log(j.getData("all"));
+
 </script>
 </body>
 </html>
