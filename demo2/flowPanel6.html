@@ -336,47 +336,22 @@
         }
 
         #bindEvent() {
-            this.root.on({
-                "dblclick": (e) => {
-                    if (e.target.className.toLowerCase().includes("toggle")) {
-                        // 双击切换
-                        this.#toggle();
-                    } else if (e.target.nodeName.toLowerCase().includes("span")) {
-                        // 双击编辑
-                        let hv = $(e.target).parents(".item-wrapper").parent().attr("class").substr(0, 1);
-                        this.#edit(hv, $(e.target));
-                    }
-                },
-                "mousedown": (e) => {
-                    e.stopPropagation();
-                    let target = $(e.target);
-                    let targetName = e.target.className.toLowerCase();
-                    let hv;
-                    let cursorStyle = window.getComputedStyle(e.target).cursor;
-
-                    if (targetName.includes("icon-add")) {
-                        hv = target.parent().attr("class").substr(0, 1);
-                        this.#addDefaultField(hv);
-
-                    } else if (targetName.includes("icon-delete")) {
-                        hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
-                        target = target.parent();
-                        this.#removeField(hv, target);
-
-                    } else if (cursorStyle === "default" && targetName === "") {
-                        target = target.parent();
-                        hv = target.parent().parent().attr("class").substr(0, 1);
-                        this.#drag(e, target, hv, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
-
-                    } else if (targetName.includes("item") && cursorStyle === "auto") {
-                        hv = target.parent().parent().attr("class").substr(0, 1);
-                        this.#resize(hv, target[0]);
-                    }
-                }
+            this.root.on("dblclick", ".toggle", () => this.#toggle());
+            this.root.on("dblclick", "span", (e) => this.#edit($(e.target)));
+            this.root.on("click", ".icon-delete", (e) => this.#removeField($(e.target)));
+            this.root.on("click", ".icon-add", (e) => this.#addDefaultField($(e.target)));
+            this.root.on("mousedown", ".item", (e) => {
+                let cursorStyle = window.getComputedStyle(e.target).cursor;
+                cursorStyle === "auto" && this.#resize($(e.target)[0]);
             });
+
+            /* 拖曳
+            this.#drag(e, target, hv, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
+            */
         }
 
-        #addDefaultField(hv) {
+        #addDefaultField(target) {
+            let hv = target.parent().attr("class").substr(0, 1);
             let title = "新增字段";
             let {horz, vert, horz_size: hs, vert_size: vs} = this.#data;
             hv === "h" ?
@@ -385,16 +360,18 @@
             this.#render(this.#data);
         }
 
-        #removeField(hv, target) {
-            let index = target.index();
+        #removeField(target) {
+            let hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
+            let index = target.parent().index();
             let {horz, vert, horz_size: hs, vert_size: vs} = this.#data;
             hv === "h" ?
                 horz.splice(index, 1) && hs.splice(index, 1)
                 : vert.splice(index, 1) && vs.splice(index, 1);
-            target.remove();
+            target.parent().remove();
         }
 
-        #edit(hv, target) {
+        #edit(target) {
+            let hv = target.parents(".item-wrapper").parent().attr("class").substr(0, 1);
             let oldText = target[0].innerText;
             let newText;
             let input = $(`<input type='text'/>`).val(oldText);
@@ -454,7 +431,8 @@
             });
         }
 
-        #resize(hv, target) {
+        #resize(target) {
+            let hv = $(target).parents(".item-wrapper").parent().attr("class").substr(0, 1);
             let config = {
                 attributes: true,
                 attributeFilter: ["style"],
