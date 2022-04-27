@@ -277,6 +277,14 @@
             outline: 1px dashed black;
             background-color: lightblue;
         }
+        .vResizeable {
+            overflow: hidden;
+            resize: vertical;
+        }
+        .hResizeable {
+            overflow: hidden;
+            resize: horizontal;
+        }
     </style>
 </head>
 <body>
@@ -455,6 +463,12 @@
 
         #resize(target) {
             let hv = $(target).parents(".item-wrapper").parent().attr("class").substr(0, 1);
+            let active = hv === "h" ? "hResizeable" : "vResizeable";
+            $(target).addClass(active);
+            this.root.on("mouseup", () => {
+                $(target).removeClass(active);
+                this.root.off("mouseup");
+            });
             let config = {
                 attributes: true,
                 attributeFilter: ["style"],
