@@ -285,6 +285,14 @@
             overflow: hidden;
             resize: horizontal;
         }
+
+        /*拖曳调试代码*/
+        body {
+            margin-top: 80px;
+        }
+        .panel {
+            outline: 3px solid yellowgreen;
+        }
     </style>
 </head>
 <body>
@@ -362,7 +370,10 @@
 
                 this.root.on("mousemove", (event) => {
                     // 判断是否在指定元素上移动
-                    if (event.target.tagName.toLowerCase() !== "span") return;
+                    if (event.target.tagName.toLowerCase() !== "span") {
+                        this.root.off("mousemove mouseup");
+                        return false;
+                    }
                     distanceX = Math.abs(event.pageX - mousePosX);
                     distanceY = Math.abs(event.pageY - mousePosY);
                     // 判断鼠标是否移动一定距离，如果移动则开始拖曳
@@ -372,10 +383,10 @@
                         this.#drag(e, hv, `${hv}Item`, `${hv}DragItem`, `${hv}Placeholder`);
                         this.root.off("mousemove");
                     }
-                });
-                this.root.on("mouseup", () => {
-                    isDragging = false;
-                    this.root.off("mousemove");
+                    this.root.on("mouseup", () => {
+                        isDragging = false;
+                        this.root.off("mousemove");
+                    });
                 });
             });
         }
