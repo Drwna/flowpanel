@@ -54,8 +54,7 @@
         }
 
         .horz {
-            background-color: red;
-            width: calc(100% - var(--panel-size) - 1px);
+            width: calc(100% - var(--panel-size));
             height: var(--panel-size);
             border-bottom: 1px solid black;
             display: flex;
@@ -122,9 +121,7 @@
         }
 
         .vert {
-            /*TODO: height:100% */
-            background-color: red;
-            height: calc(100% - var(--panel-size) - 1px);
+            height: calc(100% - var(--panel-size));
             width: var(--panel-size);
             border-right: 1px solid black;
             display: flex;
@@ -286,10 +283,6 @@
             resize: horizontal;
         }
 
-        /*拖曳调试代码*/
-        body {
-            margin-top: 80px;
-        }
     </style>
 </head>
 <body>
@@ -307,45 +300,51 @@
             vert_size: [],
         };
 
-        #template = $(`
-            <div class="panel-wrapper">
-                <i class="toggle fa fa-refresh fa-lg"></i>
-                <div class="horz">
-                    <div ids="hItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<horz.length; i++" class="item hItem"
-                             style="width: {{horz_size[i]}}px;">
-                            <span jst-text="{{horz[i]}}"></span>
-                            <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-                        </div>
+        #template_toggle = $(`
+            <i class="toggle fa fa-refresh fa-lg"></i>
+        `);
+
+        #template_horz = $(`
+            <div class="horz">
+                <div class="item-wrapper">
+                    <div jst-for="let i=0; i<horz.length; i++" class="item hItem"
+                         style="width: {{horz_size[i]}}px;">
+                        <span jst-text="{{horz[i]}}"></span>
+                        <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                     </div>
-                    <i class="icon-add fa fa-plus-circle fa-lg"></i>
                 </div>
-                <div class="vert">
-                    <div ids="vItems" class="item-wrapper">
-                        <div jst-for="let i=0; i<vert.length; i++" class="item vItem"
-                             style="height: {{vert_size[i]}}px;">
-                            <span jst-text="{{vert[i]}}"></span>
-                            <i class="icon-delete fa fa-minus-circle fa-lg"></i>
-                        </div>
+                <i class="icon-add fa fa-plus-circle fa-lg"></i>
+            </div>
+        `);
+
+        #template_vert = $(`
+            <div class="vert">
+                <div class="item-wrapper">
+                    <div jst-for="let i=0; i<vert.length; i++" class="item vItem"
+                         style="height: {{vert_size[i]}}px;">
+                        <span jst-text="{{vert[i]}}"></span>
+                        <i class="icon-delete fa fa-minus-circle fa-lg"></i>
                     </div>
-                    <i class="icon-add fa fa-plus-circle fa-lg"></i>
                 </div>
+                <i class="icon-add fa fa-plus-circle fa-lg"></i>
             </div>
         `);
 
         constructor(root) {
             this.root = root;
-            this.#init(root, this.#template, this.#data);
+            this.#init(root, this.#data);
         }
 
-        #init(root, template, data) {
-            template.appendTo(root);
+        #init(root, data) {
+            root.append(this.#template_toggle, this.#template_horz, this.#template_vert);
             this.#render(data);
             this.#bindEvent();
         }
 
-        #render(data) {
-            new jst($(".panel-wrapper")[0]).render(data);
+        #render(data, hv) {
+            hv ? hv === "h" ? new jst($(".horz")[0]).render(data)
+                    : new jst($(".vert")[0]).render(data)
+                : new jst($(".panel")[0]).render(data);
         }
 
         #bindEvent() {
@@ -395,7 +394,7 @@
             hv === "h" ?
                 horz.push(title) && hs.push(200)
                 : vert.push(title) && vs.push(200);
-            this.#render(this.#data);
+            this.#render(this.#data, hv);
         }
 
         #removeField(target) {
@@ -598,7 +597,7 @@
                 :
                 vert.includes(title) ? console.error("title is exist") :
                     vert.push(title) && vs.push(size <= 140 ? 140 : size);
-            this.#render(this.#data);
+            this.#render(this.#data, hv);
         }
 
         getData(hv) {
