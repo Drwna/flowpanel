@@ -476,10 +476,7 @@
             let hv = $(target).parents(".item-wrapper").parent().attr("class").substr(0, 1);
             let active = hv === "h" ? "hResizeable" : "vResizeable";
             $(target).addClass(active);
-            this.root.on("mouseup", () => {
-                $(target).removeClass(active);
-                this.root.off("mouseup");
-            });
+            $(document).on("mouseup", () => $(target).removeClass(active));
             let config = {
                 attributes: true,
                 attributeFilter: ["style"],
