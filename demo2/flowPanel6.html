@@ -44,7 +44,8 @@
             height: var(--panel-size);
             line-height: var(--panel-size);
             text-align: center;
-            border: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
             float: left;
             color: grey;
         }
@@ -53,10 +54,9 @@
         }
 
         .horz {
-            width: 1000px;
+            background-color: red;
+            width: calc(100% - var(--panel-size) - 1px);
             height: var(--panel-size);
-            border-top: 1px solid black;
-            border-right: 1px solid black;
             border-bottom: 1px solid black;
             display: flex;
             position: relative;
@@ -122,11 +122,11 @@
         }
 
         .vert {
-            height: 500px;
+            /*TODO: height:100% */
+            background-color: red;
+            height: calc(100% - var(--panel-size) - 1px);
             width: var(--panel-size);
-            border-left: 1px solid black;
             border-right: 1px solid black;
-            border-bottom: 1px solid black;
             display: flex;
             position: relative;
         }
@@ -289,9 +289,6 @@
         /*拖曳调试代码*/
         body {
             margin-top: 80px;
-        }
-        .panel {
-            outline: 3px solid yellowgreen;
         }
     </style>
 </head>
@@ -617,9 +614,7 @@
     }
 
     let JFlow = {
-        panel: (selector) => {
-            return new Panel(selector);
-        }
+        panel: (selector) => new Panel(selector)
     };
 
     let j = JFlow.panel($('.panel'));
